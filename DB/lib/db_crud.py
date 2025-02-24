@@ -1,13 +1,27 @@
-# pymongo와 ObjectId, datetime 모듈을 임포트합니다.
 import pymongo  # MongoDB와의 연결을 위한 라이브러리
 from bson import ObjectId  # MongoDB에서 사용하는 ObjectId를 처리하는 데 사용
 from datetime import datetime  # 현재 날짜와 시간을 다룰 때 사용
+import random
 
 # MongoDB 연결
 client = pymongo.MongoClient("mongodb://spirt:1234@localhost:27017/")  # 로컬 MongoDB 서버에 연결
 db = client["filter_test"]  # 사용할 데이터베이스 'filter_test'에 연결
 asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 print("Database connected")  # 연결 성공 메시지 출력
+
+# **인덱스 생성 (단일 인덱스 추가)**
+# 'file_format'에 대한 단일 인덱스 생성
+asset_collection.create_index([("file_format", pymongo.ASCENDING)])
+
+# 'creator'에 대한 단일 인덱스 생성
+asset_collection.create_index([("creator", pymongo.ASCENDING)])
+
+# 'updated_at'에 대한 단일 인덱스 생성
+asset_collection.create_index([("updated_at", pymongo.DESCENDING)])
+
+# 'downloads'와 'statistics.downloads'는 동일한 의미를 가지므로 하나의 인덱스로 처리 가능
+asset_collection.create_index([("downloads", pymongo.DESCENDING)])
+
 
 # 데이터 삽입 (Create)
 def insert_asset(asset_data):
@@ -46,11 +60,13 @@ def get_assets(filter_conditions=None, sort_by=None, limit=10):
     query = asset_collection.find(query_filter)
     
     if sort_by:
-        # sort_by 값이 주어지면, 해당 필드를 기준으로 내림차순 정렬
+        # sort_by 값이 주어지면, 해당 필드를 기준으로 정렬
+        # 예를 들어 'downloads'라면 다운로드 수 기준으로 내림차순 정렬
         query = query.sort(sort_by, pymongo.DESCENDING)
 
-    # 조회할 자산 수를 limit로 제한하고 리스트로 반환
+    # 조회할 자산 수를 limit으로 제한하고 리스트로 반환
     return list(query.limit(limit))
+
 
 # 특정 자산 조회 (ID로 조회)
 def get_asset_by_id(asset_id):
@@ -93,17 +109,77 @@ def increment_download_count(asset_id):
     """
     자산의 다운로드 수를 증가시킵니다.
     :param asset_id: 다운로드 수를 증가시킬 자산의 ID
-    :return: 수정된 문서의 개수 (다운로드 수가 증가된 자산의 수)
+    :return: 다운로드 수 증가 여부 (True/False)
     """
-    # 자산의 다운로드 수를 1 증가시킴
     result = asset_collection.update_one(
         {"_id": ObjectId(asset_id)},  # 자산 ID로 자산 찾기
-        {"$inc": {"statistics.downloads": 1}},  # 'statistics.downloads' 필드를 1 증가
+        {"$inc": {"statistics.downloads": 1}},  # 다운로드 수 1 증가
     )
-    return result.modified_count  # 다운로드 수가 수정된 자산의 개수 반환
+    return result.modified_count > 0  # 다운로드 수가 증가했으면 True 반환
 
-# 사용 예시 (주석 처리된 코드)
-# filter_conditions = {'file_format': 'OBJ', 'creator_name': 'Jane Smith'}
-# assets = get_assets(filter_conditions=filter_conditions, sort_by="downloads", limit=5)
-# for asset in assets:
-#     print(asset)
+
+# def get_assets_sorted_by_downloads(limit=10, sort_by_downloads=False):
+#     """
+#     자산을 다운로드 수(downloads)를 기준으로 정렬하여 조회합니다.
+#     :limit: 조회할 데이터 수 (기본값은 10)
+#     :sort_by_downloads: 다운로드 순으로 정렬할지 여부
+#     :return: 다운로드 수 기준으로 정렬된 자산 리스트
+#     """
+#     query = asset_collection.find()
+
+#     # 만약 다운로드 수 기준으로 정렬을 원하면 내림차순으로 정렬
+#     if sort_by_downloads:
+#         query = query.sort("downloads", pymongo.DESCENDING)
+#     else:
+#         query = query.sort("name", pymongo.ASCENDING)  # 기본적으로 'name' 기준 오름차순 정렬
+
+#     return list(query.limit(limit))  # 조회할 자산 수를 limit으로 제한
+
+
+"""랜덤 데이터 생성 ㅎ"""
+# 자산 데이터를 생성하는 함수
+# def generate_asset_data():
+#     """
+#     자산 데이터를 생성하는 함수
+#     :return: 자산 데이터 (사전 형태)
+#     """
+#     asset_types = ["3D Model", "Material", "Texture", "HDRI"]
+#     categories = ["Environment", "Character", "Props", "Vehicle", "Weapon", "Architecture", "Others"]
+#     styles = ["Realistic", "Stylized", "Procedural"]
+#     resolutions = ["Low-poly", "Medium-poly", "High-poly"]
+#     file_formats = ["ALL", "SBSAR", "SBS", "FBX", "GLB", "EXR", "HDRI"]
+#     license_types = ["Paid", "Free"]
+#     creator_names = ["John Doe", "Alice Smith", "Bob Johnson", "Eva White", "Charlie Brown", 
+#                      "David Lee", "Mia Garcia", "Liam Scott", "Sophia King", "James Turner"]
+    
+#     asset_data = {
+#         "_id": f"{random.randint(100000000000000000000000000, 999999999999999999999999999)}",  # Random ObjectId-like string
+#         "asset_id": f"{random.randint(1, 1000):03d}",
+#         "name": f"Asset {random.randint(1, 100)}",
+#         "description": f"A description for asset {random.randint(1, 100)}",
+#         "thumbnail_url": f"http://example.com/thumbnail{random.randint(1, 100)}.jpg",
+#         "preview_url": f"http://example.com/preview{random.randint(1, 100)}.jpg",
+#         "asset_type": random.choice(asset_types),
+#         "category": random.choice(categories),
+#         "style": random.choice(styles),
+#         "resolution": random.choice(resolutions),
+#         "file_format": random.choice(file_formats),
+#         "size": f"{random.randint(1, 500)}MB",
+#         "license_type": random.choice(license_types),
+#         "price": random.randint(0, 100),
+#         "creator_id": f"{random.randint(1000, 9999)}",
+#         "creator_name": random.choice(creator_names),  # 랜덤으로 creator_name 선택
+#         "downloads": random.randint(50, 1000),
+#         "created_at": datetime.utcnow(),
+#         "updated_at": datetime.utcnow()
+#     }
+    
+#     return asset_data
+# # 자산 데이터 20개 생성 후 MongoDB에 삽입
+# assets_data = [generate_asset_data() for _ in range(20)]  # 20개 자산 데이터 생성
+
+# # 자산 데이터를 MongoDB에 삽입
+# for asset in assets_data:
+#     insert_asset(asset)  # 자산 데이터를 DB에 삽입
+
+# print("20개의 자산 데이터가 MongoDB에 성공적으로 삽입되었습니다.")
