@@ -117,6 +117,9 @@ def increment_download_count(asset_id):
     )
     return result.modified_count > 0  # 다운로드 수가 증가했으면 True 반환
 
+# 애플리케이션 종료 시 연결 종료
+client.close()
+
 
 # def get_assets_sorted_by_downloads(limit=10, sort_by_downloads=False):
 #     """
