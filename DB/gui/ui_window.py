@@ -1,7 +1,6 @@
 from PySide6 import QtWidgets, QtCore  # PySide6에서 QtWidgets와 QtCore 모듈 가져오기
-from lib.db_crud import *  # 절대 경로로 db_crud 임포트
+from lib.asset_service import AssetService  # AssetService 임포트
 from lib.db_model import CustomTableModel  # 절대 경로로 db_model 임포트
-
 
 class MainWindow(QtWidgets.QMainWindow):
     """
@@ -16,7 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 필터 UI 요소 생성
         self.checkbox_paid = QtWidgets.QCheckBox("Paid License")  # 유료 라이선스 체크박스
         self.checkbox_free = QtWidgets.QCheckBox("Free License")  # 무료 라이선스 체크박스
-        self.checkbox_style = QtWidgets.QCheckBox("style")  # 스타일 체크박스
+        self.checkbox_style = QtWidgets.QCheckBox("Stylized")  # 스타일 체크박스
         self.checkbox_sort_downloads = QtWidgets.QCheckBox("Sort by Downloads")  # 다운로드 순 정렬 체크박스
         self.search_button = QtWidgets.QPushButton("Search")  # 검색 버튼
 
@@ -44,10 +43,15 @@ class MainWindow(QtWidgets.QMainWindow):
         # 검색 버튼 클릭 시 필터 적용 함수 연결
         self.search_button.clicked.connect(self.apply_filter)
 
+        # 테이블 뷰에서 클릭된 자산에 대한 세부 정보 조회 함수 연결
+        self.table_view.clicked.connect(self.on_item_clicked)
+
     @staticmethod
     def create_filter_conditions(filter_dict):
         """
         주어진 딕셔너리를 기반으로 필터 조건을 생성하는 팩토리 메서드
+
+        :filter_dict: 필터 적용의 딕셔너리 자료형
         """
         filter_conditions = {}
         for key, value in filter_dict.items():
@@ -72,13 +76,83 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # 다운로드 순으로 정렬할지 여부 확인
         sort_by_downloads = self.checkbox_sort_downloads.isChecked()
-        # 다운로드 순으로 정렬하려면 'downloads' 필드 기준으로 정렬
         sort_by = "downloads" if sort_by_downloads else None        
-        
-        filter_conditions = self.create_filter_conditions(filter_dict)  # 팩토리 메서드 사용
-        # 필터와 정렬 기준에 맞는 자산 조회
-        assets = get_assets(filter_conditions, sort_by=sort_by, limit=20) 
-        self.model.update_data(assets)  # 조회된 데이터를 테이블 모델에 적용
+
+        filter_conditions = self.create_filter_conditions(filter_dict)
+        print(f"Filter conditions in apply_filter: {filter_conditions}")  # 필터 조건 출력
+
+        # filter_conditions가 None인 경우 빈 딕셔너리로 처리
+        if not filter_conditions:
+            filter_conditions = {}  # 기본적으로 빈 딕셔너리 할당
+
+        assets = AssetService.get_all_assets()  # AssetService를 통해 데이터 조회
+
+        # 데이터 확인
+        if not assets:
+            print("No assets found")  # 데이터가 없는 경우 확인
+        else:
+            print(f"Fetched assets in apply_filter: {assets}")  # 데이터 확인
+
+        self.model.update_data(assets)  # 테이블 데이터 업데이트
+        print(f"Data after update: {self.model.get_data()}")  # 모델 데이터 출력 (디버깅용)
+
+
+    def on_item_clicked(self, index):
+        """
+        자산 ID를 클릭했을 때 자산의 상세 정보를 조회하는 함수
+        """
+        clicked_row = index.row()  # 클릭된 행 번호
+        data_length = len(self.model.get_data())  # 데이터 길이
+
+        # 데이터가 비어있는지 확인
+        if clicked_row < 0 or clicked_row >= data_length:
+            print(f"Invalid row index: {clicked_row}. Data length: {data_length}")
+            return  # 유효하지 않은 인덱스일 경우 처리
+
+        clicked_asset = self.model.get_data()[clicked_row]  # 해당 행의 자산 데이터
+        asset_id = clicked_asset['_id']  # 자산의 고유 ID를 가져옴
+
+        try:
+            # 자산 고유 ID로 세부 정보 조회
+            asset_details = AssetService.get_asset_by_id(asset_id)  # AssetService를 통해 자산 세부 정보 조회
+            self.show_asset_details(asset_details)  # 자산 상세 정보 UI에 표시
+        except ValueError as e:
+            print(f"Error: {e}")  # 오류 메시지 출력
+            # UI에서 오류 메시지를 표시하거나, 사용자에게 알려줄 방법을 추가할 수 있음
+
+    def show_asset_details(self, asset_details):
+        """
+        자산 세부 정보를 표시하는 함수
+        """
+        print(f"Asset details: {asset_details}")  # 디버깅용 로그 추가
+
+        if not asset_details:
+            print("Error: No asset details found.")
+            return  # 자산 세부 정보가 없으면 함수 종료
+
+        details_window = QtWidgets.QWidget()
+        details_window.setWindowTitle("Asset Details")
+        details_layout = QtWidgets.QVBoxLayout()
+
+        # Asset ID 출력
+        asset_id_label = QtWidgets.QLabel(f"Asset ID: {asset_details.get('asset_id', 'N/A')}")
+        details_layout.addWidget(asset_id_label)
+
+        # Asset Type 출력
+        asset_type_label = QtWidgets.QLabel(f"Asset Type: {asset_details.get('asset_type', 'N/A')}")
+        details_layout.addWidget(asset_type_label)
+
+        # Description 출력
+        description_label = QtWidgets.QLabel(f"Description: {asset_details.get('description', 'N/A')}")
+        details_layout.addWidget(description_label)
+
+        # Price 출력
+        price_label = QtWidgets.QLabel(f"Price: {asset_details.get('price', 'N/A')}")
+        details_layout.addWidget(price_label)
+
+        details_window.setLayout(details_layout)
+        details_window.show()
+
 
 
 # Qt 애플리케이션 실행
