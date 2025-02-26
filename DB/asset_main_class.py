@@ -1,14 +1,26 @@
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QTreeWidgetItem, QPushButton, QStyledItemDelegate
-from PySide6.QtCore import QFile, Qt,QRect
-from PySide6.QtGui import QPixmap, QStandardItemModel, QStandardItem, QPixmap,  QPainter, QBrush, QColor
+from PySide6.QtCore import QFile, Qt, Signal
+from PySide6.QtGui import QPixmap, QPixmap,  QPainter, QBrush, QColor
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QSizePolicy, QAbstractScrollArea,QVBoxLayout
+from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
 from functools import partial
 
 import sys
 
+class ClickableLabel(QLabel):
+    clicked = Signal()  # 클릭 시그널 생성
+
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            print(f" {self.text()} 라벨이 클릭되었습니다!")  # 클릭된 라벨 텍스트 출력
+            self.clicked.emit()  # 클릭 이벤트 발생
+
 
 class MainUi(QMainWindow):
+    clicked = Signal()
     def __init__(self):
         super().__init__()
         self.load_ui()
@@ -20,6 +32,7 @@ class MainUi(QMainWindow):
         self.table_widget()
         self.connect_tree_signals()
         self.search()
+
         
         
     def search(self):
@@ -210,7 +223,9 @@ class MainUi(QMainWindow):
             self.add_thumbnail(row_index, col_index, asset["thumbnail"])
 
         
-
+    def on_label_clicked(self, label_name):
+        """라벨 클릭 이벤트 발생 시 실행"""
+        print(f"🔹 {label_name} 라벨이 클릭되었습니다!")
 
 
     def add_thumbnail(self, row, col, thumbnail_path):
@@ -220,9 +235,13 @@ class MainUi(QMainWindow):
         layout.setContentsMargins(0, 0, 0, 10)  # 여백 제거
         layout.setAlignment(Qt.AlignTop)
 
-        Thum = QLabel()
-        name = QLabel()
-        type = QLabel()
+        Thum = ClickableLabel("썸네일", parent=widget)
+        name = ClickableLabel("이름", parent=widget)
+        type = ClickableLabel("타입", parent=widget)
+
+        Thum.clicked.connect(lambda: self.on_label_clicked("썸네일"))
+        name.clicked.connect(lambda: self.on_label_clicked("이름"))
+        type.clicked.connect(lambda: self.on_label_clicked("타입"))
 
         layout.addWidget(Thum)
         layout.addWidget(name)
