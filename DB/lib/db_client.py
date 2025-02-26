@@ -18,7 +18,7 @@ class MongoDBClient:
                 if cls._client is None:  # 이중 검사 (double-checked locking)
                     try:
                         # 커넥션 풀의 최대, 최소 연결 수를 지정함(메모리 절약을 위한 것임)
-                        cls._client = pymongo.MongoClient("mongodb://spirt:1234@localhost:27017/", maxPoolSize=50, minPoolSize=5)
+                        cls._client = pymongo.MongoClient("mongodb://192.168.5.19:27017/", maxPoolSize=50, minPoolSize=5)
                         print("MongoDB client created and connected successfully.")
                     except ConnectionFailure as e:
                         print(f"MongoDB connection failed: {e}")
