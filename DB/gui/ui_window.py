@@ -79,22 +79,23 @@ class MainWindow(QtWidgets.QMainWindow):
         sort_by = "downloads" if sort_by_downloads else None        
 
         filter_conditions = self.create_filter_conditions(filter_dict)
-        print(f"Filter conditions in apply_filter: {filter_conditions}")  # 필터 조건 출력
+        print(f"Filter conditions in apply_filter: {filter_conditions}")  # ✅ 필터 조건 확인
 
-        # filter_conditions가 None인 경우 빈 딕셔너리로 처리
         if not filter_conditions:
             filter_conditions = {}  # 기본적으로 빈 딕셔너리 할당
 
-        assets = AssetService.get_all_assets()  # AssetService를 통해 데이터 조회
+        # 🚀 필터를 적용해서 데이터 가져오기
+        assets = AssetService.get_all_assets(filter_conditions=filter_conditions, sort_by=sort_by)  # ✅ 필터 반영
 
         # 데이터 확인
         if not assets:
             print("No assets found")  # 데이터가 없는 경우 확인
         else:
-            print(f"Fetched assets in apply_filter: {assets}")  # 데이터 확인
+            print(f"Fetched assets in apply_filter: {assets}")  # ✅ 필터링된 데이터 확인
 
-        self.model.update_data(assets)  # 테이블 데이터 업데이트
-        print(f"Data after update: {self.model.get_data()}")  # 모델 데이터 출력 (디버깅용)
+        self.model.update_data(assets)  # ✅ UI 테이블 데이터 업데이트
+        print(f"Data after update: {self.model.get_data()}")  # ✅ 디버깅용 데이터 출력
+
 
 
     def on_item_clicked(self, index):

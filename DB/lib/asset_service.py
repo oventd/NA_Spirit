@@ -7,14 +7,19 @@ class AssetService:
     """
 
     @staticmethod
-    def get_all_assets(filter_conditions=None, sort_by=None, limit=10):
+    def get_all_assets(filter_conditions=None, sort_by=None, limit=5, skip=0):
         """
-        모든 자산 데이터를 MongoDB에서 가져옴.
-        - db_crud.py의 get_all_assets() 호출
+        모든 자산 데이터를 MongoDB에서 가져옴. 무한 스크롤을 지원.
+        - db_crud.py의 get_assets() 호출
         - 데이터를 UI에서 쉽게 사용 가능하도록 리스트로 변환
+        :param filter_conditions: 필터 조건 (기본값은 None, 모든 자산 조회)
+        :param sort_by: 정렬 기준 (기본값은 None, 정렬하지 않음)
+        :param limit: 조회할 데이터 수 (기본값은 5)
+        :param skip: 건너뛸 데이터 수 (기본값은 0, 첫 번째 페이지)
+        :return: 조회된 자산 리스트
         """
         asset_manager = Crud()  # Asset 클래스의 인스턴스를 생성
-        return asset_manager.get_assets(filter_conditions=filter_conditions, sort_by=sort_by, limit=limit)
+        return asset_manager.get_assets(filter_conditions=filter_conditions, sort_by=sort_by, limit=limit, skip=skip)
 
     @staticmethod
     def get_asset_by_id(asset_id):

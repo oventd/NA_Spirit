@@ -28,37 +28,49 @@ class Crud:
         return str(result.inserted_id)  # 삽입된 자산의 고유 ID를 반환
 
     # 데이터 조회 (필터 조건에 맞는 자산 리스트 반환)
-    def get_assets(self, filter_conditions=None, sort_by=None, limit=10):
+    """
+    find()는 필터링 된 모든 문서를 가져온 후 limit를 적용하기에 효율성 저하
+    aggregate()는 필터링 후 정렬하고, limit를 사용해서 메모리 사용을 줄인다.
+    """
+    def get_assets(self, filter_conditions=None, sort_by=None, limit=20, skip=0):
         """
         필터 조건에 맞는 자산들을 조회합니다.
         :param filter_conditions: 필터 조건 (기본값은 None, 모든 자산 조회)
         :param sort_by: 정렬 기준 (기본값은 None, 정렬하지 않음)
-        :param limit: 조회할 데이터 수 (기본값은 10)
+        :param limit: 조회할 데이터 수 (기본값은 20)
+        :param skip: 건너뛸 데이터 수 (기본값은 0)
         :return: 조회된 자산 리스트
         """
         if filter_conditions is None:
-            filter_conditions = {}  # filter_conditions가 None일 경우 빈 딕셔너리로 설정
+            filter_conditions = {}
 
         query_filter = {}
         for key, value in filter_conditions.items():
             if isinstance(value, list):
-                query_filter[key] = {"$in": value}  # 리스트 값일 경우 $in 조건
+                query_filter[key] = {"$in": value}
             else:
-                query_filter[key] = value  # 일반 값 처리
+                query_filter[key] = value
 
-        query = self.asset_collection.find(query_filter, {
-            "name": 1,
-            "preview_url": 1,
-            "thumbnail_url": 1,
-            "asset_type": 1,
-            "_id": 1  # _id 필드도 반환
-        })
+        pipeline = [
+            {"$match": query_filter},  # 🔹 필터 적용
+            {"$skip": skip},  # 🔹 건너뛰기 (skip 값 적용)
+            {"$limit": limit},  # 🔹 필요한 개수만 남기기
+            {"$project": {  # 🔹 필요한 필드만 선택
+                "name": 1,
+                "preview_url": 1,
+                "thumbnail_url": 1,
+                "asset_type": 1,
+                "_id": 1
+            }},
+            {"$sort": {sort_by: pymongo.DESCENDING}} if sort_by else None  # 🔹 정렬 (필요한 경우)
+        ]
+        
+        # None 값 제거 (sort_by가 없으면 해당 단계 삭제)
+        pipeline = [step for step in pipeline if step]
 
-        if sort_by:
-            query = query.sort(sort_by, pymongo.DESCENDING)  # sort_by 기준으로 내림차순 정렬
-
-        res = list(query.limit(limit))
+        res = list(self.asset_collection.aggregate(pipeline))
         return res
+
 
     # 세부 데이터 조회 (필터 조건에 맞는 자산 리스트 반환)
     def get_asset_by_id(self, asset_id):
