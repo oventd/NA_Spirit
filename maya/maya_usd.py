@@ -101,3 +101,4 @@ class USD_UI:
             os.makedirs(publish_dir)
         assets = cmds.ls(assemblies=True)
         cmds.mayaUSDExport(file=self.publish_path, exportRoots=assets)
+
