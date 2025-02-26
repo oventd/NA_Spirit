@@ -9,12 +9,15 @@ class MongoDBClient:
 
     @classmethod
     def get_client(cls):
-        """MongoDB 클라이언트를 싱글턴 방식으로 반환"""
-        # 이미 클라이언트가 존재하면 재사용
+        """
+        MongoDB 클라이언트를 싱글턴 방식으로 반환
+        이미 클라이언트가 존재하면 재사용
+        """
         if cls._client is None:
             with cls._lock:  # 멀티스레드 환경에서의 동시 접근을 방지
                 if cls._client is None:  # 이중 검사 (double-checked locking)
                     try:
+                        # 커넥션 풀의 최대, 최소 연결 수를 지정함(메모리 절약을 위한 것임)
                         cls._client = pymongo.MongoClient("mongodb://spirt:1234@localhost:27017/", maxPoolSize=50, minPoolSize=5)
                         print("MongoDB client created and connected successfully.")
                     except ConnectionFailure as e:

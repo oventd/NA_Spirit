@@ -24,3 +24,36 @@ class AssetService:
         """
         asset_manager = Crud()  # Asset 클래스의 인스턴스를 생성
         return asset_manager.get_asset_by_id(asset_id)
+    
+    @staticmethod
+    def create_asset(asset_data):
+        """
+        새로운 자산 데이터를 생성하여 DB에 추가합니다.
+        :param asset_data: 자산 데이터
+        :return: 추가된 자산의 ID
+        """
+        asset_manager = Crud()  # Crud 클래스의 인스턴스를 생성
+        return asset_manager.insert_asset(asset_data)  # 자산 데이터를 DB에 삽입
+    
+    @staticmethod
+    def update_asset(asset_id, update_data):
+        """
+        자산 데이터를 업데이트합니다.
+        :param asset_id: 수정할 자산 ID
+        :param update_data: 수정할 데이터
+        :return: 업데이트 성공 여부
+        """
+        asset_manager = Crud()  # Crud 클래스의 인스턴스를 생성
+        return asset_manager.update_asset(asset_id, update_data)  # 자산 데이터 업데이트
+    
+    @staticmethod
+    def delete_asset(asset_id):
+        """
+        자산 데이터를 삭제합니다.
+        :param asset_id: 삭제할 자산 ID
+        :return: 삭제 성공 여부
+        """
+        asset_manager = Crud()  # Crud 클래스의 인스턴스를 생성
+        return asset_manager.delete_asset(asset_id)  # 자산 삭제
+
+

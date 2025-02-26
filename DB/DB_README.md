@@ -17,5 +17,5 @@
 3. asset_service.py : UI와 DB 간의 중간 계층 역할 -> UI가 직접 DB 로직을 호출하지 않게
 4. db_client.py : MongoDB와의 연결 관리
 5. db_crud.py : MongoDB에 대한 CRUD(Create, Read, Update, Delete) 연산을 처리
-6. db_model.py : MongoDB 데이터를 테이블로 표시하는 모델
+6. db_model.py : MongoDB 데이터를 테이블로 표시하는 모델 -> UI에서 데이터를 모델로 변환하여 **QTableView**에 표시하는 역할
 

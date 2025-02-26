@@ -125,7 +125,7 @@ class Crud:
         """
         result = self.asset_collection.update_one(
             {"_id": ObjectId(asset_id)},
-            {"$inc": {"statistics.downloads": 1}},
+            {"$inc": {"downloads": 1}},
         )
         return result.modified_count > 0  # 다운로드 수가 증가했으면 True 반환
 
