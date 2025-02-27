@@ -486,7 +486,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::FocusPolicy::NoFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">background: #080808;
@@ -494,22 +494,22 @@
 </string>
     </property>
     <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOn</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
     <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
     </property>
     <property name="autoScroll">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="autoScrollMargin">
      <number>0</number>
     </property>
     <property name="textElideMode">
-     <enum>Qt::ElideRight</enum>
+     <enum>Qt::TextElideMode::ElideRight</enum>
     </property>
     <property name="showGrid">
      <bool>true</bool>
@@ -547,9 +547,6 @@
        <family>Pretendard</family>
       </font>
      </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
-     </property>
     </column>
     <column>
      <property name="text">
@@ -560,9 +557,6 @@
        <family>Pretendard</family>
       </font>
      </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
-     </property>
     </column>
     <column>
      <property name="text">
@@ -572,9 +566,6 @@
       <font>
        <family>Pretendard</family>
       </font>
-     </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
      </property>
     </column>
     <column/>
@@ -704,10 +695,10 @@ color:#ffffff;
 </string>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
+     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::NoSelection</enum>
+     <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
     </property>
     <property name="indentation">
      <number>10</number>
@@ -973,11 +964,26 @@ color:#ffffff;
      </font>
     </property>
     <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
+     <enum>Qt::LayoutDirection::LeftToRight</enum>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
     </property>
+   </widget>
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>0</y>
+      <width>471</width>
+      <height>851</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::StyledPanel</enum>
+    </property>
+    <widget class="QWidget" name="page_3"/>
+    <widget class="QWidget" name="page_4"/>
    </widget>
    <zorder>label</zorder>
    <zorder>user_num</zorder>
@@ -987,6 +993,7 @@ color:#ffffff;
    <zorder>toggle_btn</zorder>
    <zorder>toggle_btn_touch_area</zorder>
    <zorder>search</zorder>
+   <zorder>stackedWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -994,7 +1001,7 @@ color:#ffffff;
      <x>0</x>
      <y>0</y>
      <width>1250</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>

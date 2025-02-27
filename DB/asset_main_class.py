@@ -1,12 +1,16 @@
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QTreeWidgetItem, QPushButton, QStyledItemDelegate
-from PySide6.QtCore import QFile, Qt, Signal
+from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject
 from PySide6.QtGui import QPixmap, QPixmap,  QPainter, QBrush, QColor
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
 
 from lib.asset_service import AssetService  # AssetService 임포트
 from lib.db_model import CustomTableModel  # 절대 경로로 db_model 임포트
+import pymongo  # MongoDB 작업을 위한 라이브러리
 
+# MongoDB 연결
+client = pymongo.MongoClient("mongodb://192.168.5.19:27017/")  # 로컬 MongoDB 서버에 연결
+db = client["filter_test"]  # 사용할 데이터베이스 'filter_test'에 연결
 
 import sys
 
@@ -19,6 +23,18 @@ class ClickableLabel(QLabel):
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.clicked.emit()  # 클릭 이벤트 발생
+
+class ClickOutsideFilter(QObject):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stackedWidget = self.ui.stackedWidget  # 감지할 QStackedWidget
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.MouseButtonPress:
+            if not self.stackedWidget.geometry().contains(event.globalPosition().toPoint()):
+                self.stackedWidget.hide()  # 외부 클릭 시 닫기
+        return super().eventFilter(obj, event)
+
 
 
 class MainUi(QMainWindow):
@@ -34,44 +50,14 @@ class MainUi(QMainWindow):
         self.table_widget()
         self.connect_tree_signals()
         self.search()
-        self.asset_sort()
+        self.ui.stackedWidget.setStyleSheet("background-color: #181818;")
+        self.ui.stackedWidget.hide()
+        self.sub_bar = False
+        
+        
+      
 
-    def apply_filter(self):
-        """
-        체크된 값만 필터 조건에 추가하여 MongoDB에서 데이터 조회
-        """
-        filter_dict = {}
-
-        if self.checkbox_paid.isChecked():
-            filter_dict.setdefault("license_type", []).append("Paid")
-        if self.checkbox_free.isChecked():
-            filter_dict.setdefault("license_type", []).append("Free")
-        if self.checkbox_style.isChecked():
-            filter_dict.setdefault("style", []).append("Stylized")
-
-        # 다운로드 순으로 정렬할지 여부 확인
-        sort_by_downloads = self.checkbox_sort_downloads.isChecked()
-        sort_by = "downloads" if sort_by_downloads else None        
-
-        filter_conditions = self.create_filter_conditions(filter_dict)
-        print(f"Filter conditions in apply_filter: {filter_conditions}")  # ✅ 필터 조건 확인
-
-        if not filter_conditions:
-            filter_conditions = {}  # 기본적으로 빈 딕셔너리 할당
-
-        # 🚀 필터를 적용해서 데이터 가져오기
-        assets = AssetService.get_all_assets(filter_conditions=filter_conditions, sort_by=sort_by)  # ✅ 필터 반영
-
-        # 데이터 확인
-        if not assets:
-            print("No assets found")  # 데이터가 없는 경우 확인
-        else:
-            print(f"Fetched assets in apply_filter: {assets}")  # ✅ 필터링된 데이터 확인
-
-        self.model.update_data(assets)  # ✅ UI 테이블 데이터 업데이트
-        print(f"Data after update: {self.model.get_data()}")  # ✅ 디버깅용 데이터 출력
-
-   
+    
         
     def search(self):
         search_input =self. ui.search
@@ -180,69 +166,14 @@ class MainUi(QMainWindow):
 
 
     def table_widget(self):
+
+       
+        asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
+
+        asset = list(asset_collection.find({}, {"asset_id": 1, "preview_url": 1, "name": 1, "category":1, "_id": 0}))
+        len_asset =len(asset)
         
-        assets = [
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"},
-            {"thumbnail": "./source/asset_sum/thumbnail_abyssal_pipes_column_trim_default.png"}
-        ]
+
 
 
 
@@ -250,28 +181,32 @@ class MainUi(QMainWindow):
         self.ui.tableWidget.verticalHeader().setVisible(False)  # 행(세로) 헤더 숨기기
 
         max_columns = 5  # 한 줄에 최대 5개 배치
-        rows = (len(assets) / max_columns +1)   # 행 개수 계산
+
+        rows = (len_asset / max_columns +1)   # 행 개수 계산
 
         self.ui.tableWidget.setRowCount(rows)  # 행 개수 설정
         self.ui.tableWidget.setColumnCount(max_columns)  # 열 개수 설정
 
-        for index, asset in enumerate(assets):
+        for index, asset in enumerate(asset):
             row_index = index // max_columns  # index 항목이 몇 번째 행(row)에 있는 정의
             col_index = index % max_columns   # 나머지를 통해 몇번째 열에 있는지 정의
-            self.add_thumbnail(row_index, col_index, asset["thumbnail"])
+            self.add_thumbnail(row_index, col_index, asset["preview_url"], asset["name"], asset["category"])
 
-        
+    
     def on_label_clicked(self, label_name):
         """라벨 클릭 이벤트 발생 시 실행"""
-        print(f"🔹 {label_name} 라벨이 클릭되었습니다!")
+        print(f" {label_name} 라벨이 클릭되었습니다!")
+        self.ui.stackedWidget.show()
+      
 
-
-    def add_thumbnail(self, row, col, thumbnail_path):
+    def add_thumbnail(self, row, col, thumbnail_path, asset_name, aseet_type):
 
         widget = QWidget()  # 셀 안에 넣을 위젯 생성
         layout = QVBoxLayout()  # 세로 정렬을 위한 레이아웃 생성
         layout.setContentsMargins(0, 0, 0, 10)  # 여백 제거
         layout.setAlignment(Qt.AlignTop)
+
+ 
 
         Thum = ClickableLabel("썸네일", parent=widget)
         name = ClickableLabel("이름", parent=widget)
@@ -302,9 +237,9 @@ class MainUi(QMainWindow):
         
 
  
-        name.setText("name")
+        name.setText(asset_name)
         name.setAlignment(Qt.AlignCenter)
-        type.setText("type")
+        type.setText(aseet_type)
 
         name.setStyleSheet("""
             color: white;                 /* 글자 색상 */
