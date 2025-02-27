@@ -3,7 +3,10 @@ from PySide6.QtCore import QFile, Qt, Signal
 from PySide6.QtGui import QPixmap, QPixmap,  QPainter, QBrush, QColor
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
-from functools import partial
+
+from lib.asset_service import AssetService  # AssetService 임포트
+from lib.db_model import CustomTableModel  # 절대 경로로 db_model 임포트
+
 
 import sys
 
@@ -15,7 +18,6 @@ class ClickableLabel(QLabel):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            print(f" {self.text()} 라벨이 클릭되었습니다!")  # 클릭된 라벨 텍스트 출력
             self.clicked.emit()  # 클릭 이벤트 발생
 
 
@@ -32,8 +34,44 @@ class MainUi(QMainWindow):
         self.table_widget()
         self.connect_tree_signals()
         self.search()
+        self.asset_sort()
 
-        
+    def apply_filter(self):
+        """
+        체크된 값만 필터 조건에 추가하여 MongoDB에서 데이터 조회
+        """
+        filter_dict = {}
+
+        if self.checkbox_paid.isChecked():
+            filter_dict.setdefault("license_type", []).append("Paid")
+        if self.checkbox_free.isChecked():
+            filter_dict.setdefault("license_type", []).append("Free")
+        if self.checkbox_style.isChecked():
+            filter_dict.setdefault("style", []).append("Stylized")
+
+        # 다운로드 순으로 정렬할지 여부 확인
+        sort_by_downloads = self.checkbox_sort_downloads.isChecked()
+        sort_by = "downloads" if sort_by_downloads else None        
+
+        filter_conditions = self.create_filter_conditions(filter_dict)
+        print(f"Filter conditions in apply_filter: {filter_conditions}")  # ✅ 필터 조건 확인
+
+        if not filter_conditions:
+            filter_conditions = {}  # 기본적으로 빈 딕셔너리 할당
+
+        # 🚀 필터를 적용해서 데이터 가져오기
+        assets = AssetService.get_all_assets(filter_conditions=filter_conditions, sort_by=sort_by)  # ✅ 필터 반영
+
+        # 데이터 확인
+        if not assets:
+            print("No assets found")  # 데이터가 없는 경우 확인
+        else:
+            print(f"Fetched assets in apply_filter: {assets}")  # ✅ 필터링된 데이터 확인
+
+        self.model.update_data(assets)  # ✅ UI 테이블 데이터 업데이트
+        print(f"Data after update: {self.model.get_data()}")  # ✅ 디버깅용 데이터 출력
+
+   
         
     def search(self):
         search_input =self. ui.search
