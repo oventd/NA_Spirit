@@ -53,16 +53,18 @@ class CustomTableModel(QtCore.QAbstractTableModel):
         데이터를 반환하는 메서드 수정
         """
         return self.user_data  # user_data를 반환하도록 수정
+    
+    
 
-    # def on_item_clicked(self, index):
-    #     """
-    #     사용자가 테이블에서 항목을 클릭했을 때 호출되는 함수
-    #     :param index: 클릭된 셀의 인덱스
-    #     """
-    #     clicked_row = index.row()  # 클릭된 행 번호
-    #     if clicked_row >= 0:
-    #         clicked_asset = self.user_data[clicked_row]  # 해당 행의 자산 데이터
-    #         asset_id = clicked_asset["_id"]  # _id를 통해 자산 식별
-    #         asset_details = get_asset_by_id(asset_id)  # 자산 세부 정보 조회
-    #         print(asset_details)  # 예시: 세부 정보를 출력
+#     # def on_item_clicked(self, index):
+#     #     """
+#     #     사용자가 테이블에서 항목을 클릭했을 때 호출되는 함수
+#     #     :param index: 클릭된 셀의 인덱스
+#     #     """
+#     #     clicked_row = index.row()  # 클릭된 행 번호
+#     #     if clicked_row >= 0:
+#     #         clicked_asset = self.user_data[clicked_row]  # 해당 행의 자산 데이터
+#     #         asset_id = clicked_asset["_id"]  # _id를 통해 자산 식별
+#     #         asset_details = find_one(asset_id)  # 자산 세부 정보 조회
+#     #         print(asset_details)  # 예시: 세부 정보를 출력
 
