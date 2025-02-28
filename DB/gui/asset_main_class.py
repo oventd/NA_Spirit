@@ -3,28 +3,38 @@ from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject
 from PySide6.QtGui import QPixmap, QPixmap,  QPainter, QBrush, QColor
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
-
-from lib.asset_service import AssetService  # AssetService 임포트
-from lib.asset_service import ClickableLabel 
 import sys
+import os
+# 현재 파일(ui.py)의 절대 경로
+current_file_path = os.path.abspath(__file__)
+
+# 'NA_Spirit' 폴더의 최상위 경로 찾기
+na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
+
+# 모든 하위 폴더를 sys.path에 추가
+for root, dirs, files in os.walk(na_spirit_dir):
+    if '__pycache__' not in root:  # __pycache__ 폴더는 제외
+        sys.path.append(root)
+
+from asset_service import AssetService  # AssetService 임포트
+from asset_service import ClickableLabel 
 
 from PySide6.QtCore import QObject, QEvent, Qt
-
-
 
 class MainUi(QMainWindow):
     clicked = Signal()
     def __init__(self):
         super().__init__()
         self.load_ui()
+
         self.tree_widget()
         self.main_ui_setting()
         self.user_num()
         self.ui.treeWidget.expandAll()
-        self.setup_tree()
-        self.table_widget(None,"updated_at", 50, 0)
+        self.add_tree_checkbox()
+        self.table_widget(None,"updated_at", 50, 0) # 리뷰 이거 상수로 바꿔주세요
         self.connect_tree_signals()
-        self.search()
+        self.set_search_area_design()
         self.ui.exit_btn.clicked.connect(self.exit_sub_win)
 
 
@@ -49,7 +59,7 @@ class MainUi(QMainWindow):
                 traverse_tree(child)  #  자식 항목이 있을 경우 재귀적으로 탐색
 
 
-        traverse_tree(root)  # ✅ 트리 탐색 시작
+        traverse_tree(root)  # 트리 탐색 시작
 
         
         return checked_items
@@ -57,7 +67,7 @@ class MainUi(QMainWindow):
 
         
         
-    def search(self):
+    def set_search_area_design(self):
         search_input =self. ui.search
         search_input.setPlaceholderText("검색하기") 
         search_input.setStyleSheet("""
@@ -71,24 +81,24 @@ class MainUi(QMainWindow):
         }
     """)
 
-
-
     def main_ui_setting(self):
+
         """
         메인 UI 설정
         - 토글 버튼의 toggle의 디폴트 상태를 인스턴스 변수로 정의한다.
         - 토글 버튼에 토글 이미지를 설정/ 디폴트 이미지는 toggle_open.png
         - 메인 ui의 이미지 bg.png 배경으로 설정
         """
+
         self.like_active =False
-        self.toggle_open =QPixmap("./source/toggle_open.png")
-        self.toggle_like = QPixmap("./source/toggle_like.png")
+        self.toggle_open =QPixmap("/nas/spirit/asset_project/source/toggle_open.png")
+        self.toggle_like = QPixmap("/nas/spirit/asset_project/source/toggle_like.png")
     
         self.ui.toggle_btn.setPixmap(self.toggle_open) 
-        bg =QPixmap("./source/bg.png")
+        bg =QPixmap("/nas/spirit/asset_project/source/bg.png")
         self.ui.label.setPixmap(bg)
 
-        self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_chage) # 토글 버튼 토글 이벤트
+        self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
 
         #사이드 바 기본 설정 
         self.ui.stackedWidget.setStyleSheet("background-color: #181818;")
@@ -96,9 +106,7 @@ class MainUi(QMainWindow):
         self.filter=self.ui.treeWidget.itemClicked.connect(self.get_checked_items)
         
 
-
-
-    def toggle_chage(self):
+    def toggle_change(self): # 리뷰 오타
         """
         토글 버튼 토글 이벤트
         - 토글 버튼의 toggle의 현재 상태에 따른 이미지 변경
@@ -115,7 +123,7 @@ class MainUi(QMainWindow):
         
 
 
-    def setup_tree(self):
+    def add_tree_checkbox(self): # 리뷰 메서드 이름  , 변수명
         """기존 트리 위젯에 체크박스를 추가 (부모 제외, 자식만 추가)"""
         root = self.ui.treeWidget.invisibleRootItem()  # 트리 위젯의 최상위 항목(root item)을 반환하는 treeWidget 객체의 메서드
 
@@ -129,7 +137,7 @@ class MainUi(QMainWindow):
                 child.setCheckState(0, Qt.Unchecked) #
 
 
-    def tree_widget(self):
+    def tree_widget(self): # 리뷰 메서드 이름
         """
         트리 위젯 스타일 시트 설정
         
@@ -153,13 +161,13 @@ class MainUi(QMainWindow):
             """)
         
         
-    def connect_tree_signals(self):
+    def connect_tree_signals(self): # 한줄 할거면 왜 구현? 모으면서 지워주세요 심지어 커넥트임 
         
         """기존 트리 항목에 클릭 시 체크박스를 토글하는 이벤트 연결"""
         self.ui.treeWidget.itemClicked.connect(self.toggle_checkbox)
 
       
-    def toggle_checkbox(self, item, column):
+    def toggle_checkbox(self, item, column): 
         """트리 항목 클릭 시 체크 상태 토글"""
         if item.flags() & Qt.ItemIsUserCheckable:  # 체크박스가 있는 항목인지 확인
             current_state = item.checkState(column)
@@ -170,9 +178,11 @@ class MainUi(QMainWindow):
 
 
     def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0):
-        asset = AssetService()
+        # 리뷰 이거 셀프로 init에 구현 이거 근데 저장하는 변수명이 쫌...... 
+        # 리뷰 static밖에 없는데 왜 객체 생성????
+        
        
-        asset = list(asset.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+        asset = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
         len_asset =len(asset)
 
         #"file_format", "updated_at", "downloads" << 가지고 있는 정렬 기준
@@ -192,33 +202,52 @@ class MainUi(QMainWindow):
         for index, asset in enumerate(asset):
             row_index = index // max_columns  # index 항목이 몇 번째 행(row)에 있는 정의
             col_index = index % max_columns   # 나머지를 통해 몇번째 열에 있는지 정의
-            self.add_thumbnail(row_index, col_index, asset["preview_url"], asset["name"], asset["category"])
+            self.add_thumbnail(row_index, col_index, asset)
 
     
-    def on_label_clicked(self, label_name):
+    def on_label_clicked(self, asset,thum_path, asset_name, aseet_type ):
         """라벨 클릭 이벤트 발생 시 실행"""
-        print(f" {label_name} 라벨이 클릭되었습니다!")
-    
-        self.ui.stackedWidget.show()
-        
-      
 
-    def add_thumbnail(self, row, col, thumbnail_path, asset_name, aseet_type):
+        detail_thum1= asset["detail_url"]
+        print(f"이미지는 이렇게 나올 예쩡 {detail_thum1}")
+        detail_thum2 = asset["presetting_url1"]
+        detail_thum3 = asset["presetting_url2"]
+        detail_thum4 = asset["presetting_url3"]
+        
+
+        
+          #가져온 이미지의 메인 이미지 넣기
+        detail_thum_viewer=QPixmap(detail_thum1)
+        detail_thum_viewer2=QPixmap(detail_thum2)
+        #지금은 작은 파일이 들어감 
+        self.ui.stackedWidget.show()
+        self.ui.detail_thum.setPixmap(detail_thum_viewer)
+        self.ui.detail_thum.setPixmap()
+
+        
+        
+      # 리뷰 순서를 정리를 
+
+    def add_thumbnail(self, row, col, asset):
+        thumbnail_path = asset["preview_url"]
+        asset_name = asset["name"] 
+        aseet_type = asset["asset_type"]
+
 
         widget = QWidget()  # 셀 안에 넣을 위젯 생성
         layout = QVBoxLayout()  # 세로 정렬을 위한 레이아웃 생성
         layout.setContentsMargins(0, 0, 0, 10)  # 여백 제거
         layout.setAlignment(Qt.AlignTop)
 
- 
+        #asset[]#여기에 찾을 항목 적어서 값 도출
 
         Thum = ClickableLabel("썸네일", parent=widget)
         name = ClickableLabel("이름", parent=widget)
         type = ClickableLabel("타입", parent=widget)
 
-        Thum.clicked.connect(lambda: self.on_label_clicked("썸네일"))
-        name.clicked.connect(lambda: self.on_label_clicked("이름"))
-        type.clicked.connect(lambda: self.on_label_clicked("타입"))
+        Thum.clicked.connect(lambda: self.on_label_clicked(asset, thumbnail_path, asset_name, aseet_type))
+        name.clicked.connect(lambda: self.on_label_clicked(asset ,thumbnail_path, asset_name, aseet_type))
+        type.clicked.connect(lambda: self.on_label_clicked(asset ,thumbnail_path, asset_name, aseet_type))
 
         layout.addWidget(Thum)
         layout.addWidget(name)
@@ -226,7 +255,7 @@ class MainUi(QMainWindow):
 
         widget.setLayout(layout)  # 위젯에 레이아웃 설정
 
-    
+        # 리뷰 엔터 개 길어
 
 
         pixmap = QPixmap(thumbnail_path)
@@ -264,7 +293,7 @@ class MainUi(QMainWindow):
             color: white;                 /* 글자 색상 */
             font-family: 'Pretendard';          /* 글꼴 */
             font-size: 12px;              /* 글자 크기 */
-            font-weight: light;            /* 글자 굵기 */
+            font-weight: Pretendard-ExtraLight;            /* 글자 굵기 */
         """)
         type.setAlignment(Qt.AlignCenter)
         

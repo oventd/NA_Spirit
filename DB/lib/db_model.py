@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets, QtCore
 import sys
 sys.path.append('/home/rapa/NA_Spirit/DB/lib')  # 사용자 지정 라이브러리 폴더 경로 추가
-from lib.db_crud import *  # 절대 경로로 db_crud 모듈 임포트
+from db_crud import *  # 절대 경로로 db_crud 모듈 임포트
 
 class CustomTableModel(QtCore.QAbstractTableModel):
     """

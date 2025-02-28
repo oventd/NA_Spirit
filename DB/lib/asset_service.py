@@ -1,4 +1,5 @@
-from lib.db_crud import DbCrud  # 수정된 db_crud에서 Asset 클래스를 import
+
+from db_crud import DbCrud  # 수정된 db_crud에서 Asset 클래스를 import
 
 
 from PySide6.QtWidgets import QLabel
@@ -23,7 +24,7 @@ class AssetService:
     """
 
     @staticmethod
-    def get_all_assets(filter_conditions, sort_by, limit, skip):
+    def get_all_assets(filter_conditions, sort_by, limit, skip): # 리뷰 메서드 이상함 all과 limit가 공존하는 이름 
         """
         모든 자산 데이터를 MongoDB에서 가져옴. 무한 스크롤을 지원.
         - db_crud.py의 find() 호출
@@ -44,6 +45,7 @@ class AssetService:
         - UI에서 사용자가 클릭한 자산의 ID를 전달받아 해당 데이터를 조회
         """
         asset_manager = DbCrud()  # Asset 클래스의 인스턴스를 생성
+        print (asset_id)
         return asset_manager.find_one(asset_id)
     
     @staticmethod

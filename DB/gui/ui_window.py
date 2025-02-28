@@ -1,6 +1,18 @@
 from PySide6 import QtWidgets, QtCore  # PySide6에서 QtWidgets와 QtCore 모듈 가져오기
-from lib.asset_service import AssetService  # AssetService 임포트
-from lib.db_model import CustomTableModel  # 절대 경로로 db_model 임포트
+import sys
+import os
+# 현재 파일(ui.py)의 절대 경로
+current_file_path = os.path.abspath(__file__)
+
+# 'NA_Spirit' 폴더의 최상위 경로 찾기
+na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
+
+# 모든 하위 폴더를 sys.path에 추가
+for root, dirs, files in os.walk(na_spirit_dir):
+    if '__pycache__' not in root:  # __pycache__ 폴더는 제외
+        sys.path.append(root)
+from asset_service import AssetService  # AssetService 임포트
+from db_model import CustomTableModel  # 절대 경로로 db_model 임포트
 
 class MainWindow(QtWidgets.QMainWindow):
     """

@@ -1,4 +1,6 @@
-from .db_client import MongoDBClient
+
+
+from db_client import MongoDBClient
 from bson import ObjectId  # MongoDB에서 사용하는 ObjectId를 처리하는 데 사용
 from datetime import datetime  # 현재 날짜와 시간을 다룰 때 사용
 import pymongo  # MongoDB 작업을 위한 라이브러리
@@ -35,7 +37,7 @@ class DbCrud:
     find()는 필터링 된 모든 문서를 가져온 후 limit를 적용하기에 효율성 저하
     aggregate()는 필터링 후 정렬하고, limit를 사용해서 메모리 사용을 줄인다.
     """
-    def find(self, filter_conditions=None, sort_by=None, limit=20, skip=0, fields=None):
+    def find(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
         """
         필터 조건에 맞는 자산들을 조회합니다.
         :param filter_conditions: 필터 조건 (기본값은 None, 모든 자산 조회)
@@ -74,6 +76,11 @@ class DbCrud:
         print(f"[DEBUG] Aggregation Pipeline: {pipeline}")
         
         res = list(self.asset_collection.aggregate(pipeline))
+
+        for asset in res:
+            # URL 필드가 없는 경우 기본값 처리
+            for url_field in ["particular_url", "turnaround_url", "rig_url"]:
+                asset[url_field] = asset.get(url_field, None)
         return res
 
     def find_one(self, asset_id, fields=None):

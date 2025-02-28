@@ -715,6 +715,9 @@ color:#ffffff;
     <attribute name="headerVisible">
      <bool>false</bool>
     </attribute>
+    <attribute name="headerMinimumSectionSize">
+     <number>50</number>
+    </attribute>
     <column>
      <property name="text">
       <string>New Column</string>
@@ -726,7 +729,7 @@ color:#ffffff;
      </property>
      <property name="font">
       <font>
-       <family>Pretendard Light</family>
+       <family>Pretendard</family>
       </font>
      </property>
      <property name="flags">
@@ -738,8 +741,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -749,8 +752,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -760,8 +763,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -771,8 +774,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -783,7 +786,7 @@ color:#ffffff;
      </property>
      <property name="font">
       <font>
-       <family>Pretendard Light</family>
+       <family>Pretendard Variable</family>
       </font>
      </property>
      <property name="flags">
@@ -795,8 +798,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -806,8 +809,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -817,8 +820,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -828,8 +831,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -839,8 +842,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -850,8 +853,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -861,8 +864,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -873,7 +876,7 @@ color:#ffffff;
      </property>
      <property name="font">
       <font>
-       <family>Pretendard Light</family>
+       <family>Pretendard Variable</family>
       </font>
      </property>
      <property name="flags">
@@ -885,8 +888,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -896,8 +899,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -907,8 +910,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -973,9 +976,9 @@ color:#ffffff;
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>871</x>
       <y>0</y>
-      <width>471</width>
+      <width>380</width>
       <height>851</height>
      </rect>
     </property>
@@ -986,26 +989,150 @@ color:#ffffff;
      <widget class="QPushButton" name="exit_btn">
       <property name="geometry">
        <rect>
-        <x>440</x>
-        <y>20</y>
-        <width>21</width>
-        <height>21</height>
+        <x>5</x>
+        <y>5</y>
+        <width>31</width>
+        <height>41</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: #181818;
+color:#ffffff;</string>
+      </property>
+      <property name="text">
+       <string>&lt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="detail_thum">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>53</y>
+        <width>380</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="name">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>400</y>
+        <width>63</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: #ffffff</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="exit_btn_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>160</y>
+        <width>30</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <bold>false</bold>
+       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">background: transparent;
 color:#ffffff;</string>
       </property>
       <property name="text">
-       <string>X</string>
+       <string>&lt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="exit_btn_3">
+      <property name="geometry">
+       <rect>
+        <x>334</x>
+        <y>160</y>
+        <width>31</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">
+color:#ffffff;
+background: transparent;</string>
+      </property>
+      <property name="text">
+       <string>&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="detail_thum_2">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>53</y>
+        <width>380</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="detail_thum_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>53</y>
+        <width>380</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="detail_thum_4">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>53</y>
+        <width>380</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_4"/>
    </widget>
    <zorder>label</zorder>
-   <zorder>user_num</zorder>
    <zorder>tableWidget</zorder>
+   <zorder>user_num</zorder>
    <zorder>comboBox</zorder>
    <zorder>treeWidget</zorder>
    <zorder>toggle_btn</zorder>
