@@ -10,8 +10,6 @@ class Loader(metaclass=ABCMeta):
     @abstractmethod
     def reference_file(self):
         pass
-    @abstractmethod
-    def stage_file(self):
-        pass
+
 
 
