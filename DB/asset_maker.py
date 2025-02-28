@@ -92,21 +92,96 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 
 
 """이미지 파일 명 삽입하는 메서드 """
-def generate_asset_data():
-    # 이미지 파일명을 thum001.png ~ thum031.png 까지 순차적으로 설정
-    image_files = [f"thum{i:03}.png" for i in range(1, 32)]  # thum001.png ~ thum031.png 리스트 생성
+# def generate_asset_data():
+#     # 이미지 파일명을 thum001.png ~ thum031.png 까지 순차적으로 설정
+#     image_files = [f"thum{i:03}.png" for i in range(1, 32)]  # thum001.png ~ thum031.png 리스트 생성
 
-    # '3D Model'인 자산을 업데이트
-    for i, asset in enumerate(asset_collection.find({"asset_type": "3D Model"})):
-        # 순차적으로 이미지 파일명을 할당
-        preview_url = f"/nas/spirit/DB/thum/{image_files[i % len(image_files)]}"
+#     # '3D Model'인 자산을 업데이트
+#     for i, asset in enumerate(asset_collection.find({"asset_type": "3D Model"})):
+#         # 순차적으로 이미지 파일명을 할당
+#         preview_url = f"/nas/spirit/DB/thum/{image_files[i % len(image_files)]}"
         
-        # 업데이트 쿼리
-        asset_collection.update_one(
-            {"_id": asset["_id"]},  # 자산을 식별할 수 있는 조건 (_id)
-            {"$set": {"preview_url": preview_url}}  # preview_url 업데이트
-        )
+#         # 업데이트 쿼리
+#         asset_collection.update_one(
+#             {"_id": asset["_id"]},  # 자산을 식별할 수 있는 조건 (_id)
+#             {"$set": {"preview_url": preview_url}}  # preview_url 업데이트
+#         )
 
-    print("3D Model 타입 자산의 preview_url을 업데이트했습니다.")
+#     print("3D Model 타입 자산의 preview_url을 업데이트했습니다.")
 
-generate_asset_data()
+
+def generate_refactory_data():
+    # metal과 grill에 대한 파일 목록 설정
+    metal_presetting_files = [f"metal_presetting_{i:03}.png" for i in range(0, 3)]
+    metal_preview = "metal_texture_preview.png"
+    metal_detail = "metal_texture_detail.png"
+
+    grill_presetting_files = [f"grill_presetting_{i:03}.png" for i in range(0, 3)]
+    grill_preview = "grill_texture_preview.png"
+    grill_detail = "grill_texture_detail.png"
+
+    # asset_collection에서 "Texture" 타입의 자산을 가져오기
+    for i, asset in enumerate(asset_collection.find({"asset_type": "Texture"})):
+        if asset["asset_type"] == "Texture":  # "Texture" 타입 자산만 처리
+            # 랜덤으로 "metal" 또는 "grill"을 선택
+            asset_type = random.choice(["metal", "grill"])
+
+            if asset_type == "metal":
+                presetting_files = metal_presetting_files
+                preview_url = f"/nas/spirit/DB/thum/{metal_preview}"
+                detail_files = f"/nas/spirit/DB/thum/{metal_detail}"
+            elif asset_type == "grill":
+                presetting_files = grill_presetting_files
+                preview_url = f"/nas/spirit/DB/thum/{grill_preview}"
+                detail_files = f"/nas/spirit/DB/thum/{grill_detail}"
+
+            # 업데이트할 데이터 준비
+            update_data = {
+                "$set": {
+                    "preview_url": preview_url,  # 기존 preview_url 업데이트
+                    "presetting_url1": f"/nas/spirit/DB/thum/{presetting_files[0]}",  # 첫 번째 presetting_url
+                    "presetting_url2": f"/nas/spirit/DB/thum/{presetting_files[1]}",  # 두 번째 presetting_url
+                    "presetting_url3": f"/nas/spirit/DB/thum/{presetting_files[2]}",  # 세 번째 presetting_url
+                    "detail_url": detail_files,  # 첫 번째 detail_url
+                }
+            }
+
+            # 자산 데이터를 업데이트
+            asset_collection.update_one(
+                {"_id": asset["_id"]},  # 자산의 _id로 해당 자산을 찾아서
+                update_data  # 필드들을 업데이트
+            )
+
+            print(f"{asset['name']} 자산의 preview_url, presetting_url, detail_url을 {asset_type}로 업데이트했습니다.")
+generate_refactory_data()
+
+
+
+
+
+# 우리 칑구 특정 데이터 삭제
+# def delete_refactory_data():
+#     # asset_collection에서 "Texture" 타입의 자산을 가져오기
+#     for i, asset in enumerate(asset_collection.find({"asset_type": "Texture"})):
+#         if asset["asset_type"] == "Texture":  # "Texture" 타입 자산만 처리
+#             # 업데이트할 데이터 준비 (필드 삭제)
+#             delete_data = {
+#                 "$unset": {
+#                     "preview_url": "",  # preview_url 삭제
+#                     "presetting_url1": "",  # presetting_url 삭제
+#                     "presetting_url2": "",  # presetting_url 삭제
+#                     "presetting_url3": "",  # presetting_url 삭제
+#                     "detail_url": "",  # detail_url 삭제
+#                     # "particular_url": ""
+#                 }
+#             }
+
+#             # 자산 데이터를 업데이트하여 필드 삭제
+#             asset_collection.update_one(
+#                 {"_id": asset["_id"]},  # 자산의 _id로 해당 자산을 찾아서
+#                 delete_data  # 필드 삭제
+#             )
+
+#             print(f"{asset['name']} 자산에서 preview_url, presetting_url, detail_url을 삭제했습니다.")
+
+# delete_refactory_data()
