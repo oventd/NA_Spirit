@@ -1,5 +1,21 @@
 from lib.db_crud import DbCrud  # 수정된 db_crud에서 Asset 클래스를 import
 
+
+from PySide6.QtWidgets import QLabel
+from PySide6.QtCore import Signal, Qt
+
+class ClickableLabel(QLabel):
+    clicked = Signal()  # 클릭 시그널 생성
+
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()  # 클릭 시그널 발생
+
+
+
 class AssetService:
     """
     UI와 DB 사이의 중간 계층 역할을 수행하는 서비스 클래스.
@@ -7,7 +23,7 @@ class AssetService:
     """
 
     @staticmethod
-    def get_all_assets(filter_conditions=None, sort_by=None, limit=5, skip=0):
+    def get_all_assets(filter_conditions, sort_by, limit, skip):
         """
         모든 자산 데이터를 MongoDB에서 가져옴. 무한 스크롤을 지원.
         - db_crud.py의 find() 호출

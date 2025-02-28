@@ -5,35 +5,10 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
 
 from lib.asset_service import AssetService  # AssetService 임포트
-from lib.db_model import CustomTableModel  # 절대 경로로 db_model 임포트
-import pymongo  # MongoDB 작업을 위한 라이브러리
-
-# MongoDB 연결
-client = pymongo.MongoClient("mongodb://192.168.5.19:27017/")  # 로컬 MongoDB 서버에 연결
-db = client["filter_test"]  # 사용할 데이터베이스 'filter_test'에 연결
-
+from lib.asset_service import ClickableLabel 
 import sys
 
-class ClickableLabel(QLabel):
-    clicked = Signal()  # 클릭 시그널 생성
-
-    def __init__(self, text="", parent=None):
-        super().__init__(text, parent)
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.clicked.emit()  # 클릭 이벤트 발생
-
-class ClickOutsideFilter(QObject):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stackedWidget = self.ui.stackedWidget  # 감지할 QStackedWidget
-
-    def eventFilter(self, obj, event):
-        if event.type() == QEvent.Type.MouseButtonPress:
-            if not self.stackedWidget.geometry().contains(event.globalPosition().toPoint()):
-                self.stackedWidget.hide()  # 외부 클릭 시 닫기
-        return super().eventFilter(obj, event)
+from PySide6.QtCore import QObject, QEvent, Qt
 
 
 
@@ -47,17 +22,40 @@ class MainUi(QMainWindow):
         self.user_num()
         self.ui.treeWidget.expandAll()
         self.setup_tree()
-        self.table_widget()
+        self.table_widget(None,"updated_at", 50, 0)
         self.connect_tree_signals()
         self.search()
-        self.ui.stackedWidget.setStyleSheet("background-color: #181818;")
-        self.ui.stackedWidget.hide()
-        self.sub_bar = False
-        
-        
-      
+        self.ui.exit_btn.clicked.connect(self.exit_sub_win)
 
+
+        self.sub_bar = False
     
+    def exit_sub_win(self):
+         self.ui.stackedWidget.hide()
+
+        
+    
+    def get_checked_items(self):
+        """QTreeWidget에서 체크된 항목들의 텍스트를 가져오는 함수"""
+        checked_items = []  # 체크된 항목을 저장할 리스트
+        root = self.ui.treeWidget.invisibleRootItem()  # 트리의 루트 아이템 가져오기
+
+        def traverse_tree(item):
+            """재귀적으로 트리의 모든 항목을 탐색"""
+            for i in range(item.childCount()):
+                child = item.child(i)
+                if child.checkState(0) == Qt.Checked:  #  체크된 항목 확인
+                    checked_items.append(child.text(0))  #  항목의 텍스트 저장
+                traverse_tree(child)  #  자식 항목이 있을 경우 재귀적으로 탐색
+
+
+        traverse_tree(root)  # ✅ 트리 탐색 시작
+
+        
+        return checked_items
+     
+
+        
         
     def search(self):
         search_input =self. ui.search
@@ -85,12 +83,18 @@ class MainUi(QMainWindow):
         self.like_active =False
         self.toggle_open =QPixmap("./source/toggle_open.png")
         self.toggle_like = QPixmap("./source/toggle_like.png")
-
+    
         self.ui.toggle_btn.setPixmap(self.toggle_open) 
         bg =QPixmap("./source/bg.png")
         self.ui.label.setPixmap(bg)
 
         self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_chage) # 토글 버튼 토글 이벤트
+
+        #사이드 바 기본 설정 
+        self.ui.stackedWidget.setStyleSheet("background-color: #181818;")
+        self.ui.stackedWidget.hide()
+        self.filter=self.ui.treeWidget.itemClicked.connect(self.get_checked_items)
+        
 
 
 
@@ -165,15 +169,13 @@ class MainUi(QMainWindow):
     
 
 
-    def table_widget(self):
-
+    def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0):
+        asset = AssetService()
        
-        asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
-
-        asset = list(asset_collection.find({}, {"asset_id": 1, "preview_url": 1, "name": 1, "category":1, "_id": 0}))
+        asset = list(asset.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
         len_asset =len(asset)
-        
 
+        #"file_format", "updated_at", "downloads" << 가지고 있는 정렬 기준
 
 
 
@@ -196,7 +198,9 @@ class MainUi(QMainWindow):
     def on_label_clicked(self, label_name):
         """라벨 클릭 이벤트 발생 시 실행"""
         print(f" {label_name} 라벨이 클릭되었습니다!")
+    
         self.ui.stackedWidget.show()
+        
       
 
     def add_thumbnail(self, row, col, thumbnail_path, asset_name, aseet_type):
@@ -227,7 +231,7 @@ class MainUi(QMainWindow):
 
         pixmap = QPixmap(thumbnail_path)
         if pixmap.isNull():
-            print(f"❌ 이미지 로드 실패: {thumbnail_path}")
+            print(f" 이미지 로드 실패: {thumbnail_path}")
 
         Thum.setPixmap(pixmap)
         Thum.setFixedHeight(160)

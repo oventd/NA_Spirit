@@ -982,7 +982,25 @@ color:#ffffff;
     <property name="frameShape">
      <enum>QFrame::Shape::StyledPanel</enum>
     </property>
-    <widget class="QWidget" name="page_3"/>
+    <widget class="QWidget" name="page_3">
+     <widget class="QPushButton" name="exit_btn">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>20</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent;
+color:#ffffff;</string>
+      </property>
+      <property name="text">
+       <string>X</string>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="page_4"/>
    </widget>
    <zorder>label</zorder>
