@@ -207,25 +207,52 @@ class MainUi(QMainWindow):
     
     def on_label_clicked(self, asset,thum_path, asset_name, aseet_type ):
         """라벨 클릭 이벤트 발생 시 실행"""
-
-        detail_thum1= asset["detail_url"]
-        print(f"이미지는 이렇게 나올 예쩡 {detail_thum1}")
-        detail_thum2 = asset["presetting_url1"]
-        detail_thum3 = asset["presetting_url2"]
-        detail_thum4 = asset["presetting_url3"]
         
 
-        
-          #가져온 이미지의 메인 이미지 넣기
-        detail_thum_viewer=QPixmap(detail_thum1)
-        detail_thum_viewer2=QPixmap(detail_thum2)
-        #지금은 작은 파일이 들어감 
+        # 이미지 URL 가져오기
+        detail_thum_urls = [
+            asset["detail_url"],
+            asset["presetting_url1"],
+            asset["presetting_url2"],
+            asset["presetting_url3"]
+        ]
+
+        #  딕셔너리를 사용하여 QPixmap 저장
+        detail_thum_viewers = {}
+
+        for i in range(4):
+            detail_thum_viewers[f"detail_thum_viewer{i}"] = QPixmap(detail_thum_urls[i])
+
+        #  UI에 이미지 설정
         self.ui.stackedWidget.show()
-        self.ui.detail_thum.setPixmap(detail_thum_viewer)
-        self.ui.detail_thum.setPixmap()
+        image_labels = []
 
-        
-        
+        for i in range(4):
+            label_widget = getattr(self.ui, f"detail_thum_{i}")  #  UI 객체 가져오기
+            label_widget.setPixmap(detail_thum_viewers[f"detail_thum_viewer{i}"])  #  이미지 설정
+            image_labels.append(label_widget)  #  리스트에 추가
+
+
+            print(f"image_labels")
+
+            self.ui.exit_l_btn.clicked.connect(self.prev_slide)
+            self.ui.exit_r_btn.clicked.connect(self.next_slide)
+
+
+    def next_slide(self):
+        """다음 배너로 이동"""
+        current_index = self.carousel.currentIndex()
+        next_index = (current_index + 1) % len(self.image_labels)  # 순환 구조
+        self.carousel.setCurrentIndex(next_index)
+
+    def prev_slide(self):
+        """이전 배너로 이동"""
+        current_index = self.carousel.currentIndex()
+        prev_index = (current_index - 1) % len(self.image_labels)  # 순환 구조
+        self.carousel.setCurrentIndex(prev_index)
+
+
+
       # 리뷰 순서를 정리를 
 
     def add_thumbnail(self, row, col, asset):

@@ -1010,7 +1010,7 @@ color:#ffffff;</string>
        <string>&lt;</string>
       </property>
      </widget>
-     <widget class="QLabel" name="detail_thum">
+     <widget class="QLabel" name="detail_thum_0">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -1039,7 +1039,7 @@ color:#ffffff;</string>
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="exit_btn_2">
+     <widget class="QPushButton" name="exit_l_btn">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -1063,7 +1063,7 @@ color:#ffffff;</string>
        <string>&lt;</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="exit_btn_3">
+     <widget class="QPushButton" name="exit_r_btn">
       <property name="geometry">
        <rect>
         <x>334</x>
@@ -1086,6 +1086,19 @@ background: transparent;</string>
       </property>
       <property name="text">
        <string>&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="detail_thum_1">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>53</y>
+        <width>380</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="detail_thum_2">
@@ -1114,19 +1127,14 @@ background: transparent;</string>
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="detail_thum_4">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>53</y>
-        <width>380</width>
-        <height>271</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
+     <zorder>exit_btn</zorder>
+     <zorder>detail_thum_0</zorder>
+     <zorder>name</zorder>
+     <zorder>detail_thum_1</zorder>
+     <zorder>detail_thum_2</zorder>
+     <zorder>exit_r_btn</zorder>
+     <zorder>exit_l_btn</zorder>
+     <zorder>detail_thum_3</zorder>
     </widget>
     <widget class="QWidget" name="page_4"/>
    </widget>
