@@ -1,8 +1,11 @@
 import maya.mel as mel
 import maya.cmds as cmds
 import os
+import sys
+sys.path.append('/home/rapa/NA_Spirit/load/loader')
 
-class MayaLoader:
+
+class MayaLoader(Loader.Loader):
     def import_file(self, paths):
         """USD 파일을 마야에 임포트"""
         for path in paths: 
