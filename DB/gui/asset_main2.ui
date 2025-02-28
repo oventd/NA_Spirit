@@ -486,7 +486,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::FocusPolicy::NoFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">background: #080808;
@@ -494,22 +494,22 @@
 </string>
     </property>
     <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOn</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
     <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
     </property>
     <property name="autoScroll">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="autoScrollMargin">
      <number>0</number>
     </property>
     <property name="textElideMode">
-     <enum>Qt::ElideRight</enum>
+     <enum>Qt::TextElideMode::ElideRight</enum>
     </property>
     <property name="showGrid">
      <bool>true</bool>
@@ -547,9 +547,6 @@
        <family>Pretendard</family>
       </font>
      </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
-     </property>
     </column>
     <column>
      <property name="text">
@@ -560,9 +557,6 @@
        <family>Pretendard</family>
       </font>
      </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
-     </property>
     </column>
     <column>
      <property name="text">
@@ -572,9 +566,6 @@
       <font>
        <family>Pretendard</family>
       </font>
-     </property>
-     <property name="textAlignment">
-      <set>AlignCenter</set>
      </property>
     </column>
     <column/>
@@ -704,10 +695,10 @@ color:#ffffff;
 </string>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
+     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::NoSelection</enum>
+     <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
     </property>
     <property name="indentation">
      <number>10</number>
@@ -724,6 +715,9 @@ color:#ffffff;
     <attribute name="headerVisible">
      <bool>false</bool>
     </attribute>
+    <attribute name="headerMinimumSectionSize">
+     <number>50</number>
+    </attribute>
     <column>
      <property name="text">
       <string>New Column</string>
@@ -735,7 +729,7 @@ color:#ffffff;
      </property>
      <property name="font">
       <font>
-       <family>Pretendard Light</family>
+       <family>Pretendard</family>
       </font>
      </property>
      <property name="flags">
@@ -747,8 +741,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -758,8 +752,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -769,8 +763,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -780,8 +774,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -792,7 +786,7 @@ color:#ffffff;
      </property>
      <property name="font">
       <font>
-       <family>Pretendard Light</family>
+       <family>Pretendard Variable</family>
       </font>
      </property>
      <property name="flags">
@@ -804,8 +798,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -815,8 +809,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -826,8 +820,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -837,8 +831,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -848,8 +842,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -859,8 +853,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -870,8 +864,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -882,7 +876,7 @@ color:#ffffff;
      </property>
      <property name="font">
       <font>
-       <family>Pretendard Light</family>
+       <family>Pretendard Variable</family>
       </font>
      </property>
      <property name="flags">
@@ -894,8 +888,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -905,8 +899,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -916,8 +910,8 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Thin</family>
-        <pointsize>11</pointsize>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
      </item>
@@ -973,20 +967,186 @@ color:#ffffff;
      </font>
     </property>
     <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
+     <enum>Qt::LayoutDirection::LeftToRight</enum>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
     </property>
    </widget>
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>871</x>
+      <y>0</y>
+      <width>380</width>
+      <height>851</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::StyledPanel</enum>
+    </property>
+    <widget class="QWidget" name="page_3">
+     <widget class="QPushButton" name="exit_btn">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>5</y>
+        <width>31</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: #181818;
+color:#ffffff;</string>
+      </property>
+      <property name="text">
+       <string>&lt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="detail_thum_0">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>53</y>
+        <width>380</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="name">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>400</y>
+        <width>63</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: #ffffff</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="exit_l_btn">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>160</y>
+        <width>30</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent;
+color:#ffffff;</string>
+      </property>
+      <property name="text">
+       <string>&lt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="exit_r_btn">
+      <property name="geometry">
+       <rect>
+        <x>334</x>
+        <y>160</y>
+        <width>31</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">
+color:#ffffff;
+background: transparent;</string>
+      </property>
+      <property name="text">
+       <string>&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="detail_thum_1">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>53</y>
+        <width>380</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="detail_thum_2">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>53</y>
+        <width>380</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="detail_thum_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>53</y>
+        <width>380</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <zorder>exit_btn</zorder>
+     <zorder>detail_thum_0</zorder>
+     <zorder>name</zorder>
+     <zorder>detail_thum_1</zorder>
+     <zorder>detail_thum_2</zorder>
+     <zorder>exit_r_btn</zorder>
+     <zorder>exit_l_btn</zorder>
+     <zorder>detail_thum_3</zorder>
+    </widget>
+    <widget class="QWidget" name="page_4"/>
+   </widget>
    <zorder>label</zorder>
-   <zorder>user_num</zorder>
    <zorder>tableWidget</zorder>
+   <zorder>user_num</zorder>
    <zorder>comboBox</zorder>
    <zorder>treeWidget</zorder>
    <zorder>toggle_btn</zorder>
    <zorder>toggle_btn_touch_area</zorder>
    <zorder>search</zorder>
+   <zorder>stackedWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -994,7 +1154,7 @@ color:#ffffff;
      <x>0</x>
      <y>0</y>
      <width>1250</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
