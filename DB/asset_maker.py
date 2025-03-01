@@ -109,34 +109,75 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 #     print("3D Model 타입 자산의 preview_url을 업데이트했습니다.")
 
 """머티리얼 이미지 삽입 공장"""
+# def generate_asset_data():
+#     # 'Material'인 자산을 업데이트
+#     image_files = [
+#         "fabric_material_preview.png",
+#         "moss_material_preview.png",
+#         "gold_material_preview.png",
+#         "stone_material_preview.png",
+#         "leaf_material_preview.png",
+#         "wood_material_preview.png",
+#         "metal_material_preview.png"
+#     ]
+    
+#     descriptions = {
+#         "fabric_material": "A soft and versatile fabric material, perfect for clothing or interior designs.",
+#         "moss_material": "A natural moss material, ideal for creating lush environments in 3D models.",
+#         "gold_material": "A shiny and luxurious gold material, suitable for creating high-end objects and jewelry.",
+#         "stone_material": "A rugged and durable stone material, perfect for creating rocky surfaces or ancient ruins.",
+#         "leaf_material": "A detailed and realistic leaf material, ideal for creating vibrant foliage in nature scenes.",
+#         "wood_material": "A rich, textured wood material, perfect for creating furniture or outdoor structures.",
+#         "metal_material": "A strong and reflective metal material, ideal for industrial objects or futuristic designs."
+#     }
+    
+#     for i, asset in enumerate(asset_collection.find({"asset_type": "Material"})):
+#         # 순차적으로 이미지 파일명과 설명을 할당
+#         material_type = image_files[i % len(image_files)].replace("_preview.png", "")  # 파일명에서 _preview.png 제거하여 material_type 추출
+#         preview_url = f"/nas/spirit/DB/thum/material/{image_files[i % len(image_files)]}"  # preview_url 경로 설정
+#         asset_name = material_type  # 이름을 material_type으로 설정
+#         description = descriptions.get(material_type, "No description available.")  # 설명 설정
+        
+#         # 업데이트 쿼리
+#         asset_collection.update_one(
+#             {"_id": asset["_id"]},  # 자산을 식별할 수 있는 조건 (_id)
+#             {
+#                 "$set": {
+#                     "preview_url": preview_url,
+#                     "name": asset_name,
+#                     "description": description
+#                 }
+#             }
+#         )
+
+#     print("Material 타입 자산의 preview_url, name, description을 업데이트했습니다.")
+# generate_asset_data()
+
+"""HDRI 이미지"""
 def generate_asset_data():
-    # 'Material'인 자산을 업데이트
-    image_files = [
-        "fabric_material_preview.png",
-        "moss_material_preview.png",
-        "gold_material_preview.png",
-        "stone_material_preview.png",
-        "leaf_material_preview.png",
-        "wood_material_preview.png",
-        "metal_material_preview.png"
+    # 'HDRI' 자산을 업데이트
+    hdri_files = [
+        {"name": "light_indoor", "preview": "light_indoor_hdri_preview.png", "applyhdri": "light_indoor_addhdri.png", "hdri": "light_indoor_hdri.png"},
+        {"name": "night", "preview": "night_hdri_preview.png", "applyhdri": "night_addhdri.png", "hdri": "night_hdri.png"},
+        {"name": "sun", "preview": "sun_hdri_preview.png", "applyhdri": "sun_addhdri.png", "hdri": "sun_hdri.png"}
     ]
     
     descriptions = {
-        "fabric_material": "A soft and versatile fabric material, perfect for clothing or interior designs.",
-        "moss_material": "A natural moss material, ideal for creating lush environments in 3D models.",
-        "gold_material": "A shiny and luxurious gold material, suitable for creating high-end objects and jewelry.",
-        "stone_material": "A rugged and durable stone material, perfect for creating rocky surfaces or ancient ruins.",
-        "leaf_material": "A detailed and realistic leaf material, ideal for creating vibrant foliage in nature scenes.",
-        "wood_material": "A rich, textured wood material, perfect for creating furniture or outdoor structures.",
-        "metal_material": "A strong and reflective metal material, ideal for industrial objects or futuristic designs."
+        "light_indoor": "A bright and warm indoor HDRI, ideal for simulating daylight in interior scenes.",
+        "night": "A dark and moody HDRI, perfect for creating night-time atmospheres in outdoor or indoor environments.",
+        "sun": "A high contrast HDRI with sunlight for realistic outdoor scenes, ideal for daylight simulations."
     }
-    
-    for i, asset in enumerate(asset_collection.find({"asset_type": "Material"})):
-        # 순차적으로 이미지 파일명과 설명을 할당
-        material_type = image_files[i % len(image_files)].replace("_preview.png", "")  # 파일명에서 _preview.png 제거하여 material_type 추출
-        preview_url = f"/nas/spirit/DB/thum/material/{image_files[i % len(image_files)]}"  # preview_url 경로 설정
-        asset_name = material_type  # 이름을 material_type으로 설정
-        description = descriptions.get(material_type, "No description available.")  # 설명 설정
+
+    for i, asset in enumerate(asset_collection.find({"asset_type": "HDRI"})):
+        # 각 HDRI 파일에 대해 순차적으로 데이터 할당
+        hdri_data = hdri_files[i % len(hdri_files)]  # HD리 파일명 순서대로 가져옴
+        
+        preview_url = f"/nas/spirit/DB/thum/hdri/{hdri_data['preview']}"  # preview_url 경로 설정
+        applyhdri_url = f"/nas/spirit/DB/thum/hdri/{hdri_data['applyhdri']}"  # applyhdri_url 경로 설정
+        hdri_url = f"/nas/spirit/DB/thum/hdri/{hdri_data['hdri']}"  # hdri_url 경로 설정
+        
+        asset_name = hdri_data["name"]  # 이름을 hdri_data['name']으로 설정
+        description = descriptions.get(hdri_data["name"], "No description available.")  # 설명 설정
         
         # 업데이트 쿼리
         asset_collection.update_one(
@@ -144,13 +185,16 @@ def generate_asset_data():
             {
                 "$set": {
                     "preview_url": preview_url,
+                    "applyhdri_url": applyhdri_url,
+                    "hdri_url": hdri_url,
                     "name": asset_name,
                     "description": description
                 }
             }
         )
 
-    print("Material 타입 자산의 preview_url, name, description을 업데이트했습니다.")
+    print("HDRI 타입 자산의 preview_url, applyhdri_url, hdri_url, name, description을 업데이트했습니다.")
+
 generate_asset_data()
 
 
