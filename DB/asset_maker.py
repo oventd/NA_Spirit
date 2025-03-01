@@ -81,7 +81,6 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 
 #     return asset_data
 
-
 # # 자산 데이터 20개 생성 후 MongoDB에 삽입
 # assets_data = [generate_asset_data() for _ in range(20)]  # 20개 자산 데이터 생성
 
@@ -99,7 +98,7 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 #     # '3D Model'인 자산을 업데이트
 #     for i, asset in enumerate(asset_collection.find({"asset_type": "3D Model"})):
 #         # 순차적으로 이미지 파일명을 할당
-#         preview_url = f"/nas/spirit/DB/thum/{image_files[i % len(image_files)]}"
+#         preview_url = f"/nas/spirit/DB/thum/3d_assets{image_files[i % len(image_files)]}"
         
 #         # 업데이트 쿼리
 #         asset_collection.update_one(
@@ -109,57 +108,103 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 
 #     print("3D Model 타입 자산의 preview_url을 업데이트했습니다.")
 
-
-def generate_refactory_data():
-    # metal과 grill에 대한 파일 목록 설정
-    metal_presetting_files = [f"metal_presetting_{i:03}.png" for i in range(0, 3)]
-    metal_preview = "metal_texture_preview.png"
-    metal_detail = "metal_texture_detail.png"
-
-    grill_presetting_files = [f"grill_presetting_{i:03}.png" for i in range(0, 3)]
-    grill_preview = "grill_texture_preview.png"
-    grill_detail = "grill_texture_detail.png"
-
-    # asset_collection에서 "Texture" 타입의 자산을 가져오기
-    for i, asset in enumerate(asset_collection.find({"asset_type": "Texture"})):
-        if asset["asset_type"] == "Texture":  # "Texture" 타입 자산만 처리
-            # 랜덤으로 "metal" 또는 "grill"을 선택
-            asset_type = random.choice(["metal", "grill"])
-
-            if asset_type == "metal":
-                presetting_files = metal_presetting_files
-                preview_url = f"/nas/spirit/DB/thum/{metal_preview}"
-                detail_files = f"/nas/spirit/DB/thum/{metal_detail}"
-            elif asset_type == "grill":
-                presetting_files = grill_presetting_files
-                preview_url = f"/nas/spirit/DB/thum/{grill_preview}"
-                detail_files = f"/nas/spirit/DB/thum/{grill_detail}"
-
-            # 업데이트할 데이터 준비
-            update_data = {
+"""머티리얼 이미지 삽입 공장"""
+def generate_asset_data():
+    # 'Material'인 자산을 업데이트
+    image_files = [
+        "fabric_material_preview.png",
+        "moss_material_preview.png",
+        "gold_material_preview.png",
+        "stone_material_preview.png",
+        "leaf_material_preview.png",
+        "wood_material_preview.png",
+        "metal_material_preview.png"
+    ]
+    
+    descriptions = {
+        "fabric_material": "A soft and versatile fabric material, perfect for clothing or interior designs.",
+        "moss_material": "A natural moss material, ideal for creating lush environments in 3D models.",
+        "gold_material": "A shiny and luxurious gold material, suitable for creating high-end objects and jewelry.",
+        "stone_material": "A rugged and durable stone material, perfect for creating rocky surfaces or ancient ruins.",
+        "leaf_material": "A detailed and realistic leaf material, ideal for creating vibrant foliage in nature scenes.",
+        "wood_material": "A rich, textured wood material, perfect for creating furniture or outdoor structures.",
+        "metal_material": "A strong and reflective metal material, ideal for industrial objects or futuristic designs."
+    }
+    
+    for i, asset in enumerate(asset_collection.find({"asset_type": "Material"})):
+        # 순차적으로 이미지 파일명과 설명을 할당
+        material_type = image_files[i % len(image_files)].replace("_preview.png", "")  # 파일명에서 _preview.png 제거하여 material_type 추출
+        preview_url = f"/nas/spirit/DB/thum/material/{image_files[i % len(image_files)]}"  # preview_url 경로 설정
+        asset_name = material_type  # 이름을 material_type으로 설정
+        description = descriptions.get(material_type, "No description available.")  # 설명 설정
+        
+        # 업데이트 쿼리
+        asset_collection.update_one(
+            {"_id": asset["_id"]},  # 자산을 식별할 수 있는 조건 (_id)
+            {
                 "$set": {
-                    "preview_url": preview_url,  # 기존 preview_url 업데이트
-                    "presetting_url1": f"/nas/spirit/DB/thum/{presetting_files[0]}",  # 첫 번째 presetting_url
-                    "presetting_url2": f"/nas/spirit/DB/thum/{presetting_files[1]}",  # 두 번째 presetting_url
-                    "presetting_url3": f"/nas/spirit/DB/thum/{presetting_files[2]}",  # 세 번째 presetting_url
-                    "detail_url": detail_files,  # 첫 번째 detail_url
+                    "preview_url": preview_url,
+                    "name": asset_name,
+                    "description": description
                 }
             }
+        )
 
-            # 자산 데이터를 업데이트
-            asset_collection.update_one(
-                {"_id": asset["_id"]},  # 자산의 _id로 해당 자산을 찾아서
-                update_data  # 필드들을 업데이트
-            )
-
-            print(f"{asset['name']} 자산의 preview_url, presetting_url, detail_url을 {asset_type}로 업데이트했습니다.")
-generate_refactory_data()
+    print("Material 타입 자산의 preview_url, name, description을 업데이트했습니다.")
+generate_asset_data()
 
 
 
 
 
-# 우리 칑구 특정 데이터 삭제
+
+"""조건에 해당하는 파일 넣기"""
+# def generate_refactory_data():
+#     # metal과 grill에 대한 파일 목록 설정
+#     metal_presetting_files = [f"metal_presetting_{i:03}.png" for i in range(0, 3)]
+#     metal_preview = "metal_texture_preview.png"
+#     metal_detail = "metal_texture_detail.png"
+
+#     grill_presetting_files = [f"grill_presetting_{i:03}.png" for i in range(0, 3)]
+#     grill_preview = "grill_texture_preview.png"
+#     grill_detail = "grill_texture_detail.png"
+
+#     # asset_collection에서 "Texture" 타입의 자산을 가져오기
+#     for i, asset in enumerate(asset_collection.find({"asset_type": "Texture"})):
+#         if asset["asset_type"] == "Texture":  # "Texture" 타입 자산만 처리
+#             # 랜덤으로 "metal" 또는 "grill"을 선택
+#             asset_type = random.choice(["metal", "grill"])
+
+#             if asset_type == "metal":
+#                 presetting_files = metal_presetting_files
+#                 preview_url = f"/nas/spirit/DB/thum/texture/{metal_preview}"
+#                 detail_files = f"/nas/spirit/DB/thum/texture/{metal_detail}"
+#             elif asset_type == "grill":
+#                 presetting_files = grill_presetting_files
+#                 preview_url = f"/nas/spirit/DB/thum/texture/{grill_preview}"
+#                 detail_files = f"/nas/spirit/DB/thum/texture/{grill_detail}"
+
+#             # 업데이트할 데이터 준비
+#             update_data = {
+#                 "$set": {
+#                     "preview_url": preview_url,  # 기존 preview_url 업데이트
+#                     "presetting_url1": f"/nas/spirit/DB/thum/texture/{presetting_files[0]}",  # 첫 번째 presetting_url
+#                     "presetting_url2": f"/nas/spirit/DB/thum/texture/{presetting_files[1]}",  # 두 번째 presetting_url
+#                     "presetting_url3": f"/nas/spirit/DB/thum/texture/{presetting_files[2]}",  # 세 번째 presetting_url
+#                     "detail_url": detail_files,  # 첫 번째 detail_url
+#                 }
+#             }
+
+#             # 자산 데이터를 업데이트
+#             asset_collection.update_one(
+#                 {"_id": asset["_id"]},  # 자산의 _id로 해당 자산을 찾아서
+#                 update_data  # 필드들을 업데이트
+#             )
+
+#             print(f"{asset['name']} 자산의 preview_url, presetting_url, detail_url을 {asset_type}로 업데이트했습니다.")
+# generate_refactory_data()
+
+"""우리 칑구 특정 데이터 삭제"""
 # def delete_refactory_data():
 #     # asset_collection에서 "Texture" 타입의 자산을 가져오기
 #     for i, asset in enumerate(asset_collection.find({"asset_type": "Texture"})):
@@ -183,5 +228,53 @@ generate_refactory_data()
 #             )
 
 #             print(f"{asset['name']} 자산에서 preview_url, presetting_url, detail_url을 삭제했습니다.")
-
 # delete_refactory_data()
+
+"""이미지 경로 변경"""
+# def generate_asset_data():
+#     # 이미지 파일명을 thum001.png ~ thum031.png 까지 순차적으로 설정
+#     image_files = [f"thum{i:03}.png" for i in range(1, 32)]  # thum001.png ~ thum031.png 리스트 생성
+
+#     # '3D Model'인 자산을 업데이트
+#     for i, asset in enumerate(asset_collection.find({"asset_type": "Texture"})):
+#         # 순차적으로 이미지 파일명을 할당 (파일 경로에 슬래시 추가)
+#         preview_url = f"/nas/spirit/DB/thum/texture/{image_files[i % len(image_files)]}"
+        
+#         # 필요한 다른 URL도 계산 (presetting_url, detail_url 등)
+#         presetting_url1 = f"/nas/spirit/DB/thum/texture/{image_files[i % len(image_files)]}"
+#         presetting_url2 = f"/nas/spirit/DB/thum/texture/{image_files[(i + 1) % len(image_files)]}"
+#         presetting_url3 = f"/nas/spirit/DB/thum/texture/{image_files[(i + 2) % len(image_files)]}"
+#         detail_url = f"/nas/spirit/DB/thum/texture/{image_files[(i + 3) % len(image_files)]}"
+
+#         # 업데이트할 데이터 준비
+#         update_data = {
+#             "$set": {
+#                 "preview_url": preview_url,  # 기존 preview_url 업데이트
+#                 "presetting_url1": presetting_url1,  # 첫 번째 presetting_url 업데이트
+#                 "presetting_url2": presetting_url2,  # 두 번째 presetting_url 업데이트
+#                 "presetting_url3": presetting_url3,  # 세 번째 presetting_url 업데이트
+#                 "detail_url": detail_url  # detail_url 업데이트
+#             }
+#         }
+
+#         # 자산 데이터를 업데이트
+#         asset_collection.update_one(
+#             {"_id": asset["_id"]},  # 자산의 _id로 해당 자산을 찾아서
+#             update_data  # 필드들을 업데이트
+#         )
+
+#     print("3D Model 타입 자산의 preview_url, presetting_url, detail_url을 업데이트했습니다.")
+# generate_asset_data()
+
+
+
+
+"""모든 인덱스 삭제"""
+# asset_collection.drop_indexes()
+# print("모든 인덱스 삭제 완료")
+
+"""인덱스 목록 확인"""
+# indexes = asset_collection.index_information()
+# print("현재 인덱스 목록:")
+# for index_name, index_info in indexes.items():
+#     print(f"{index_name}: {index_info}"

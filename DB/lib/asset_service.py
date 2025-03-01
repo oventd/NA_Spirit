@@ -89,7 +89,15 @@ class AssetService:
         asset_manager = UserDb()  # UserDb 클래스의 인스턴스를 생성
         return asset_manager.increment_count(asset_id)  # 자산 데이터 업데이트
     
-
+    @staticmethod
+    def search_asset(user_query):
+        """
+        데이터를 검색합니다.
+        :param user_query: 검색어
+        :return: 검색 성공 여부
+        """
+        asset_manager = UserDb()  # UserDb 클래스의 인스턴스를 생성
+        return asset_manager.search(user_query)  # 자산 데이터 업데이트
 
 
 # from lib.db_crud import UserDb  # 수정된 db_crud에서 Asset 클래스를 import

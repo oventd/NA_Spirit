@@ -1,70 +1,54 @@
-from datetime import datetime, timedelta
 import pymongo
-from bson import ObjectId  # MongoDB의 ObjectId 처리용
 
-# 1️⃣ MongoDB 연결
-client = pymongo.MongoClient("mongodb://spirt:1234@localhost:27017/")
-db = client["filter_test"]
-asset_collection = db["test"]
+class DbCrud:
+    def __init__(self):
+        # MongoDB 연결
+        client = pymongo.MongoClient("mongodb://spirt:1234@localhost:27017/")
+        self.db = client["filter_test"]
+        self.asset_collection = self.db["test"]
 
-# # 1️⃣ 모든 인덱스 삭제
-# asset_collection.drop_indexes()
-# print("✅ 모든 인덱스 삭제 완료")
+    def search(self, user_query):
+        """
+        데이터에 대한 검색 기능을 수행합니다.
+        :user_query: 검색할 데이터
+        :return: 검색 결과
+        """
+        query = { "$text": { "$search": user_query } }
+        projection = { "name": 1, "_id": 0, "score": { "$meta": "textScore" } }
 
-# # 2️⃣ 삭제 후 인덱스 목록 확인
-# indexes = asset_collection.index_information()
-# print("📌 현재 인덱스 목록:")
-# for index_name, index_info in indexes.items():
-#     print(f"🔹 {index_name}: {index_info}")
-
-# 2️⃣ 텍스트 인덱스 생성 (이미 생성되었으면 실행 시 오류 발생 가능)
-# try:
-#     asset_collection.create_index([("name", "text"), ("description", "text")])
-#     print("✅ 텍스트 인덱스 생성 완료")
-# except Exception as e:
-#     print(f"⚠️ 텍스트 인덱스 생성 오류: {e}")
-# try:
-#     asset_collection.create_index([("category", "text"), ("style", "text")])
-#     print("✅ 텍스트 인덱스 생성 완료")
-# except Exception as e:
-#     print(f"⚠️ 텍스트 인덱스 생성 오류: {e}")
-
-
-# 3️⃣ 검색 함수
-def search():
-    print("🔎 search() 메서드 시작")  # 실행 여부 확인
-
-
-    # sample_data = asset_collection.find({"$text": {"$search": "metal"}})
-    # for item in sample_data:
-    #     print(item)
-
-
-    query = { "$text": { "$search": "Realistic" } }
-    projection = { "name": 1, "_id": 0 }  # name 필드만 가져옴 (_id는 제외)
-
-    try:
-        results = asset_collection.find(query, projection).limit(10)
-        print("🔎 검색 수행 완료")  # 쿼리 실행 확인
-        result_list = list(results)  # 리스트 변환 후 반환
-
-        if result_list:
-            print("🔹 검색 결과:")
-            for doc in result_list:
-                print(f"  - {doc}")
-        else:
-            print("⚠️ 검색 결과가 없습니다.")
+        results = (
+            self.asset_collection.find(query, projection)
+            .sort([("score", {"$meta": "textScore"})])  # 정확도 순으로 정렬
+            .limit(10)  # 최대 10개 제한
+        )
+        result_list = list(results)
         return result_list
-    except Exception as e:
-        print(f"⚠️ search() 메서드 오류: {e}")
-        return []
 
 
+class UserDb(DbCrud):
+    def __init__(self):
+        super().__init__()  # 부모 클래스 생성자 호출
+        self.setup_indexes()
 
-indexes = asset_collection.index_information()
-print("📌 현재 인덱스 목록:")
-for index_name, index_info in indexes.items():
-    print(f"🔹 {index_name}: {index_info}")
+    def setup_indexes(self):
+        self.asset_collection.create_index([("name", "text"), ("description", "text")])  # 텍스트 인덱스 추가
+        print("인덱스 설정 완료!")
 
-# 4️⃣ 검색 실행
-search()
+    def search(self, user_query):
+        """부모 클래스의 search()를 그대로 사용"""
+        return super().search(user_query)
+
+
+# 🔥 터미널에서 사용자 입력을 받음
+if __name__ == "__main__":
+    user_db = UserDb()  # UserDb의 인스턴스를 생성
+    user_input = input("🔍 검색어를 입력하세요: ").strip()  # 사용자 입력 받기
+    search_results = user_db.search(user_input)  # UserDb 인스턴스를 통해 search 호출
+
+    # 검색 결과 출력
+    if search_results:
+        print("🔹 검색 결과:")
+        for result in search_results:
+            print(f"  - {result}")
+    else:
+        print("⚠️ 검색 결과가 없습니다.")

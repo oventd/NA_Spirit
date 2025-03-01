@@ -33,6 +33,11 @@ PREVIEW_URL = "preview_url"  # preview_url 값
 TURNAROUND_URL = "turnaround_url" # turnaround_url 값
 RIG_URL = "rig_url" # rig_url 값
 
+# DB 인덱싱 정의 상수(메타 데이터)
+SCORE = "score"
+TEXT = "text"
+
+
 
 # logger 관련 상수
 LOGGER_NAME = "db_crud" # DbCrud(객체 생성용) 로거 이름

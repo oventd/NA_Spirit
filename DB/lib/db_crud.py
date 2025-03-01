@@ -119,22 +119,6 @@ class DbCrud:
         self.logger.info(f"Retrieved document ID: {object_id}")
         return details
 
-
-
-       
-    
-
-
-
-
-
-
-
-
-
-
-
-
     # 데이터 수정 (Update)
     def update_one(self, object_id, update_data):
         """
@@ -177,6 +161,23 @@ class DbCrud:
         self.logger.info(f"Deleted document ID: {object_id} | Acknowledged: {result.modified_count}")
         return result.modified_count > 0  # 다운로드 수가 증가했으면 True 반환
 
+    # 데이터 검색 (Search)
+    def search(self, user_query):
+        """
+        데이터에 대한 검색 기능을 수행합니당.
+        :user_query: 검색을 진행할 데이터
+        :return: 검색 결과
+        """
+        query = { "$text": { "$search": user_query } }
+        projection = { NAME: 1, "_id": 0, SCORE: { "$meta": "textScore" } }  # name 필드와 점수 가져오기
+        
+        results = (
+            self.asset_collection.find(query, projection)
+            .sort([(SCORE, {"$meta": "textScore"})])  # 정확도 순 정렬
+            .limit(10)  # 최대 10개 제한
+        )
+        result_list = list(results)
+        return result_list
 
 
 class UserDb(DbCrud):
@@ -189,4 +190,8 @@ class UserDb(DbCrud):
         self.asset_collection.create_index([(FILE_FORMAT, pymongo.ASCENDING)])
         self.asset_collection.create_index([(UPDATED_AT, pymongo.DESCENDING)])
         self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
+        self.asset_collection.create_index([(NAME, TEXT), (DESCRIPTION, TEXT)])
         self.logger.info("Indexes set up for UserDb")
+
+    def search(self, user_query):
+        return super().search(user_query)
