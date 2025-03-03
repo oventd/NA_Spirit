@@ -486,7 +486,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::FocusPolicy::NoFocus</enum>
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">background: #080808;
@@ -494,13 +494,13 @@
 </string>
     </property>
     <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+     <enum>Qt::ScrollBarAsNeeded</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+     <enum>Qt::ScrollBarAsNeeded</enum>
     </property>
     <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
+     <enum>QAbstractScrollArea::AdjustIgnored</enum>
     </property>
     <property name="autoScroll">
      <bool>false</bool>
@@ -509,7 +509,7 @@
      <number>0</number>
     </property>
     <property name="textElideMode">
-     <enum>Qt::TextElideMode::ElideRight</enum>
+     <enum>Qt::ElideLeft</enum>
     </property>
     <property name="showGrid">
      <bool>true</bool>
@@ -644,6 +644,9 @@ QComboBox QAbstractItemView {
 
 }</string>
     </property>
+    <property name="currentText">
+     <string>최신순</string>
+    </property>
     <item>
      <property name="text">
       <string>최신순</string>
@@ -695,10 +698,10 @@ color:#ffffff;
 </string>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+     <enum>QAbstractItemView::NoSelection</enum>
     </property>
     <property name="indentation">
      <number>10</number>
@@ -967,7 +970,7 @@ color:#ffffff;
      </font>
     </property>
     <property name="layoutDirection">
-     <enum>Qt::LayoutDirection::LeftToRight</enum>
+     <enum>Qt::LeftToRight</enum>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -983,44 +986,44 @@ color:#ffffff;
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::Shape::StyledPanel</enum>
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
     </property>
     <widget class="QWidget" name="page_3">
      <widget class="QPushButton" name="exit_btn">
       <property name="geometry">
        <rect>
-        <x>5</x>
-        <y>5</y>
-        <width>31</width>
-        <height>41</height>
+        <x>10</x>
+        <y>10</y>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: #181818;
-color:#ffffff;</string>
-      </property>
-      <property name="text">
-       <string>&lt;</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="detail_thum_0">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>53</y>
-        <width>380</width>
-        <height>271</height>
-       </rect>
+       <string notr="true"/>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../../nas/spirit/asset_project/source/ic___white.png</normaloff>../../../../../../nas/spirit/asset_project/source/ic___white.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>30</width>
+        <height>30</height>
+       </size>
       </property>
      </widget>
      <widget class="QLabel" name="name">
@@ -1039,102 +1042,663 @@ color:#ffffff;</string>
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="exit_l_btn">
+     <widget class="QPushButton" name="image_l_btn">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>160</y>
-        <width>30</width>
-        <height>41</height>
+        <x>20</x>
+        <y>360</y>
+        <width>71</width>
+        <height>71</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">background: transparent;
-color:#ffffff;</string>
+       <string notr="true">QPushButton {
+    background: transparent;  /* 버튼 배경을 투명하게 설정 */
+    border: none;             /* 테두리 없애기 (필요 시) */
+    background-attachment: fixed;  /* 배경 이미지가 창 크기 변경 시 고정됨 */
+    padding: 0px;                  /* 여백 제거 */
+    margin: 0px;                   /* 여백 제거 */
+    alignment: center;  
+}
+</string>
       </property>
       <property name="text">
-       <string>&lt;</string>
+       <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="exit_r_btn">
+     <widget class="QPushButton" name="image_r_btn">
       <property name="geometry">
        <rect>
-        <x>334</x>
-        <y>160</y>
-        <width>31</width>
-        <height>41</height>
+        <x>300</x>
+        <y>360</y>
+        <width>71</width>
+        <height>71</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">
-color:#ffffff;
-background: transparent;</string>
+       <string notr="true">QPushButton {
+    background: transparent;  /* 버튼 배경을 투명하게 설정 */
+    border: none;             /* 테두리 없애기 (필요 시) */
+    background-attachment: fixed;  /* 배경 이미지가 창 크기 변경 시 고정됨 */
+    padding: 0px;                  /* 여백 제거 */
+    margin: 0px;                   /* 여백 제거 */
+    alignment: center;  
+}
+</string>
       </property>
       <property name="text">
-       <string>&gt;</string>
+       <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="detail_thum_1">
+     <widget class="QStackedWidget" name="stackedWidget_2">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>53</y>
         <width>380</width>
-        <height>271</height>
+        <height>291</height>
+       </rect>
+      </property>
+      <widget class="QWidget" name="page"/>
+      <widget class="QWidget" name="page_2"/>
+     </widget>
+     <widget class="QLabel" name="info_list_bar_s">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>360</y>
+        <width>340</width>
+        <height>71</height>
        </rect>
       </property>
       <property name="text">
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="detail_thum_2">
+     <widget class="QLabel" name="info_name">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>53</y>
-        <width>380</width>
-        <height>271</height>
+        <x>45</x>
+        <y>10</y>
+        <width>291</width>
+        <height>31</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard</family>
+        <pointsize>13</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:#ffffff;</string>
       </property>
       <property name="text">
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="detail_thum_3">
+     <widget class="QWidget" name="horizontalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>53</y>
-        <width>380</width>
-        <height>271</height>
+        <x>74</x>
+        <y>367</y>
+        <width>233</width>
+        <height>51</height>
        </rect>
+      </property>
+      <layout class="QHBoxLayout" name="image_widget_s">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+      </layout>
+     </widget>
+     <widget class="QPushButton" name="like_btn">
+      <property name="geometry">
+       <rect>
+        <x>302</x>
+        <y>6</y>
+        <width>40</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background: transparent;  /* 버튼 배경을 투명하게 설정 */
+    border: none;             /* 테두리 없애기 (필요 시) */
+    background-attachment: fixed;  /* 배경 이미지가 창 크기 변경 시 고정됨 */
+    padding: 0px;                  /* 여백 제거 */
+    margin: 0px;                   /* 여백 제거 */
+    alignment: center;  
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>40</width>
+        <height>40</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="exit_btn_3">
+      <property name="geometry">
+       <rect>
+        <x>349</x>
+        <y>16</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background: transparent;  /* 버튼 배경을 투명하게 설정 */
+    border: none;             /* 테두리 없애기 (필요 시) */
+    background-attachment: fixed;  /* 배경 이미지가 창 크기 변경 시 고정됨 */
+    padding: 0px;                  /* 여백 제거 */
+    margin: 0px;                   /* 여백 제거 */
+    alignment: center;  
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../nas/spirit/asset_project/source/more_icon.png</normaloff>../../../../../nas/spirit/asset_project/source/more_icon.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>20</width>
+        <height>20</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLabel" name="description">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>477</y>
+        <width>339</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard</family>
+        <pointsize>9</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:#c7c7c7;</string>
       </property>
       <property name="text">
        <string/>
       </property>
      </widget>
+     <widget class="QLabel" name="asset_type">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>500</y>
+        <width>339</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard</family>
+        <pointsize>9</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:#C7C7C7;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="info_name_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>440</y>
+        <width>291</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Sans</family>
+        <pointsize>15</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:#ffffff;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>553</y>
+        <width>341</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>12</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinAndMaxSize</enum>
+       </property>
+       <item>
+        <widget class="QLabel" name="license_type">
+         <property name="font">
+          <font>
+           <family>Pretendard</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:#ffffff;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="style_area">
+         <property name="font">
+          <font>
+           <family>Pretendard</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:#ffffff;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="category">
+         <property name="font">
+          <font>
+           <family>Pretendard</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:#ffffff;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>-10</y>
+        <width>391</width>
+        <height>631</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:#181818;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>29</x>
+        <y>608</y>
+        <width>321</width>
+        <height>91</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>8</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="creator">
+         <property name="font">
+          <font>
+           <family>Pretendard</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:#717171;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="downloads">
+         <property name="font">
+          <font>
+           <family>Pretendard</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:#717171;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="create_at">
+         <property name="font">
+          <font>
+           <family>Pretendard</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:#717171;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="update_up">
+         <property name="font">
+          <font>
+           <family>Pretendard</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:#717171;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QComboBox" name="comboBox_3">
+      <property name="geometry">
+       <rect>
+        <x>141</x>
+        <y>748</y>
+        <width>161</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox {
+    background: #080808;
+ 	color:#ffffff;
+    border: 0.5px solid #282828;
+    border-radius: 10px;
+}
+
+QComboBox QAbstractItemView {
+    background-color:#181818; /* 배경 빨간색 */
+    color: white;
+    selection-background-color: #080808;
+    selection-color: white;
+    
+
+    border:0.5px solid #383838; /* 테두리도 배경과 같은 색으로 */
+
+}</string>
+      </property>
+      <property name="currentText">
+       <string>4096x4096 (281MB)</string>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QComboBox::AdjustToContents</enum>
+      </property>
+      <item>
+       <property name="text">
+        <string>4096x4096 (281MB)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2048 x2048 (141MB)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1024 x1024 (70MB)</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>35</x>
+        <y>728</y>
+        <width>91</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:#ffffff;</string>
+      </property>
+      <property name="text">
+       <string>
+resolution     |</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="download_btn">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>747</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background: transparent;  /* 버튼 배경을 투명하게 설정 */
+    border: none;             /* 테두리 없애기 (필요 시) */
+    background-attachment: fixed;  /* 배경 이미지가 창 크기 변경 시 고정됨 */
+    padding: 0px;                  /* 여백 제거 */
+    margin: 0px;                   /* 여백 제거 */
+    alignment: center;  
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../nas/spirit/asset_project/source/download.png</normaloff>../../../../../nas/spirit/asset_project/source/download.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>717</y>
+        <width>391</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">c</string>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>530</y>
+        <width>390</width>
+        <height>330</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:#101010;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>-10</x>
+        <y>727</y>
+        <width>392</width>
+        <height>330</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:#000000;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <zorder>label_3</zorder>
+     <zorder>label_2</zorder>
      <zorder>exit_btn</zorder>
-     <zorder>detail_thum_0</zorder>
      <zorder>name</zorder>
-     <zorder>detail_thum_1</zorder>
-     <zorder>detail_thum_2</zorder>
-     <zorder>exit_r_btn</zorder>
-     <zorder>exit_l_btn</zorder>
-     <zorder>detail_thum_3</zorder>
+     <zorder>stackedWidget_2</zorder>
+     <zorder>info_list_bar_s</zorder>
+     <zorder>info_name</zorder>
+     <zorder>image_l_btn</zorder>
+     <zorder>image_r_btn</zorder>
+     <zorder>horizontalLayoutWidget</zorder>
+     <zorder>like_btn</zorder>
+     <zorder>exit_btn_3</zorder>
+     <zorder>description</zorder>
+     <zorder>asset_type</zorder>
+     <zorder>info_name_2</zorder>
+     <zorder>horizontalLayoutWidget_2</zorder>
+     <zorder>verticalLayoutWidget</zorder>
+     <zorder>line</zorder>
+     <zorder>label_5</zorder>
+     <zorder>download_btn</zorder>
+     <zorder>comboBox_3</zorder>
+     <zorder>label_4</zorder>
     </widget>
     <widget class="QWidget" name="page_4"/>
    </widget>
@@ -1154,7 +1718,7 @@ background: transparent;</string>
      <x>0</x>
      <y>0</y>
      <width>1250</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
