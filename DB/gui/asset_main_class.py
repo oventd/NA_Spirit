@@ -338,11 +338,16 @@ class MainUi(QMainWindow):
             for label in self.ui.stackedWidget_2.findChildren(QLabel):
                 label.deleteLater()
 
+            self.ui.image_l_btn.clicked.connect(self.prev_slide)
 
-            
-            self.ui.image_l_btn.clicked.disconnect(self.prev_slide)
-            self.ui.image_r_btn.clicked.disconnect(self.next_slide)
+               
+            self.ui.image_r_btn.clicked.connect(self.next_slide)
             self.set_detail_info(asset)
+     
+
+
+
+        
          
 
         except TypeError:
@@ -515,7 +520,7 @@ class MainUi(QMainWindow):
         self.ui.user_num.setText("b976211")
 
     def load_ui(self):
-        ui_file_path = "/home/llly/NA_Spirit/DB/gui/asset_main2.ui"
+        ui_file_path = "/home/rapa/NA_Spirit/DB/gui/asset_main2.ui"
         ui_file = QFile(ui_file_path)  
         loader = QUiLoader() 
         self.ui = loader.load(ui_file) 
