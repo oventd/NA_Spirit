@@ -392,7 +392,7 @@ class UserDb(DbCrud):
         # URL 필드가 없는 경우 기본값 처리
         if details:
             for url_field in [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
-                              PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL]:
+                              PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]:
                 details[url_field] = details.get(url_field, None)
 
         return details

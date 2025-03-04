@@ -34,6 +34,7 @@ TURNAROUND_URL = "turnaround_url" # turnaround_url 값
 RIG_URL = "rig_url" # rig_url 값
 APPLY_HDRI = "applyhdri_url" # applyhdri_url 값
 HDRI_URL = "hdri_url" # hdri_url 값
+MATERIAL_URLS = "material_urls" # material_urls 값
 
 # DB 인덱싱 정의 상수(메타 데이터)
 SCORE = "score"

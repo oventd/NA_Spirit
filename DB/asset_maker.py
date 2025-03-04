@@ -154,48 +154,48 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 # generate_asset_data()
 
 """HDRI 이미지"""
-def generate_asset_data():
-    # 'HDRI' 자산을 업데이트
-    hdri_files = [
-        {"name": "light_indoor", "preview": "light_indoor_hdri_preview.png", "applyhdri": "light_indoor_addhdri.png", "hdri": "light_indoor_hdri.png"},
-        {"name": "night", "preview": "night_hdri_preview.png", "applyhdri": "night_addhdri.png", "hdri": "night_hdri.png"},
-        {"name": "sun", "preview": "sun_hdri_preview.png", "applyhdri": "sun_addhdri.png", "hdri": "sun_hdri.png"}
-    ]
+# def generate_asset_data():
+#     # 'HDRI' 자산을 업데이트
+#     hdri_files = [
+#         {"name": "light_indoor", "preview": "light_indoor_hdri_preview.png", "applyhdri": "light_indoor_addhdri.png", "hdri": "light_indoor_hdri.png"},
+#         {"name": "night", "preview": "night_hdri_preview.png", "applyhdri": "night_addhdri.png", "hdri": "night_hdri.png"},
+#         {"name": "sun", "preview": "sun_hdri_preview.png", "applyhdri": "sun_addhdri.png", "hdri": "sun_hdri.png"}
+#     ]
     
-    descriptions = {
-        "light_indoor": "A bright and warm indoor HDRI, ideal for simulating daylight in interior scenes.",
-        "night": "A dark and moody HDRI, perfect for creating night-time atmospheres in outdoor or indoor environments.",
-        "sun": "A high contrast HDRI with sunlight for realistic outdoor scenes, ideal for daylight simulations."
-    }
+#     descriptions = {
+#         "light_indoor": "A bright and warm indoor HDRI, ideal for simulating daylight in interior scenes.",
+#         "night": "A dark and moody HDRI, perfect for creating night-time atmospheres in outdoor or indoor environments.",
+#         "sun": "A high contrast HDRI with sunlight for realistic outdoor scenes, ideal for daylight simulations."
+#     }
 
-    for i, asset in enumerate(asset_collection.find({"asset_type": "HDRI"})):
-        # 각 HDRI 파일에 대해 순차적으로 데이터 할당
-        hdri_data = hdri_files[i % len(hdri_files)]  # HD리 파일명 순서대로 가져옴
+#     for i, asset in enumerate(asset_collection.find({"asset_type": "HDRI"})):
+#         # 각 HDRI 파일에 대해 순차적으로 데이터 할당
+#         hdri_data = hdri_files[i % len(hdri_files)]  # HD리 파일명 순서대로 가져옴
         
-        preview_url = f"/nas/spirit/DB/thum/hdri/{hdri_data['preview']}"  # preview_url 경로 설정
-        applyhdri_url = f"/nas/spirit/DB/thum/hdri/{hdri_data['applyhdri']}"  # applyhdri_url 경로 설정
-        hdri_url = f"/nas/spirit/DB/thum/hdri/{hdri_data['hdri']}"  # hdri_url 경로 설정
+#         preview_url = f"/nas/spirit/DB/thum/hdri/{hdri_data['preview']}"  # preview_url 경로 설정
+#         applyhdri_url = f"/nas/spirit/DB/thum/hdri/{hdri_data['applyhdri']}"  # applyhdri_url 경로 설정
+#         hdri_url = f"/nas/spirit/DB/thum/hdri/{hdri_data['hdri']}"  # hdri_url 경로 설정
         
-        asset_name = hdri_data["name"]  # 이름을 hdri_data['name']으로 설정
-        description = descriptions.get(hdri_data["name"], "No description available.")  # 설명 설정
+#         asset_name = hdri_data["name"]  # 이름을 hdri_data['name']으로 설정
+#         description = descriptions.get(hdri_data["name"], "No description available.")  # 설명 설정
         
-        # 업데이트 쿼리
-        asset_collection.update_one(
-            {"_id": asset["_id"]},  # 자산을 식별할 수 있는 조건 (_id)
-            {
-                "$set": {
-                    "preview_url": preview_url,
-                    "applyhdri_url": applyhdri_url,
-                    "hdri_url": hdri_url,
-                    "name": asset_name,
-                    "description": description
-                }
-            }
-        )
+#         # 업데이트 쿼리
+#         asset_collection.update_one(
+#             {"_id": asset["_id"]},  # 자산을 식별할 수 있는 조건 (_id)
+#             {
+#                 "$set": {
+#                     "preview_url": preview_url,
+#                     "applyhdri_url": applyhdri_url,
+#                     "hdri_url": hdri_url,
+#                     "name": asset_name,
+#                     "description": description
+#                 }
+#             }
+#         )
 
-    print("HDRI 타입 자산의 preview_url, applyhdri_url, hdri_url, name, description을 업데이트했습니다.")
+#     print("HDRI 타입 자산의 preview_url, applyhdri_url, hdri_url, name, description을 업데이트했습니다.")
 
-generate_asset_data()
+# generate_asset_data()
 
 
 
@@ -312,7 +312,6 @@ generate_asset_data()
 
 
 
-
 """모든 인덱스 삭제"""
 # asset_collection.drop_indexes()
 # print("모든 인덱스 삭제 완료")
@@ -322,3 +321,87 @@ generate_asset_data()
 # print("현재 인덱스 목록:")
 # for index_name, index_info in indexes.items():
 #     print(f"{index_name}: {index_info}"
+
+
+
+
+"""이미지 경로 변경"""
+# image_files와 해당하는 이미지 파일 매핑
+# def update_material():
+#     # image_files_mapping 정의 (이제 preview.png는 제외하고 material_url만 포함)
+#     image_files_mapping = {
+#         "fabric_material": [
+#             "fabric_material_albedo.png", 
+#             "fabric_material_normal.png", 
+#             "fabric_material_ao.png", 
+#             "fabric_material_roughness.png", 
+#             "fabric_material_height.png"
+#         ],
+#         "moss_material": [
+#             "moss_material_albedo.png", 
+#             "moss_material_normal.png", 
+#             "moss_material_ao.png", 
+#             "moss_material_height.png"
+#         ],
+#         "gold_material": [
+#             "gold_material_albedo.png", 
+#             "gold_material_normal.png", 
+#             "gold_material_ao.png", 
+#             "gold_material_height.png", 
+#             "gold_material_roughness.png"
+#         ],
+#         "stone_material": [
+#             "stone_material_albedo.png", 
+#             "stone_material_normal.png", 
+#             "stone_material_ao.png", 
+#             "stone_material_height.png", 
+#             "stone_material_roughness.png"
+#         ],
+#         "leaf_material": [
+#             "leaf_material_albedo.png", 
+#             "leaf_material_normal.png", 
+#             "leaf_material_ao.png", 
+#             "leaf_material_height.png", 
+#             "leaf_material_roughness.png"
+#         ],
+#         "wood_material": [
+#             "wood_material_height.png", 
+#             "wood_material_metallic.png", 
+#             "wood_material_normal.png", 
+#             "wood_material_roughness.png"
+#         ],
+#         "metal_material": [
+#             "metal_material_basecolor.png", 
+#             "metal_material_normal.png", 
+#             "metal_material_roughness.png"
+#         ]
+#     }
+
+#     # "asset_type"이 "Material"인 항목들 찾기
+#     materials = asset_collection.find({"asset_type": "Material"})
+
+#     # 각 항목에 대해 material_url 업데이트
+#     for material in materials:
+#         name = material.get("name")
+        
+#         # 해당 name이 매핑에 있으면
+#         if name in image_files_mapping:
+#             # 해당 이름에 맞는 이미지 경로들 만들기 (preview.png 제외)
+#             material_urls = [f"/nas/spirit/DB/thum/material/{image}" for image in image_files_mapping[name]]
+            
+#             # 해당 문서에 material_urls 필드 추가
+#             result = asset_collection.update_one(
+#                 {"_id": material["_id"]},
+#                 {"$set": {"material_urls": material_urls}}  # material_urls로 필드 이름 변경
+#             )
+            
+#             # 업데이트 성공 여부 확인
+#             print(f"Updated {name}: {result.acknowledged}")
+
+#     print("material_urls 업데이트 완료!")
+
+#     # 업데이트 후 바로 확인
+# updated_material = asset_collection.find_one({"asset_type": "Material"})
+# print(updated_material["material_urls"])  # 이 부분에서 배열로 저장된 값이 출력될 것입니다.
+
+# update_material()
