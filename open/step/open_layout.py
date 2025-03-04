@@ -5,19 +5,19 @@ import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 
-class ModelingStep(StepOpenMaya):
+class LayoutStep(StepOpenMaya):
     def __init__(self):
         super().__init__()
         print ("모델링 불러오기")
 
     def open(self):
-        if not cmds.objExists("geo"):
-            cmds.group(em=True, name="geo")
-            print("geo 그룹이 생성되었습니다.")
+        if not cmds.objExists("layout"):
+            cmds.group(em=True, name="layout")
+            print("The layout group was created.")
         else:
-            print("geo 그룹이 이미 존재합니다.")
+            print("A layout group already exists.")
 
 
-modeling = ModelingStep()
-modeling.open()
+layout = LayoutStep()
+layout.open()
     
