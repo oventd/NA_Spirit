@@ -398,12 +398,28 @@ class UserDb(DbCrud):
         return details
     
     def find(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
+        """
+        자산들을 조회하여 상세 정보를 반환 (필터링, 정렬, 제한, 건너뛰기 등 포함)
+        :param filter_conditions: 필터 조건 (기본값은 None)
+        :param sort_by: 정렬 기준 (기본값은 None)
+        :param limit: 조회할 데이터 수 (기본값은 40)
+        :param skip: 건너뛸 데이터 수 (기본값은 0)
+        :param fields: 반환할 필드 목록 (기본값은 None)
+        :return: 자산들의 상세 정보 리스트
+        """
         details = super().find(filter_conditions, sort_by, limit, skip, fields)
-            # URL 필드가 없는 경우 기본값 처리
+        
+        # URL 필드가 없는 경우 기본값 처리
         if details:
-            for url_field in [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
-                              PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]:
-                details[url_field] = details.get(url_field, None)
+            if isinstance(details, list):  # 결과가 리스트인 경우
+                for item in details:
+                    for url_field in [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
+                                      PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]:
+                        item[url_field] = item.get(url_field, None)
+            else:  # 단일 자산인 경우
+                for url_field in [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
+                                  PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]:
+                    details[url_field] = details.get(url_field, None)
 
         return details
     
