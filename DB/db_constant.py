@@ -40,7 +40,7 @@ MATERIAL_URLS = "material_urls" # material_urls 값
 SCORE = "score"
 TEXT = "text"
 
-# logger 관련 상수
+# DB logger 관련 상수
 LOGGER_NAME = "db_crud" # DbCrud(객체 생성용) 로거 이름
 DB_LOGGER_DIR = "/nas/spirit/DB/db_logger" # 로거 저장 경로
 ASSET_LOGGER_NAME = "user_db" # 로거 저장 이름

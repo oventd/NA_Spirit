@@ -3,10 +3,11 @@ from bson import ObjectId  # MongoDB에서 사용하는 ObjectId를 처리하는
 from datetime import datetime  # 현재 날짜와 시간을 다룰 때 사용
 import pymongo  # MongoDB 작업을 위한 라이브러리
 from db_constant import * # 모든 상수 임포트
-from db_logger import *
 import logging
 import os
-
+import sys
+sys.path.append(os.path.abspath('/home/rapa/NA_Spirit/utils'))
+from logger import *
 """
 대형민 주문사항 CREATED_DATA 처럼 상수 파일 따로 만들어서 파일분리해주세요 그리고 DB 사용하는 모든 파일에 import
 logging 기능도 넣어주세요
@@ -21,7 +22,7 @@ class DbCrud:
         if log_path is None:
             log_path = default_log_dir
 
-        self.logger = get_logger(logger_name, log_path)
+        self.logger = create_logger(logger_name, log_path)
         
 
     # 데이터 삽입 (Create)
