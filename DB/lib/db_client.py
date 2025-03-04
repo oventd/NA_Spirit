@@ -1,7 +1,7 @@
 import pymongo
 from pymongo.errors import ConnectionFailure
 import threading
-from db_constant import MONGODB_ADRESS, DATA_BASE
+from utils.db_constant import MONGODB_ADRESS, DATA_BASE
 
 class MongoDBClient:
     _client = None
