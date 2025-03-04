@@ -486,7 +486,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::FocusPolicy::NoFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">background: #080808;
@@ -494,13 +494,13 @@
 </string>
     </property>
     <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAsNeeded</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAsNeeded</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
     <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::AdjustIgnored</enum>
+     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
     </property>
     <property name="autoScroll">
      <bool>false</bool>
@@ -509,7 +509,7 @@
      <number>0</number>
     </property>
     <property name="textElideMode">
-     <enum>Qt::ElideLeft</enum>
+     <enum>Qt::TextElideMode::ElideLeft</enum>
     </property>
     <property name="showGrid">
      <bool>true</bool>
@@ -698,10 +698,10 @@ color:#ffffff;
 </string>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
+     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::NoSelection</enum>
+     <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
     </property>
     <property name="indentation">
      <number>10</number>
@@ -970,7 +970,7 @@ color:#ffffff;
      </font>
     </property>
     <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
+     <enum>Qt::LayoutDirection::LeftToRight</enum>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -986,7 +986,7 @@ color:#ffffff;
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
+     <enum>QFrame::Shape::NoFrame</enum>
     </property>
     <property name="currentIndex">
      <number>0</number>
@@ -1005,7 +1005,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1017,7 +1016,7 @@ color:#ffffff;
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../../../nas/spirit/asset_project/source/ic___white.png</normaloff>../../../../../../nas/spirit/asset_project/source/ic___white.png</iconset>
+        <normaloff>../../../../../../../nas/spirit/asset_project/source/ic___white.png</normaloff>../../../../../../../nas/spirit/asset_project/source/ic___white.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -1055,7 +1054,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1087,7 +1085,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1167,7 +1164,7 @@ color:#ffffff;
         <number>0</number>
        </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
+        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
        </property>
        <property name="topMargin">
         <number>0</number>
@@ -1187,7 +1184,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1225,7 +1221,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1245,7 +1240,7 @@ color:#ffffff;
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../../nas/spirit/asset_project/source/more_icon.png</normaloff>../../../../../nas/spirit/asset_project/source/more_icon.png</iconset>
+        <normaloff>../../../../../../nas/spirit/asset_project/source/more_icon.png</normaloff>../../../../../../nas/spirit/asset_project/source/more_icon.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -1267,7 +1262,6 @@ color:#ffffff;
        <font>
         <family>Pretendard</family>
         <pointsize>9</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1291,7 +1285,6 @@ color:#ffffff;
        <font>
         <family>Pretendard</family>
         <pointsize>9</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1315,7 +1308,6 @@ color:#ffffff;
        <font>
         <family>Sans</family>
         <pointsize>15</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -1340,7 +1332,7 @@ color:#ffffff;
         <number>12</number>
        </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SetMinAndMaxSize</enum>
+        <enum>QLayout::SizeConstraint::SetMinAndMaxSize</enum>
        </property>
        <item>
         <widget class="QLabel" name="license_type">
@@ -1357,7 +1349,7 @@ color:#ffffff;
           <string/>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -1376,7 +1368,7 @@ color:#ffffff;
           <string/>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -1395,7 +1387,7 @@ color:#ffffff;
           <string/>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -1502,7 +1494,7 @@ color:#ffffff;
         <x>141</x>
         <y>748</y>
         <width>161</width>
-        <height>31</height>
+        <height>20</height>
        </rect>
       </property>
       <property name="font">
@@ -1512,7 +1504,7 @@ color:#ffffff;
        </font>
       </property>
       <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
+       <enum>Qt::LayoutDirection::LeftToRight</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">QComboBox {
@@ -1537,7 +1529,7 @@ QComboBox QAbstractItemView {
        <string>4096x4096 (281MB)</string>
       </property>
       <property name="sizeAdjustPolicy">
-       <enum>QComboBox::AdjustToContents</enum>
+       <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
       </property>
       <item>
        <property name="text">
@@ -1578,7 +1570,7 @@ QComboBox QAbstractItemView {
 resolution     |</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
      <widget class="QPushButton" name="download_btn">
@@ -1594,7 +1586,6 @@ resolution     |</string>
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1614,7 +1605,7 @@ resolution     |</string>
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../../../../../nas/spirit/asset_project/source/download.png</normaloff>../../../../../nas/spirit/asset_project/source/download.png</iconset>
+        <normaloff>../../../../../../nas/spirit/asset_project/source/download.png</normaloff>../../../../../../nas/spirit/asset_project/source/download.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -1636,13 +1627,13 @@ resolution     |</string>
        <string notr="true">c</string>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
+       <enum>QFrame::Shadow::Sunken</enum>
       </property>
       <property name="lineWidth">
        <number>1</number>
       </property>
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
@@ -1702,6 +1693,30 @@ resolution     |</string>
     </widget>
     <widget class="QWidget" name="page_4"/>
    </widget>
+   <widget class="QLabel" name="like_empty_notice">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>310</y>
+      <width>251</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Pretendard Thin</family>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color:#ffffff;</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;아직 관심있는 에셋이 없어요!&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;에셋 상세페이지에서 하트를 눌러주세요&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
    <zorder>label</zorder>
    <zorder>tableWidget</zorder>
    <zorder>user_num</zorder>
@@ -1711,6 +1726,7 @@ resolution     |</string>
    <zorder>toggle_btn_touch_area</zorder>
    <zorder>search</zorder>
    <zorder>stackedWidget</zorder>
+   <zorder>like_empty_notice</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1718,7 +1734,7 @@ resolution     |</string>
      <x>0</x>
      <y>0</y>
      <width>1250</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
