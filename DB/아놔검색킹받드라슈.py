@@ -34,16 +34,29 @@ class DbCrud:
         :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
         :return: 조회된 자산 리스트
         """
+        # filter_conditions가 None이면 빈 리스트로 초기화
         if filter_conditions is None:
             filter_conditions = []
 
-        # filter_conditions는 ObjectId의 리스트라고 가정
-        object_ids = [ObjectId(v) for v in filter_conditions]  # 문자열을 ObjectId로 변환
-        query_filter = {"_id": {"$in": object_ids}}  # _id 값이 object_ids에 포함되는 데이터를 찾는 필터
+        # ObjectId로 변환된 값들을 저장할 빈 리스트를 만들기
+        object_ids = []
 
+        # filter_conditions 리스트에 있는 각 값을 ObjectId로 변환하여 object_ids 리스트에 추가
+        for value in filter_conditions:
+            object_id = ObjectId(value)  # value를 ObjectId로 변환
+            object_ids.append(object_id)  # 변환된 ObjectId를 리스트에 추가
 
-        # 필요한 필드를 선택할 프로젝션 설정 (동적 필드 지정)
-        projection = {field: 1 for field in fields} if fields else None
+        # _id 필드를 ObjectId 값들로 필터링하기 위한 쿼리 작성
+        query_filter = {"_id": {"$in": object_ids}}
+
+        # 필드 목록이 주어지면 그에 맞는 프로젝션 생성
+        if fields:
+            projection = {}  # 빈 딕셔너리 생성
+            for field in fields:
+                projection[field] = 1  # 각 필드를 1로 설정하여 포함시킴
+        else:
+            projection = None  # 필드가 없다면 None으로 설정
+
         
         # 파이프라인 생성
         pipeline = [
