@@ -25,7 +25,7 @@ from asset_service import AssetService  # AssetService 임포트
 from asset_service import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
-from db_constant import *
+from constant import *
 
 class MainUi(QMainWindow):
     clicked = Signal()

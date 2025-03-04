@@ -1,7 +1,11 @@
 import pymongo
 from pymongo.errors import ConnectionFailure
 import threading
-from utils.db_constant import MONGODB_ADRESS, DATA_BASE
+import sys
+import os
+utils_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), "../../../"))+'/utils'
+sys.path.append(utils_dir)
+from constant import MONGODB_ADRESS, DATA_BASE
 
 class MongoDBClient:
     _client = None
