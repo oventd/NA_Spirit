@@ -17,12 +17,12 @@ class JsonManager:
             print(f"JSON file not found: {self.file_path}")
             return {}
         try:
-            with open(self.__path, "r") as file:
-                if os.stat(self.__path).st_size == 0:
+            with open(self.file_path, "r") as file:
+                if os.stat(self.file_path).st_size == 0:
                     return {}
                 return json.load(file)
         except json.JSONDecodeError:
-            raise ValueError(f"'{self.__path}' contains invalid JSON data.")
+            raise ValueError(f"'{self.file_path}' contains invalid JSON data.")
 
     def write_json(self, data: dict) -> None:
         """

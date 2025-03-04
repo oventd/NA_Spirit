@@ -3,8 +3,14 @@ import sys
 import shutil
 import importlib
 import re
-from json_manager import JsonManager
+
 import logging
+
+current_file_path = os.path.abspath(__file__)
+print(os.path.abspath(os.path.join(current_file_path, "../../../")))
+sys.path.append(os.path.abspath(os.path.join(current_file_path, "../../../")))
+
+from class_loader import load_classes_from_json
 
 # 로깅 설정 (필요에 따라 파일 로깅 등 추가 가능)
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -15,7 +21,7 @@ class LoadManager:
         self.types = ["assets", "sequences"]
         self.default_file = "scene"
         print(dcc_config_path)
-        self.dcc_creators = self.load_dcc_creators(dcc_config_path)
+        self.dcc_creators = load_classes_from_json(dcc_config_path)
 
     @property
     def root_path(self) -> str:
@@ -24,63 +30,6 @@ class LoadManager:
     @root_path.setter
     def root_path(self, value: str) -> None:
         self._root_path = value
-
-    def load_dcc_creators(self, config_path: str) -> dict:
-        """
-        JSON 파일을 읽어 dcc_creators 딕셔너리를 동적으로 생성합니다.
-        
-        JSON 예시:
-        {
-          "maya": {
-            "module": "maya_creator",
-            "class": "MayaWorkFileCreator",
-            "path": "loadManager/work_dcc_file_creators/maya_work_file_creator.py"
-          },
-          "houdini": {
-            "module": "houdini_creator",
-            "class": "HoudiniWorkFileCreator",
-            "path": "loadManager/work_dcc_file_creators/houdini_work_file_creator.py"
-          }
-        }
-        
-        여기서 path는 load_manager.py 파일이 있는 디렉토리를 기준으로 상대경로로 해석됩니다.
-        """
-        print(os.path.exists(config_path))
-        json_manager = JsonManager(config_path)
-        config = json_manager.read_json()
-        print(config_path,config)
-        creators = {}
-        # 현재 파일(load_manager.py)의 디렉토리
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        
-        for dcc, info in config.items():
-            module_name = info.get("module")
-            class_name = info.get("class")
-            module_path_value = info.get("path")
-            if module_path_value:
-                # 만약 module_path_value가 절대경로가 아니라면, 현재 파일 기준으로 해석합니다.
-                if not os.path.isabs(module_path_value):
-                    module_path_value = os.path.join(current_dir, module_path_value)
-                # module_path_value가 파일 경로라면 해당 파일이 있는 디렉토리를 사용합니다.
-                module_dir = os.path.dirname(module_path_value)
-            else:
-                module_dir = None
-
-            if module_dir and module_dir not in sys.path:
-                sys.path.append(module_dir)
-                logging.debug(f"Added to sys.path: {module_dir}")
-            if not module_name or not class_name:
-                logging.warning(f"Skipping {dcc} creator due to missing module or class info.")
-                continue
-            try:
-                module = importlib.import_module(module_name)
-                creator_class = getattr(module, class_name)
-                creators[dcc] = creator_class()  # 인스턴스 생성
-                logging.info(f"Loaded {dcc} creator from module '{module_name}'.")
-            except (ModuleNotFoundError, AttributeError) as e:
-                logging.error(f"Error loading {dcc} creator: {e}")
-        print(creators)
-        return creators
 
     def validate_inputs(self, entity_type: str, dcc: str) -> None:
         """
@@ -155,11 +104,13 @@ class LoadManager:
         return f"v{new_version:03d}"
 
     @staticmethod
-    def make_entity_file_path(root_path: str, entity_type: str, category: str, entity: str, step: str, version: str = None, dcc: str = None, file: str = None) -> str:
+    def make_entity_file_path(root_path: str, entity_type: str, category: str, entity: str, step: str = None, version: str = None, dcc: str = None, file: str = None) -> str:
         """
         root_path와 나머지 인자들을 결합하여 파일 경로를 생성합니다.
         """
-        path_parts = [entity_type, category, entity, step]
+        path_parts = [entity_type, category, entity]
+        if step is not None:
+            path_parts.append(step)
         if version is not None:
             path_parts.append(version)
         if dcc is not None:
@@ -202,16 +153,48 @@ class LoadManager:
             raise ValueError(f"No work file creator defined for dcc '{dcc}'.")
         try:
             result = creator.create_work_file(library_file_path, file_path)
+            if result is None:
+                raise ValueError(f"Work file creator for dcc '{dcc}' returned None.")
             logging.info(f"Work file created: {file_path}")
             return result
         except Exception as e:
             logging.error(f"Error creating work file for {dcc}: {e}")
             raise
 
+    def remove_entity(self, entity_info: dict) -> None:
+        """
+        해당 entity의 work 및 publish 파일을 삭제합니다.
+
+        entity_info 딕셔너리는 다음 키를 포함해야 합니다.
+          - entity_type: 'assets' 또는 'sequences'
+          - category: 카테고리 (예: 'Prop')
+          - entity: 에셋명 (예: 'Chair')
+          - step: 작업 스텝 (예: 'MDL')
+          - dcc: 'maya' 또는 'houdini'
+        """
+        entity_type = entity_info.get("entity_type")
+        category = entity_info.get("category")
+        entity = entity_info.get("entity")
+        step = entity_info.get("step")
+        dcc = entity_info.get("dcc")
+        
+        step_path = self.make_entity_file_path(self._root_path, entity_type, category, entity, step)
+        asset_path = self.make_entity_file_path(self._root_path, entity_type, category, entity)
+
+        if not os.path.exists(step_path):
+            logging.warning(f"Entity not found: {entity_info}")
+            return
+        
+        shutil.rmtree(step_path)
+        if os.listdir(asset_path) == []:
+            shutil.rmtree(asset_path)
+
+        logging.info(f"Entity removed: {entity_info}")
 
 if __name__ == "__main__":
+
     # 예: dcc_config.json 파일의 경로를 지정합니다.
-    dcc_config_path = "/home/rapa/NA_Spirit/load/loadManager/work_file_creators.json"
+    dcc_config_path = "/home/rapa/NA_Spirit/load/manager/work_file_creators.json"
     lm = LoadManager("/nas/sam/show/test", dcc_config_path)
     library_asset_path = "/home/rapa/Kitchen_set/assets/Chair/Chair.usd"
     entity_info = {
@@ -223,4 +206,4 @@ if __name__ == "__main__":
         "work_ext": ".ma",
         "publish_ext": ".usd"
     }
-    lm.add_entity(library_asset_path, entity_info)
+    lm.remove_entity(entity_info)
