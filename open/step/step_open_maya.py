@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class StepOpenMaya(metaclass=ABC):
+class StepOpenMaya(ABC):
     #@abstractmethod
     #def validate(self)
     #    pass
