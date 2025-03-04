@@ -12,7 +12,7 @@ class MayaWorkFileCreator(WorkFileCreator):
 
 
         # USD 파일 import 
-        library_file_path = "/home/rapa/3D_usd/Kitchen_set/assets/OilBottle/OilBottle.usd"
+        library_file_path = ""
         
         if not os.path.exists(library_file_path):
             print(f"USD file not found: {library_file_path}") # 함수화해서 재활용할 수
@@ -22,7 +22,7 @@ class MayaWorkFileCreator(WorkFileCreator):
         cmds.file(library_file_path, i=True, type="USD Import")
      
          # import 된 새로운 파일 save as 
-        save_path = "/home/rapa/3D_usd/test/real/OilBottle_v001.ma"
+        save_path = ""
         save_dir = os.path.dirname(save_path)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
@@ -36,6 +36,6 @@ if __name__ == "__main__":
     work_file_creator = MayaWorkFileCreator()
 
     library_path = "/home/rapa/3D_usd/Kitchen_set/assets/OilBottle/OilBottle_v001.usd"
-    save_path = "/home/rapa/3D_usd/test/real/OilBottle_v001.ma"
+    save_path = ""
 
     work_file_creator.create_work_file(library_path, save_path)
