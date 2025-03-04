@@ -109,6 +109,52 @@ class DbCrud:
         print(f"[DEBUG] Retrieved Asset Details: {details}")
         self.logger.info(f"Retrieved document ID: {object_id}")
         return details
+    
+    def find_and_sort(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
+        """
+        필터 조건에 맞는 자산들을 조회하고, 해당 자산들을 정렬합니다.
+        :param filter_conditions: ObjectId 리스트 (기본값은 None, 모든 자산 조회)
+        :param sort_by: 정렬 기준 (기본값은 None, 정렬하지 않음)
+        :param limit: 조회할 데이터 수 (기본값은 40)
+        :param skip: 건너뛸 데이터 수 (기본값은 0)
+        :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
+        :return: 조회된 자산 리스트
+        """
+        if filter_conditions is None:
+            filter_conditions = []
+
+        # _id 필드를 리스트로 전달받은 ObjectId 값들로 필터링
+        query_filter = {"_id": {"$in": [ObjectId(v) for v in filter_conditions]}}
+
+        # 필요한 필드를 선택할 프로젝션 설정 (동적 필드 지정)
+        projection = {field: 1 for field in fields} if fields else None
+        
+        # 파이프라인 생성
+        pipeline = [
+            {"$match": query_filter},  # _id 필터링
+            {"$limit": limit},         # 제한된 개수만 조회
+            {"$skip": skip},           # 건너뛰기
+            {"$project": projection} if projection else None,  # 필드 선택
+            {"$sort": {sort_by: pymongo.DESCENDING}} if sort_by else None,  # 정렬
+        ]
+
+        # None 값 제거 (필요한 단계만 파이프라인에 추가)
+        pipeline = [step for step in pipeline if step]
+
+        # 쿼리 실행
+        result = list(self.asset_collection.aggregate(pipeline))
+        
+        return result
+
+
+
+
+
+
+
+
+
+
 
     # 데이터 수정 (Update)
     def update_one(self, object_id, update_data):

@@ -33,5 +33,6 @@ class MatchMoveStep(StepOpenMaya):
         else:
             print("A env group already exists.")
 
+# MatchMoveStep 객체 생성 및 open 메서드 실행
 matchmove = MatchMoveStep()
 matchmove.open()
