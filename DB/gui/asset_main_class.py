@@ -1,3 +1,6 @@
+# 로거 파일 추가해서 유저가 중요한 
+
+
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
 from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject
 from PySide6.QtGui import QPixmap, QPixmap, QIcon
@@ -6,6 +9,7 @@ from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
 from functools import partial
 import sys
 import os
+
 # 현재 파일(ui.py)의 절대 경로
 current_file_path = os.path.abspath(__file__)
 
@@ -30,20 +34,20 @@ class MainUi(QMainWindow):
         self.load_ui()
         self.image_labels = [] 
         self.check_dict = {}    
-        self.like_asset_dict = {}
+        self.like_asset_list = []
+    
         self.main_ui_setting()
         self.ui.exit_btn.clicked.connect(self.exit_sub_win)
+        self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
+        self.ui.treeWidget.itemClicked.connect(self.toggle_checkbox)
+        self.filter=self.ui.treeWidget.itemClicked.connect(self.get_checked_items)
+        self.ui.image_l_btn.clicked.connect(self.prev_slide)
+        self.ui.image_r_btn.clicked.connect(self.next_slide)
+        self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
         
-       
-        
-    
-
-
-  
+        self.ui.like_btn.clicked.connect(self.toggle_like_icon)
 
     def make_label_list(self):
-         
-
         for _ in range(4):  # 4개의 QLabel을 미리 생성
             label = QLabel()
             label.setFixedSize(60, 60)
@@ -54,8 +58,6 @@ class MainUi(QMainWindow):
     def exit_sub_win(self):
         
         self.ui.stackedWidget.hide()
-
-        
     
     def get_checked_items(self):
         """QTreeWidget에서 체크된 항목들의 텍스트를 가져오는 함수"""
@@ -70,15 +72,10 @@ class MainUi(QMainWindow):
                     checked_items.append(child.text(0))  #  항목의 텍스트 저장
                 traverse_tree(child)  #  자식 항목이 있을 경우 재귀적으로 탐색
 
-
         traverse_tree(root)  # 트리 탐색 시작
 
-        
         return checked_items
-     
 
-        
-        
     def set_search_area_design(self):
         search_input =self. ui.search
         search_input.setPlaceholderText("검색하기") 
@@ -93,23 +90,30 @@ class MainUi(QMainWindow):
         }
     """)
 
-    def toggle_like_icon(self,asset):
-        """하트 버튼을 눌렀을때 아이콘 변경 & 딕셔너리에 좋아요한 asset 정보 저장 """
-
-
+    def toggle_like_icon(self):
+        """하트 버튼을 누르는 시그널로 실행
+        아이콘 변경 & 딕셔너리에 좋아요한 asset 정보 저장 """
+     
+        asset = self.current_asset
         current_icon = self.ui.like_btn.icon()
-        
+      
         if current_icon.cacheKey() == self.like_icon_empty.cacheKey():  #빈하트 상태일때 
             self.ui.like_btn.setIcon(self.like_icon)
-            for asset_id, asset_info in asset.items(): 
-                self.like_asset_dict[asset_id]=asset_info
-             
-        else:
-            self.ui.like_btn.setIcon(self.like_icon_empty)  #채워진 하트 상태일때 
-            for asset_id, asset_info in asset.items(): 
-                del self.like_asset_dict[asset_id]
-     
+            self.like_asset_list.append(str(asset[OBJECT_ID]))
+           
+                
+        else:  # 채워진 하트 상태일 때 (좋아요 취소)
+            self.ui.like_btn.setIcon(self.like_icon_empty)  # 빈 하트로 변경
+            if str(asset[OBJECT_ID]) in self.like_asset_list:
+                self.like_asset_list.remove(str(asset[OBJECT_ID]))  # 리스트에서 제거
+                
+        self.set_like_icon(asset)
 
+    def set_like_icon(self, asset):
+        if str(asset[OBJECT_ID]) in self.like_asset_list: #에셋딕트 안에 에셋이 있다면 
+            self.ui.like_btn.setIcon(self.like_icon)
+        else:
+            self.ui.like_btn.setIcon(self.like_icon_empty)
 
     def main_ui_setting(self):
 
@@ -133,7 +137,6 @@ class MainUi(QMainWindow):
         self.like_icon = QIcon("/nas/spirit/asset_project/source/like_icon_on.png")
 
         self.ui.like_btn.setIcon(self.like_icon_empty)
-       
 
         self.like_active =False
         self.toggle_open =QPixmap("/nas/spirit/asset_project/source/toggle_open.png")
@@ -147,28 +150,17 @@ class MainUi(QMainWindow):
         
         self.ui.label.setPixmap(bg)
 
-        self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
-
         #사이드 바 기본 설정 
-        
-        self.ui.treeWidget.itemClicked.connect(self.toggle_checkbox)
-        
-
         self.ui.stackedWidget.hide()
-        self.filter=self.ui.treeWidget.itemClicked.connect(self.get_checked_items)
-
-
+    
         # 사이드 바 안에 이미지 롤링 배너 안 stackedwidget에 속한 위젯 지우기
         self.ui.stackedWidget_2.removeWidget(self.ui.page)
         self.ui.stackedWidget_2.removeWidget(self.ui.page_2)
 
         #정렬 콤보박스를 바꾸면 set_sorting_option 메서드로 연결
-        self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
-
+        
 
     def set_sorting_option(self, option):
-
-
         #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
         if option == "오래된 순":
             print(f"오래된 순의 필터임 :{self.check_dict}")
@@ -182,8 +174,6 @@ class MainUi(QMainWindow):
             print("최신 순서를 정렬할게요")
             self.table_widget(self.check_dict,CREATED_AT, 40, 0, None)
 
-
-
     def toggle_change(self): 
 
         """
@@ -193,23 +183,29 @@ class MainUi(QMainWindow):
         """
 
         if self.like_active == False:
-            if not self.like_asset_dict:
-                self.ui.tableWidget.clear()
-                self.ui.like_empty_notice.show()
-            
             self.ui.toggle_btn.setPixmap(self.toggle_like)
             self.like_active = True
-            self.table_widget(self.like_asset_dict,UPDATED_AT, 40, 0,None)
-            
-            
-        else:
-            self.ui.like_empty_notice.hide()
-            self.ui.tableWidget.clear()
-            self.ui.toggle_btn.setPixmap(self.toggle_open)
-            self.like_active = False
-            self.table_widget(self.check_dict,UPDATED_AT, 40, 0,None)
-
-        
+            if not self.like_asset_list:
+                self.ui.tableWidget.clear()
+                self.ui.like_empty_notice.show()
+                
+            else:
+                self.ui.tableWidget.clear()
+                like_asset_dict = []
+                for object_id in self.like_asset_list:
+                    asset_info = AssetService.get_asset_by_id(object_id)
+                    like_asset_dict.append(asset_info)
+                    
+                self.make_table(like_asset_dict)
+                self.ui.like_empty_notice.hide()
+        else: 
+            if self.like_active == True:
+                self.ui.toggle_btn.setPixmap(self.toggle_open)
+                self.like_active = False
+                self.ui.like_empty_notice.hide()
+                self.ui.tableWidget.clear()
+                self.table_widget(self.check_dict,UPDATED_AT, 40, 0,None)
+                #사용자 pc에 저장해두고 라이크 받을때 마다 오브젝트 id를 json에 저장해두고 
 
 
     def add_tree_checkbox(self): # 리뷰 메서드 이름  , 변수명
@@ -241,9 +237,6 @@ class MainUi(QMainWindow):
             """)
         self.ui.treeWidget.expandAll()
         self.add_tree_checkbox()
-
-
-
       
     def toggle_checkbox(self, item, column): 
         """트리 항목 클릭 시 체크 상태 토글"""
@@ -265,11 +258,8 @@ class MainUi(QMainWindow):
                 parent_item_convert = "category"
             else: 
                 parent_item_convert = "style"
-
-
   
             item.setCheckState(column, new_state)  # 체크박스 상태 변경
-            
             
             if new_state == Qt.Checked:  #체크 상태일 경우 부모 item을 키로 item을 list에 담아 value로 추가
                 self.check_dict.setdefault(parent_item_convert, []).append(filter_name_convert)
@@ -277,7 +267,6 @@ class MainUi(QMainWindow):
                 self.check_dict[parent_item_convert].remove(filter_name_convert)
                 if self.check_dict[parent_item_convert] == []:
                     del self.check_dict[parent_item_convert]
-              
            
             sort_by = self.ui.comboBox.currentText()
             if sort_by == "최신 순":
@@ -287,15 +276,9 @@ class MainUi(QMainWindow):
             else:
                 sort_by = DOWNLOADS
                 
-
             self.table_widget(filter_conditions = self.check_dict, sort_by= sort_by, limit = 20, skip = 0, fields =None)
 
             #만들어 진 리스트를 필터로 table에 정렬해주기 + s실제 콤보박스의 정렬이랑도 섞여야함
-         
-
-        
-    
-
 
     def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
         # 리뷰 이거 셀프로 init에 구현 이거 근데 저장하는 변수명이 쫌...... 
@@ -303,13 +286,13 @@ class MainUi(QMainWindow):
         self.ui.like_empty_notice.hide()
        
         asset = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
-        len_asset =len(asset)
         print(f"asset입니다 >>>>>>> {asset}")
+        self.make_table(asset)
 
         #"file_format", "updated_at", "downloads" << 가지고 있는 정렬 기준
 
-
-
+    def make_table(self, asset):
+        len_asset =len(asset)
         self.ui.tableWidget.horizontalHeader().setVisible(False)  # 열(가로) 헤더 숨기기
         self.ui.tableWidget.verticalHeader().setVisible(False)  # 행(세로) 헤더 숨기기
 
@@ -325,50 +308,30 @@ class MainUi(QMainWindow):
             col_index = index % max_columns   # 나머지를 통해 몇번째 열에 있는지 정의
             self.add_thumbnail(row_index, col_index, asset)
 
-    
     def del_label(self, asset):
         """라벨 클릭 이벤트 발생 시 실행"""
        # 기존 라벨 개수 확인
-        
-   
         for label in self.ui.image_widget_s.findChildren(QWidget):
             print(f" QLabel 위치 확인: {label} (부모: {label.parent()})")
 
         try:
-            
             for label in self.ui.stackedWidget_2.findChildren(QLabel):
                 label.deleteLater()
 
-            self.ui.image_l_btn.clicked.connect(self.prev_slide)
-
-               
-            self.ui.image_r_btn.clicked.connect(self.next_slide)
             self.set_detail_info(asset)
-     
-
-
-
-        
-         
 
         except TypeError:
-            self.set_detail_info(asset)
+            # self.set_detail_info(asset)
+            print("error")
 
-  
-    
     def set_detail_info(self, asset):
         self.ui.stackedWidget.show()
-        
-        for asset_id, asset_info in asset.items(): 
-
-            if asset_id in self.like_asset_dict:
-                print(f">>>>>>>>에셋아이디{asset_id}")
-                self.ui.like_btn.setIcon(self.like_icon) 
-            else:  
-                self.ui.like_btn.setIcon(self.like_icon_empty)
-
-        self.ui.like_btn.clicked.connect(partial(self.toggle_like_icon,asset))
         detail_thum_urls=[]
+        
+        # for asset_id, asset_info in asset.items(): 
+        self.set_like_icon(asset)
+
+        self.current_asset = asset
         self.ui.info_name.setText(asset[NAME])
         self.ui.info_name_2.setText(asset[NAME])
         self.ui.description.setText(asset[DESCRIPTION])
@@ -379,7 +342,6 @@ class MainUi(QMainWindow):
         self.ui.update_up.setText(f"최종 수정일 : {asset[UPDATED_AT]}회")
 
         #세부항목 태그
-
         common_style = "color: #ffffff; background-color: #282828; padding: 5px; border-radius: 12px;"
 
         # QLabel 목록과 해당할 데이터 매핑
@@ -387,9 +349,6 @@ class MainUi(QMainWindow):
             self.ui.category: asset[CATEGORY],
             self.ui.style_area: asset[STYLE],
             self.ui.license_type: asset[LICENSE_TYPE],
-            
-
-         
         }
 
         # 반복문을 사용해 설정 적용
@@ -397,10 +356,6 @@ class MainUi(QMainWindow):
             label.setText(text)
             label.setStyleSheet(common_style)
             label.adjustSize()
-
-
-
-
 
         # 이미지 URL 가져오기
         detail_thum_urls = [
@@ -412,12 +367,13 @@ class MainUi(QMainWindow):
         
         print(detail_thum_urls)
         for img_path in detail_thum_urls:
+            if img_path == None:
+                continue
             label = QLabel()
             pixmap = QPixmap(img_path)
             label.setPixmap(pixmap)
             label.setAlignment(Qt.AlignCenter)
             self.ui.stackedWidget_2.addWidget(label)
-      
 
         for idx, label in enumerate(self.image_labels):
             if idx < len(detail_thum_urls) and detail_thum_urls[idx]:  # URL이 있는 경우에만 설정
@@ -428,31 +384,27 @@ class MainUi(QMainWindow):
         
         self.ui.stackedWidget.setCurrentIndex(0)  # 0번째의 label을 보여준다. 
         
-        self.ui.image_l_btn.clicked.connect(self.prev_slide)
-        self.ui.image_r_btn.clicked.connect(self.next_slide)
+        
 
     def next_slide(self):
         """다음 슬라이드 이동"""
         current_index = self.ui.stackedWidget_2.currentIndex()
         next_index = (current_index + 1) % self.ui.stackedWidget_2.count()
         self.ui.stackedWidget_2.setCurrentIndex(next_index)
-        print("다음 이미지로 변경됨")
+        print(f"{next_index}다음 이미지로 변경됨")
       
-
     def prev_slide(self):
         """이전 슬라이드 이동"""
         current_index = self.ui.stackedWidget_2.currentIndex()
         prev_index = (current_index - 1) % self.ui.stackedWidget_2.count()
         self.ui.stackedWidget_2.setCurrentIndex(prev_index)
         print("이전 이미지로 변경됨")
-
       # 리뷰 순서를 정리를 
 
     def add_thumbnail(self, row, col, asset):
         thumbnail_path = asset["preview_url"]
         asset_name = asset["name"] 
         aseet_type = asset["asset_type"]
-
 
         widget = QWidget()  # 셀 안에 넣을 위젯 생성
         layout = QVBoxLayout()  # 세로 정렬을 위한 레이아웃 생성
@@ -507,7 +459,6 @@ class MainUi(QMainWindow):
         name.setFixedHeight(14)
         name.setAlignment(Qt.AlignCenter)
 
-
         type.setStyleSheet("color: white;")
         type.setStyleSheet("""
             color: white;                 /* 글자 색상 */
@@ -519,8 +470,6 @@ class MainUi(QMainWindow):
         
         type.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         type.setFixedHeight(18)
-
-
 
         self.ui.tableWidget.setCellWidget(row, col, widget)  # 행과 열에 이미지 추가
         self.ui.tableWidget.resizeRowsToContents() 

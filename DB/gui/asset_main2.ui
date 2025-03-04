@@ -453,7 +453,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Asset_Lib</string>
   </property>
   <property name="styleSheet">
    <string notr="true">color : #080808;</string>
