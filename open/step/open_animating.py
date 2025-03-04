@@ -5,10 +5,10 @@ import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 
-class LayoutStep(StepOpenMaya):
+class AnimatingStep(StepOpenMaya):
     def __init__(self):
         super().__init__()
-        print ("layout initialized")
+        print ("Animating initialized")
 
     def open(self):
         #리그 그룹
@@ -58,6 +58,6 @@ class LayoutStep(StepOpenMaya):
             print("The camera {camera_file} was not found.")
 
 
-layout = LayoutStep()
-layout.open()
+animation = AnimatingStep()
+animation.open()
     
