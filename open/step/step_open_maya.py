@@ -2,8 +2,7 @@ from abc import ABC, abstractmethod
 
 class StepOpenMaya(ABC):
     def __init__(self):
-        print ("초기화")
-
+        pass
     @abstractmethod
     def open(self):
         pass
