@@ -1,12 +1,9 @@
 from abc import ABC, abstractmethod
 
-class StepOpenMaya(metaclass=ABC):
-    #@abstractmethod
-    #def validate(self)
-    #    pass
-
+class StepOpenMaya(ABC):
     def __init__(self):
-        pass
+        print ("초기화")
+
     @abstractmethod
     def open(self):
         pass
