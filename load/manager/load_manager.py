@@ -7,8 +7,9 @@ import re
 import logging
 
 current_file_path = os.path.abspath(__file__)
-print(os.path.abspath(os.path.join(current_file_path, "../../../")))
-sys.path.append(os.path.abspath(os.path.join(current_file_path, "../../../")))
+spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../../"))
+utils_dir = os.path.abspath(os.path.join(spirit_dir, "utils"))
+sys.path.append(utils_dir)
 
 from class_loader import load_classes_from_json
 
@@ -206,4 +207,5 @@ if __name__ == "__main__":
         "work_ext": ".ma",
         "publish_ext": ".usd"
     }
+    lm.add_entity(library_asset_path, entity_info)
     lm.remove_entity(entity_info)

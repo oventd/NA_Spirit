@@ -1,7 +1,7 @@
 import os
 import sys
 import importlib
-from json_manager import JsonManager
+from json_utils import JsonUtils
 
 def load_classes_from_json(json_file_path: str) -> dict:
     """
@@ -30,8 +30,7 @@ def load_classes_from_json(json_file_path: str) -> dict:
         return {}
 
     # JSON 파일을 읽어 딕셔너리로 변환
-    json_loader = JsonManager(json_file_path)
-    data_dict = json_loader.read_json()
+    data_dict = JsonUtils.read_json(json_file_path)
     
     # 생성된 클래스 인스턴스를 저장할 딕셔너리
     loaded_classes = {}
