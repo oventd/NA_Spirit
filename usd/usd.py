@@ -5,22 +5,47 @@ sys.path.append(utils_dir)
 
 from constant import *
 
+from sg_path_utils import SgPathUtils
+
 class UsdProcessor:
 
-    def __init__(self):
+    def __init__(self, entity_path:str):
+
+        self.entity_path = entity_path
+        
+
+
+        self.entity_type = SgPathUtils.get_entity_type(entity_path)
+        
         self.step_publish_data_dict = {
             MODELING : ['geo'],
             # LOOKDEV : [],
             RIGGING : [],
             MATCHMOVE : ["camera", "terrain"],
             LAYOUT : ["camera", "terrain"],
-            ANIMATION : ["camera", "terrain", "anim_cache"],
+            ANIMATING : ["camera", "terrain", "anim_cache"],
             LIGHTING : ["light"],
-             
         }
+    
+    @staticmethod
+    def trim_entity_path(entity_path):
+        dirs = entity_path.split("/")
+        for i, dir in enumerate(dirs):
+            if dir == "assets" or dir == "sequences":
+                
+
+
 
     @staticmethod
-    def get_arg_dict(geo= None, char = None, anim_cache = None, terrain = None, camera = None, light = None):
+    def get_arg_dict(
+        geo= None, 
+        char = None, 
+        anim_cache = None, 
+        terrain = None, 
+        camera = None, 
+        light = None
+        ):
+        
         provided_args = {
             "geo": geo,
             "char": char,
@@ -56,15 +81,15 @@ class UsdProcessor:
             print("UsdProcessor MatchMove")
         elif step == LAYOUT:
             print("UsdProcessor Layout")
-        elif step == ANIMATION:
+        elif step == ANIMATING:
             print("UsdProcessor Animate")
         elif step == LIGHTING:
             print("UsdProcessor Lighting")
 
     
-    
-    
 
 if __name__ == "__main__":
-    usd = UsdProcessor()
-    usd.process(MODELING, geo = "", camera= "")
+    root_path = "/nas/sam/show/applestore/assets/Character/Bille/RIG/work/maya/scene.v012.ma"
+
+    usd = UsdProcessor(root_path)
+    # usd.process(MODELING, geo = "", camera= "")

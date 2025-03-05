@@ -55,3 +55,13 @@ LAYOUT = 'Layout'
 ANIMATING = 'Animation'
 LIGHTING = 'Light'
 COMPOSITING = 'Comp'
+
+# Shotgrid Pipeline Step Shot 상수
+MDL = 'MDL' # Model
+RIG = 'RIG' # Rig
+LDV = 'LDV' # Lookdev
+MMV = 'MMV' # Matchmove
+LAY = 'LAY' # Layout
+ANM = 'ANM' # Animation
+LGT = 'LGT' # Light
+CMP = 'CMP' # Compositing
