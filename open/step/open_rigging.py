@@ -11,6 +11,10 @@ class RiggingStep(StepOpenMaya):
         print("Opening rigging step")
 
     def open(self):
+        self.create_rig_group()
+
+    def create_rig_group(self):
+        """rig 그룹을 생성하는 메서드"""
         if not cmds.objExists("rig"):
             cmds.group(em=True, name="rig")
             print("The rig group was created.")
@@ -18,4 +22,4 @@ class RiggingStep(StepOpenMaya):
             print("A rig group already exists.")
 
 rigging = RiggingStep()
-rigging.open()  # Open하면 자동으로 GEO 그룹 생성됨!
+rigging.open()
