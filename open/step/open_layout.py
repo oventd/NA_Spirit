@@ -11,53 +11,32 @@ class LayoutStep(StepOpenMaya):
         print ("layout initialized")
 
     def open(self):
-        #리그 그룹
-        if not cmds.objExists("rig"):
-            cmds.group(em=True, name="rig")
-            print("The rig group was created.")
-        else:
-            print("A rig group already exists.")
-        # terrain 그룹
-        if not cmds.objExists("terrain"):
-            cmds.group(em=True, name="terrain")
-            print("The terrain group was created.")
-        else:
-            print("A terrain group already exists.")
-        
-        # camera 그룹
-        if not cmds.objExists("camera"):
-            cmds.group(em=True, name="camera")
-            print("The camera group was created.")
-            self.reference_camera()
-    
-        else:
-            print("A camera group already exists.")
-            
-    def reference_rig(self):
-        rig_file =""
-        if os.path.exists(rig_file):
-            cmds.file(rig_file, name="rig")
-            print("The rig {rig_file} was referenced.")
-        else:
-            print("The rig {rig_file} was not found.")
-    
-    def reference_terrain(self):
-        terrain_file =""
-        if os.path.exists(terrain_file):
-            cmds.file(terrain_file, reference=True, namesapce="terrain")
-            print("The terrain {terrain_file} was referenced.")
-        else:
-            print("The terrain {terrain_file} was not found.")
-    
-    def reference_camera(self):
-        camera_file =""
-        if os.path.exists(camera_file):
-            cmds.file(camera_file, reference=True, namesapce="camera")
-            print("The camera {camera_file} was referenced.")
-        else:
-            print("The camera {camera_file} was not found.")
+        self.create_group("char")
+        self.create_group("env")
+        self.create_group("camera")
 
+        self.reference_file("","char")
+        self.reference_file("","env")
+        self.reference_file("","camera")
+
+        # 매치무브 카메라
+        self.reference_file("", "matchmove_camera")
+        self.reference_file("", "matchmove_env")
+        
+    def create_group(self, group_name):
+        if not cmds.objExists(group_name):
+            cmds.group(em=True, name=group_name)
+            print(f"The {group_name} group was created.")
+        else:
+            print(f"A {group_name} group already exists.")
+    
+    def reference_file(self, file_path, group_name):
+        if os.path.exists(file_path):
+            cmds.file(file_path, name=group_name)
+            print(f"The {group_name} {file_path} was referenced.")
+        else:
+            print(f"The {group_name} {file_path} was not found.")
 
 layout = LayoutStep()
 layout.open()
-    
+
