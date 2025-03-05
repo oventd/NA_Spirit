@@ -2,10 +2,12 @@
 ##### json 파일은 나스피릿에 넣고 이그노어 에 포함
 
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
-from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject
+from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
 from PySide6.QtGui import QPixmap, QPixmap, QIcon
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
+from PySide6.QtMultimedia import QMediaPlayer
+from PySide6.QtMultimediaWidgets import QVideoWidget
 from functools import partial
 import sys
 import os
@@ -26,15 +28,20 @@ from asset_service import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
+from add_video_player import *
 
 class MainUi(QMainWindow):
     clicked = Signal()
     def __init__(self):
         super().__init__()
+        self.setGeometry(100, 100, 800, 600)
         self.load_ui()
         self.image_labels = [] 
         self.check_dict = {}    
         self.like_asset_list = []
+        self.media_players = []  # 각 동영상 플레이어(QMediaPlayer) 리스트
+        self.video_widgets = []  # 각 동영상을 표시할 `QVideoWidget` 리스트
+        self.labels = [] 
     
         self.main_ui_setting()
         self.ui.exit_btn.clicked.connect(self.exit_sub_win)
@@ -44,7 +51,6 @@ class MainUi(QMainWindow):
         self.ui.image_l_btn.clicked.connect(self.prev_slide)
         self.ui.image_r_btn.clicked.connect(self.next_slide)
         self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
-        
         self.ui.like_btn.clicked.connect(self.toggle_like_icon)
 
     def make_label_list(self):
@@ -358,14 +364,34 @@ class MainUi(QMainWindow):
             label.adjustSize()
 
         # 이미지 URL 가져오기
-        detail_thum_urls = [
-            asset["detail_url"],
-            asset["presetting_url1"],
-            asset["presetting_url2"],
-            asset["presetting_url3"]
-        ]
+        if asset[ASSET_TYPE]=="Texture":
+            print(f"에셋 타입 >>>>>>>>{asset[ASSET_TYPE]}")
+            detail_thum_urls = [
+                asset["detail_url"],
+                asset["presetting_url1"],
+                asset["presetting_url2"],
+                asset["presetting_url3"]
+            ]
+            self.show_asset_detail_image(detail_thum_urls)
+
+        elif asset[ASSET_TYPE]=="3D Model":
+            detail_thum_urls = [
+                asset["turnaround_url"],
+                asset["rig_url"]
+            ]
+            self.show_asset_detail_media(detail_thum_urls)
+
+        elif asset[ASSET_TYPE]=="3D Model":
+            detail_thum_urls = [
+                asset["applyhdri_url"],
+                asset["hdri_url"]
+            ]
+            self.show_asset_detail_image(detail_thum_urls)
+            
+            
+
+    def show_asset_detail_image(self, detail_thum_urls):
         
-        print(detail_thum_urls)
         for img_path in detail_thum_urls:
             if img_path == None:
                 continue
@@ -382,9 +408,8 @@ class MainUi(QMainWindow):
             else:
                 label.clear()
         
-        self.ui.stackedWidget.setCurrentIndex(0)  # 0번째의 label을 보여준다. 
-        
-        
+        self.ui.stackedWidget_2.setCurrentIndex(0)  # 0번째의 label을 보여준다. 
+
 
     def next_slide(self):
         """다음 슬라이드 이동"""
@@ -411,7 +436,7 @@ class MainUi(QMainWindow):
         layout.setContentsMargins(0, 0, 0, 10)  # 여백 제거
         layout.setAlignment(Qt.AlignTop)
 
-        #asset[]#여기에 찾을 항목 적어서 값 도출
+        #asset[]#여기에 찾을 항목 적어서 값 도출  
 
         Thum = ClickableLabel("썸네일", parent=widget)
         name = ClickableLabel("이름", parent=widget)
