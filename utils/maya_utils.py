@@ -2,7 +2,7 @@ import maya.cmds as cmds
 import os  # os 모듈 임포트 추가
 
 """maya에서 공통 기능을 모아둔 메서드입니다."""
-def ensure_group(name, parent=None):
+def create_group(name, parent=None):
     """
     특정 그룹이 존재하지 않으면 생성하는 함수.
     :param name: 생성할 그룹 이름
@@ -17,7 +17,7 @@ def ensure_group(name, parent=None):
     else:
         print(f"Group '{name}' already exists.")
 
-def ensure_camera(group_name, camera_name=None):
+def create_camera(group_name, camera_name=None):
     """
     카메라 그룹과 카메라가 없으면 생성하는 함수.
     :param group_name: 생성할 카메라 그룹 이름 (반드시 지정해야 함)

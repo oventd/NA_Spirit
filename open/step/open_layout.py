@@ -5,7 +5,7 @@ import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
-from maya_utils import ensure_group, reference_file  # 유틸 함수 임포트
+from maya_utils import create_group, reference_file  # 유틸 함수 임포트
 
 class LayoutStep(StepOpenMaya):
     def __init__(self):
@@ -13,9 +13,9 @@ class LayoutStep(StepOpenMaya):
         print ("layout initialized")
 
     def open(self):
-        ensure_group("char")
-        ensure_group("env")
-        ensure_group("camera")
+        create_group("char")
+        create_group("env")
+        create_group("camera")
 
         reference_file("","char")
         reference_file("","env")

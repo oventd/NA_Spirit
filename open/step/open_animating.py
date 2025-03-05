@@ -5,7 +5,7 @@ import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
-from maya_utils import ensure_group, ensure_camera, reference_file  # 유틸 함수 임포트
+from maya_utils import create_group, reference_file  # 유틸 함수 임포트
 
 class AnimatingStep(StepOpenMaya):
     def __init__(self):
@@ -14,9 +14,9 @@ class AnimatingStep(StepOpenMaya):
 
     def open(self):
         #리그 그룹
-        ensure_group("rig")
-        ensure_group("terrain")
-        ensure_group("camera")
+        create_group("rig")
+        create_group("terrain")
+        create_group("camera")
         self.reference_camera()
             
     def reference_rig(self):
