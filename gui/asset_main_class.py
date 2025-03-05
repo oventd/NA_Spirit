@@ -478,7 +478,7 @@ class MainUi(QMainWindow):
         self.ui.user_num.setText("b976211")
 
     def load_ui(self):
-        ui_file_path = "./asset_main2.ui"
+        ui_file_path = "/home/rapa/NA_Spirit/gui/asset_main2.ui"
         ui_file = QFile(ui_file_path)  
         loader = QUiLoader() 
         self.ui = loader.load(ui_file) 
