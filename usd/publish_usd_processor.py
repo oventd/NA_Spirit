@@ -7,16 +7,20 @@ from constant import *
 
 from sg_path_utils import SgPathUtils
 
-class UsdProcessor:
+class PublishUsdProcessor:
 
     def __init__(self, entity_path:str):
 
-        self.entity_path = entity_path
-        
-
+        self.entity_path = self.trim_entity_path(entity_path)
+        self.entity_name = os.path.basename(entity_path)
 
         self.entity_type = SgPathUtils.get_entity_type(entity_path)
         
+        self.entity_usd = os.path.join(self.entity_path, f"{self.entity_name}.usd")
+        self.publish_dir = os.path.join(self.entity_path, "publish")
+
+
+
         self.step_publish_data_dict = {
             MODELING : ['geo'],
             # LOOKDEV : [],
@@ -27,14 +31,6 @@ class UsdProcessor:
             LIGHTING : ["light"],
         }
     
-    @staticmethod
-    def trim_entity_path(entity_path):
-        dirs = entity_path.split("/")
-        for i, dir in enumerate(dirs):
-            if dir == "assets" or dir == "sequences":
-                
-
-
 
     @staticmethod
     def get_arg_dict(
@@ -55,7 +51,9 @@ class UsdProcessor:
             "light": light
         }
         return provided_args
-    
+
+
+
     def validate_args(self, step, provided_args):
         if self.step_publish_data_dict.get(step) is None:
             raise ValueError(f"Invalid step: {step}")
@@ -90,6 +88,7 @@ class UsdProcessor:
 
 if __name__ == "__main__":
     root_path = "/nas/sam/show/applestore/assets/Character/Bille/RIG/work/maya/scene.v012.ma"
-
-    usd = UsdProcessor(root_path)
+    root1_path = "/nas/sam/show/applestore/assets/Character/Bille"
+    print(    SgPathUtils.trim_entity_path(root1_path))
+    # usd = UsdProcessor(root_path)
     # usd.process(MODELING, geo = "", camera= "")

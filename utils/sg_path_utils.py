@@ -55,3 +55,30 @@ class SgPathUtils:
         elif 'assets' in path:
             return 'assets'
         return None
+    @staticmethod
+    def trim_entity_path(entity_path):
+        dirs = os.path.normpath(entity_path).split(os.sep)  # OS에 맞게 경로 정규화
+        symbolic_index = -1
+
+        # "assets" 또는 "sequences"가 포함된 첫 번째 위치 찾기
+        for i, dir_name in enumerate(dirs):
+            if dir_name in ("assets", "sequences"):
+                symbolic_index = i
+                break
+
+        if symbolic_index == -1:
+            raise ValueError(f"Invalid entity path (no 'assets' or 'sequences' found): {entity_path}")
+
+        # "assets" 또는 "sequences" 이후 2개 더 포함 (총 3개 유지)
+        symbolic_index_added = symbolic_index + 3
+
+        if symbolic_index_added > len(dirs):  # num보다 커야 정상
+            raise ValueError(f"Invalid entity path (too short): {entity_path}")
+
+        trimmed_path = os.sep.join(dirs[:symbolic_index_added])
+        return trimmed_path
+    @staticmethod
+    def get_publish_dir(entity_path, step):
+        trimed_path = SgPathUtils.trim_entity_path(entity_path)
+        return os.path.join(trimed_path, "publish", step)
+        
