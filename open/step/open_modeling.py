@@ -5,7 +5,7 @@ import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
-from maya_utils import create_group  # 유틸 함수 임포트
+from maya_utils import create_group, validate_hierarchy  # 유틸 함수 임포트
 
 class ModelingStep(StepOpenMaya):
     def __init__(self):
@@ -14,6 +14,17 @@ class ModelingStep(StepOpenMaya):
 
     def open(self):
         create_group("geo")
+
+        if validate_hierarchy(group_name="geo"):
+            print(f"Validation passed:'geo' exists.")
+        else:
+            print(f"Validation failed:'geo' does not exist.")
+
+        if validate_hierarchy("geo", "Low", "High"):
+            print("Geo 그룹 하위에 Low와 High 그룹이 모두 존재합니다.")
+        else:
+            print("Geo 그룹 하위에 Low와 High 그룹이 모두 존재하지 않습니다.")
+
 
 if __name__ == "__main__":
     modeling = ModelingStep()
