@@ -4,6 +4,8 @@ import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
+sys.path.append('/home/rapa/NA_Spirit/utils')
+from maya_utils import create_group  # 유틸 함수 임포트
 
 class ModelingStep(StepOpenMaya):
     def __init__(self):
@@ -11,13 +13,9 @@ class ModelingStep(StepOpenMaya):
         print ("모델링 불러오기")
 
     def open(self):
-        if not cmds.objExists("geo"):
-            cmds.group(em=True, name="geo")
-            print("geo 그룹이 생성되었습니다.")
-        else:
-            print("geo 그룹이 이미 존재합니다.")
+        create_group("geo")
 
-
-modeling = ModelingStep()
-modeling.open()
+if __name__ == "__main__":
+    modeling = ModelingStep()
+    modeling.open()
     

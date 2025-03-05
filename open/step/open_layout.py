@@ -4,6 +4,8 @@ import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
+sys.path.append('/home/rapa/NA_Spirit/utils')
+from maya_utils import create_group, reference_file  # 유틸 함수 임포트
 
 class LayoutStep(StepOpenMaya):
     def __init__(self):
@@ -11,32 +13,19 @@ class LayoutStep(StepOpenMaya):
         print ("layout initialized")
 
     def open(self):
-        self.create_group("char")
-        self.create_group("env")
-        self.create_group("camera")
+        create_group("char")
+        create_group("env")
+        create_group("camera")
 
-        self.reference_file("","char")
-        self.reference_file("","env")
-        self.reference_file("","camera")
+        reference_file("","char")
+        reference_file("","env")
+        reference_file("","camera")
 
         # 매치무브 카메라
-        self.reference_file("", "matchmove_camera")
-        self.reference_file("", "matchmove_env")
-        
-    def create_group(self, group_name):
-        if not cmds.objExists(group_name):
-            cmds.group(em=True, name=group_name)
-            print(f"The {group_name} group was created.")
-        else:
-            print(f"A {group_name} group already exists.")
-    
-    def reference_file(self, file_path, group_name):
-        if os.path.exists(file_path):
-            cmds.file(file_path, name=group_name)
-            print(f"The {group_name} {file_path} was referenced.")
-        else:
-            print(f"The {group_name} {file_path} was not found.")
+        reference_file("", "matchmove_camera")
+        reference_file("", "matchmove_env")
 
-layout = LayoutStep()
-layout.open()
+if __name__ == "__main__":
+    layout = LayoutStep()
+    layout.open()
 
