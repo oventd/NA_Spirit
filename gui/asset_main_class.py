@@ -1,5 +1,5 @@
 # 로거 파일 추가해서 유저가 중요한 
-
+##### json 파일은 나스피릿에 넣고 이그노어 에 포함
 
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
 from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject
@@ -478,7 +478,7 @@ class MainUi(QMainWindow):
         self.ui.user_num.setText("b976211")
 
     def load_ui(self):
-        ui_file_path = "/home/rapa/NA_Spirit/DB/gui/asset_main2.ui"
+        ui_file_path = "./asset_main2.ui"
         ui_file = QFile(ui_file_path)  
         loader = QUiLoader() 
         self.ui = loader.load(ui_file) 
