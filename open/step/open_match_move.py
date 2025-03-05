@@ -3,36 +3,20 @@ import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
+sys.path.append('/home/rapa/NA_Spirit/utils')
+from maya_utils import ensure_group, ensure_camera  # 유틸 함수 임포트
 
 """각 스텝에 맞는 match move 파일을 불러올 클래스입니다."""
 class MatchMoveStep(StepOpenMaya):
-    def init(self):
-        super().init()
+    def __init__(self):
+        super().__init__()
         print("Opening match move step")
 
-    def open(self):
-        # 카메라 그룹 생성
-        self.create_camera_group()
-        # env 그룹 생성
-        self.create_env_group()
+    def open(self, group_name="env", camera_group_name="anim_cam", camera_name=None):
+        ensure_group(group_name)
+        # ensure_camera() 호출 시 인자를 키워드 인자로 전달
+        ensure_camera(group_name=camera_group_name, camera_name=camera_name)
 
-    def create_camera_group(self):
-        """카메라 그룹을 생성하는 메서드"""
-        if not cmds.objExists("camera_group"):
-            camera_name = cmds.camera()[0]  # 첫 번째 반환 값은 카메라의 이름
-            cmds.group(camera_name, name="camera_group")
-            print("camera group was created.")
-        else:
-            print("A camera group already exists.")
-
-    def create_env_group(self):
-        """env 그룹을 생성하는 메서드"""
-        if not cmds.objExists("env"):
-            cmds.group(em=True, name="env")
-            print("The env group was created.")
-        else:
-            print("A env group already exists.")
-
-# MatchMoveStep 객체 생성 및 open 메서드 실행
-matchmove = MatchMoveStep()
-matchmove.open()
+if __name__ == "__main__":
+    matchmove = MatchMoveStep()
+    matchmove.open()
