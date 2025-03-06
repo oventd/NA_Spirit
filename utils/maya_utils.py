@@ -124,14 +124,6 @@ def create_usd_proxy(usd_file, proxy_name="mayaUsdProxyShape"):
         print(f"Created USD Proxy Node: {proxy_node}")
 
     # USD 파일 경로 설정
-    cmds.setAttr(f"{proxy_node}.filePath", usd_file, type="string")
-    print(f"USD Proxy Node linked to: {usd_file}")
+        cmds.setAttr(f"{proxy_node}.filePath", usd_file, type="string")
+        print(f"USD Proxy Node linked to: {usd_file}")
 
-
-        # if os.path.exists(self.anim_cache_usd):
-        #     proxy_node = cmds.createNode("mayaUSDProxyShape", name = "animCacheProxy")
-        #     cmds.setAttr(f"{proxy_node}.proxyPath", self.anim_cache_usd, type="string")
-        #     print(f"animCache USD file found: {self.anim_cache_usd}")
-        # else:
-        #     cmds.warning(f"animCache USD file not found: {self.anim_cache_usd}")
-        
