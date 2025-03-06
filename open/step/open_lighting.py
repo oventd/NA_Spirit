@@ -28,11 +28,19 @@ class Lighting(StepOpenMaya):
         # usd 로드
         create_usd_proxy(None)
 
-        # env usd 레퍼런스
-        reference_file(self.env_usd, "environment")
+        # env USD 파일이 존재하는지 확인 후 레퍼런스
+        if not os.path.exists(self.env_usd):
+            cmds.warning(f"Environment USD file not found: {self.env_usd}")
+        else:
+            reference_file(self.env_usd, "environment")
+
+        # USD Layer Editor 실행 전 플러그인 확인
+        if not cmds.pluginInfo("mayaUsdPlugin", query=True, loaded=True):
+            cmds.loadPlugin("mayaUsdPlugin")
 
         cmds.mayaUsdLayerEditorWindow()
-        print("Opened Usd Layer Editor")
+        print("Opened USD Layer Editor")
+
 
 
 if __name__ == "__main__":
