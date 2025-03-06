@@ -62,3 +62,4 @@ STEP_PATH = '/home/rapa/NA_Spirit/open/step'
 UTILS_PATH = '/home/rapa/NA_Spirit/utils'
 RIG = "rig"
 GEO = "geo"
+ENV = "env"
