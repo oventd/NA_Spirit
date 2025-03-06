@@ -16,7 +16,6 @@ class RiggingStep(StepOpenMaya):
     class Open:
         @staticmethod
         def setup(group_name=RIG):
-            group_name = group_name
             create_group(group_name)
             
     class Publish:

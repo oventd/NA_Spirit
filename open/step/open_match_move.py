@@ -15,17 +15,16 @@ class MatchMoveStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(group_name=ENV, camera_group_name="anim_cam", camera_name=None):
-            group_name = group_name
-            camera_group_name = camera_group_name
+        def setup(group_name=ENV, camera_group_name=ANIM_CAM, camera_name=None):
             create_group(group_name)
             camera_name = create_camera(group_name=camera_group_name, camera_name=camera_name)
+   
     class Publish:
         @staticmethod
-        def validate(group_name=ENV, camera_group_name="anim_cam", camera_name="camera1"):
+        def validate(group_name=ENV, camera_group_name=ANIM_CAM, camera_name=CAMERA1):
             """그룹 및 카메라 검증"""
             if not camera_name:
-                camera_name = "camera1"  # 기본 카메라 이름으로 설정
+                camera_name = CAMERA1  # 기본 카메라 이름으로 설정
 
             # 카메라 그룹 검증
             if validate_hierarchy(group_name=camera_group_name, valid_list=[camera_name]):
@@ -42,4 +41,4 @@ class MatchMoveStep(StepOpenMaya):
 if __name__ == "__main__":
     matchmove = MatchMoveStep()
     MatchMoveStep.Open.setup(group_name=ENV)
-    MatchMoveStep.Publish.validate(group_name=ENV, camera_name=camera_name)
+    MatchMoveStep.Publish.validate(group_name=ENV, camera_group_name=ANIM_CAM)

@@ -52,6 +52,19 @@ def reference_file(file_path, group_name):
     else:
         print(f"The {group_name} file '{file_path}' was not found.")
 
+def reference_camera(camera_file):
+    """카메라 파일 참조하고, 카메라 락 설정"""
+    if os.path.exists(camera_file):
+        cmds.file(camera_file, reference=True)  # 파일 참조
+        camera_name = cmds.ls(type="camera")[0]  # 첫 번째 카메라 찾기
+        if camera_name:
+            cmds.lockNode(camera_name, lock=True)  # 카메라 락 설정
+            print(f"The camera layout file '{camera_file}' was referenced and locked.")
+        else:
+            print("No camera found in the scene to lock.")
+    else:
+        print(f"The camera layout file '{camera_file}' was not found.")
+
 def validate_hierarchy(group_name, valid_list=None):
     """
     특정 그룹과 자식 객체들이 존재하는지 확인하는 함수.
@@ -89,4 +102,12 @@ def validate_hierarchy(group_name, valid_list=None):
 
     return True
 
+def validate_anim_curve():
+    """animCurveTL 노드가 존재하는지 확인하는 함수"""
+    if not cmds.objExists("animCurveTL"):
+        print("Validation failed: 'animCurveTL' node does not exist.")
+        return False
+    else:
+        print("Validation passed: 'animCurveTL' node exists.")
+        return True
        
