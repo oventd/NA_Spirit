@@ -52,36 +52,6 @@ def reference_file(file_path, group_name):
     else:
         print(f"The {group_name} file '{file_path}' was not found.")
 
-# def validate(group_name, child_name=None):
-#     """ 특정 그룹 및 자식 객체 존재 여부 확인 """
-#     if not cmds.objExists(group_name):
-#         print(f"Validation failed: Group '{group_name}' does not exist.")
-#         return False
-
-#     if child_name:
-#         children = cmds.listRelatives(group_name, children=True, fullPath=False) or []
-#         if child_name not in children:
-#             print(f"Validation failed: '{child_name}' does not exist under group '{group_name}'.")
-#             return False
-
-#     return True
-
-# def validate_hierarchy(group_name, valid_list):
-#     """
-#     특정 그룹에 자식 객체가 있는지 확인하는 함수.
-#     :param group_name: 부모 그룹 이름
-#     :param valid_list: 확인할 자식 그룹들의 이름들 (가변 인자)
-#     :return: 자식 그룹들이 모두 존재하면 True, 아니면 False
-#     """
-#     # 그룹 내 자식 객체들 확인
-#     existing_valid_list = cmds.listRelatives(group_name, valid_list=True, fullPath=False) or []
-    
-#     # 각 자식 이름이 존재하는지 확인
-#     for child in valid_list:
-#         if child not in existing_valid_list:
-#             return False
-#     return True
-
 def validate_hierarchy(group_name, valid_list=None):
     """
     특정 그룹과 자식 객체들이 존재하는지 확인하는 함수.
@@ -97,6 +67,8 @@ def validate_hierarchy(group_name, valid_list=None):
     if not cmds.objExists(group_name):
         print(f"Validation failed: Group '{group_name}' does not exist.")
         return False
+    else:
+        print(f"Validation passed: Group '{group_name}' exists.")
 
     # 자식 그룹들이 있을 경우에만 확인
     if valid_list:
@@ -108,6 +80,12 @@ def validate_hierarchy(group_name, valid_list=None):
             if child not in existing_children:
                 print(f"Validation failed: '{child}' does not exist under group '{group_name}'.")
                 return False
+            
+    # 그룹이 비어있는지 확인 (자식이 없는 경우)
+    existing_children = cmds.listRelatives(group_name, children=True, fullPath=False) or []
+    if not existing_children:
+        print(f"Validation passed: Group '{group_name}' exists but is empty.")
+        return False
 
     return True
 

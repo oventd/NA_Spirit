@@ -55,3 +55,10 @@ LAYOUT = 'Layout'
 ANIMATING = 'Animation'
 LIGHTING = 'Light'
 COMPOSITING = 'Comp'
+
+
+# Open step 상수
+STEP_PATH = '/home/rapa/NA_Spirit/open/step'
+UTILS_PATH = '/home/rapa/NA_Spirit/utils'
+RIG = "rig"
+GEO = "geo"

@@ -1,19 +1,22 @@
 from abc import ABC, abstractmethod
 
 class StepOpenMaya(ABC):
-    #@abstractmethod
-    #def validate(self)
-    #    pass
-
     def __init__(self):
         pass
-
-    """ 추상 클래스로 각 스텝에서 사용할 메서드를 정의함"""
-    @abstractmethod
-    def open(self):
-        pass
-
-    @abstractmethod
-    def validate(self):
-        pass
     
+    # Open 클래스: 'setup' 관련 기능을 다룬다.    
+    class Open(ABC):
+        @abstractmethod
+        def setup(self):
+            pass
+
+    # Publish 클래스: 퍼블리시 관련 기능을 다룬다.    
+    class Publish(ABC):
+        def __init__(self):
+            pass
+
+        @abstractmethod
+        def validate(self):
+            pass
+        
+
