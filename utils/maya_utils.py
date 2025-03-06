@@ -52,19 +52,31 @@ def reference_file(file_path, group_name):
     else:
         print(f"The {group_name} file '{file_path}' was not found.")
 
-def reference_camera(camera_file):
-    """카메라 파일 참조하고, 카메라 락 설정"""
+def lock_camera(camera_file):
+    """레이아웃 카메라 파일을 참조하고, 카메라의 트랜스폼 속성을 락 설정"""
     if os.path.exists(camera_file):
-        cmds.file(camera_file, reference=True)  # 파일 참조
-        camera_name = cmds.ls(type="camera")[0]  # 첫 번째 카메라 찾기
+        reference_file(camera_file, "camera")  # 카메라 레이아웃 파일을 레퍼런스
+        camera_name = cmds.ls(type="camera")[0]  # 첫 번째 카메라 객체를 찾아 이름 추출
+        
         if camera_name:
-            cmds.lockNode(camera_name, lock=True)  # 카메라 락 설정
+            # 카메라의 트랜스폼 속성 락
+            cmds.setAttr(f"{camera_name}.translateX", lock=True)
+            cmds.setAttr(f"{camera_name}.translateY", lock=True)
+            cmds.setAttr(f"{camera_name}.translateZ", lock=True)
+            cmds.setAttr(f"{camera_name}.rotateX", lock=True)
+            cmds.setAttr(f"{camera_name}.rotateY", lock=True)
+            cmds.setAttr(f"{camera_name}.rotateZ", lock=True)
+            cmds.setAttr(f"{camera_name}.scaleX", lock=True)
+            cmds.setAttr(f"{camera_name}.scaleY", lock=True)
+            cmds.setAttr(f"{camera_name}.scaleZ", lock=True)
             print(f"The camera layout file '{camera_file}' was referenced and locked.")
         else:
             print("No camera found in the scene to lock.")
     else:
         print(f"The camera layout file '{camera_file}' was not found.")
 
+    # else:
+    #     print(f"Validation passed: Group '{group_name}' exists.")
 def validate_hierarchy(group_name, valid_list=None):
     """
     특정 그룹과 자식 객체들이 존재하는지 확인하는 함수.
@@ -80,26 +92,28 @@ def validate_hierarchy(group_name, valid_list=None):
     if not cmds.objExists(group_name):
         print(f"Validation failed: Group '{group_name}' does not exist.")
         return False
-    else:
-        print(f"Validation passed: Group '{group_name}' exists.")
 
-    # 자식 그룹들이 있을 경우에만 확인
+    # valid_list가 있을 경우에만 자식 객체들 확인
     if valid_list:
-        # 자식 객체들의 목록 가져오기
         existing_children = cmds.listRelatives(group_name, children=True, fullPath=False) or []
-        
+
         # 각 자식 그룹들이 존재하는지 확인
         for child in valid_list:
             if child not in existing_children:
                 print(f"Validation failed: '{child}' does not exist under group '{group_name}'.")
                 return False
-            
-    # 그룹이 비어있는지 확인 (자식이 없는 경우)
+        # valid_list에 있는 자식들이 모두 존재하면 True
+        print(f"Validation passed: All children in valid_list exist under group '{group_name}'.")
+        return True
+
+    # valid_list가 비어있을 경우 자식 객체 존재 여부 확인
     existing_children = cmds.listRelatives(group_name, children=True, fullPath=False) or []
     if not existing_children:
-        print(f"Validation passed: Group '{group_name}' exists but is empty.")
+        print(f"Validation failed: Group '{group_name}' exists but is empty.")
         return False
 
+    # 자식 객체가 존재하면 True
+    print(f"Validation passed: Group '{group_name}' exists and has children.")
     return True
 
 def validate_anim_curve():
@@ -110,4 +124,3 @@ def validate_anim_curve():
     else:
         print("Validation passed: 'animCurveTL' node exists.")
         return True
-       

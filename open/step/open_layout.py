@@ -5,6 +5,7 @@ import sys
 sys.path.append(STEP_PATH)
 from step_open_maya import StepOpenMaya
 sys.path.append(UTILS_PATH)
+
 from constant import * 
 from maya_utils import create_group, reference_file, validate_hierarchy  # 유틸 함수 임포트
 
@@ -31,18 +32,18 @@ class LayoutStep(StepOpenMaya):
     class Publish:
         @staticmethod
         def validate(group_name=TERRAIN):
-            # validate_hierarchy 메서드를 사용하여 환경 그룹과 자식 객체 존재 여부 확인
+            validate_hierarchy # 메서드를 사용하여 환경 그룹과 자식 객체 존재 여부 확인
             if validate_hierarchy(group_name=group_name):
-                print(f"Validation passed: Env '{group_name}' exists.")
+                print(f"Validation passed222: Env '{group_name}' exists.")
             else:
-                print(f"Validation failed: Env '{group_name}' does not exist.")  
+                print(f"Validation failed222: Env '{group_name}' does not exist.")  
 
             if validate_hierarchy(group_name=CAMERA):
-                print(f"Validation passed: Camera group '{group_name}' exists.")
+                print(f"Validation passed222: Camera group '{group_name}' exists.")
             else:
-                print(f"Validation failed: Camera group '{group_name}' does not exist.")  
+                print(f"Validation failed222: Camera group '{group_name}' does not exist.")  
             
-
+            pass
 if __name__ == "__main__":
     layout = LayoutStep()
     LayoutStep.Open.setup(group_name=TERRAIN)

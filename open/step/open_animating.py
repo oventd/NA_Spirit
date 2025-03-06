@@ -6,7 +6,7 @@ sys.path.append(STEP_PATH)
 from step_open_maya import StepOpenMaya
 sys.path.append(UTILS_PATH)
 from constant import *
-from maya_utils import create_group, reference_file, validate_hierarchy, validate_anim_curve # 유틸 함수 임포트
+from maya_utils import create_group, reference_file, validate_hierarchy, validate_anim_curve, lock_camera # 유틸 함수 임포트
 
 class AnimatingStep(StepOpenMaya):
     def __init__(self):
@@ -32,13 +32,13 @@ class AnimatingStep(StepOpenMaya):
         @staticmethod
         def reference_camera():
             camera_file =""
-            reference_file(camera_file, "camera")
+            lock_camera(camera_file)
 
     class Publish:       
         @staticmethod 
         def validate():
-            """Rig 그룹과 Terrain 그룹이 존재하는지 확인"""
-            if validate_hierarchy("rig", valid_list=[]):
+            """Rig 그룹이 존재하는지 확인"""
+            if validate_hierarchy("rig"):
                 print("Validation passed: 'rig' group exists.")
             else:
                 print("Validation failed: 'rig' group does not exist.")
