@@ -37,6 +37,8 @@ def create_camera(group_name, camera_name=None):
         print(f"Camera group '{group_name}' was created with camera '{camera_name}'.")
     else:
         print(f"Camera group '{group_name}' already exists.")
+        
+    return camera_name
 
 def reference_file(file_path, group_name):
     """

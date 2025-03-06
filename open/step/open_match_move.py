@@ -12,23 +12,34 @@ class MatchMoveStep(StepOpenMaya):
         super().__init__()
         print("Opening match move step")
 
-    def open(self, group_name="env", camera_group_name="anim_cam", camera_name=None):
-        create_group(group_name)
-        # create_camera() 호출 시 인자를 키워드 인자로 전달
-        create_camera(group_name=camera_group_name, camera_name=camera_name)
+        self.group_name = None
+        self.camera_group_name = None
+        self.camera_name = None
 
-        # validate_hierarchy 메서드를 사용하여 카메라 그룹과 자식 객체 존재 여부 확인
-        if validate_hierarchy(group_name=camera_group_name, valid_list=[camera_name]):
-            print(f"Validation passed: Camera '{camera_name}' exists in group '{camera_group_name}'.")
+    def open(self, group_name="env", camera_group_name="anim_cam", camera_name=None):
+        self.group_name = group_name
+        self.camera_group_name = camera_group_name
+        create_group(group_name)
+        self.camera_name = create_camera(group_name=self.camera_group_name, camera_name=camera_name)
+
+    def validate(self):
+        """그룹 및 카메라 검증"""
+        if not self.camera_name:
+            self.camera_name = "camera1"  # 기본 카메라 이름으로 설정
+
+        # 카메라 그룹 검증
+        if validate_hierarchy(group_name=self.camera_group_name, valid_list=[self.camera_name]):
+            print(f"Validation passed: Camera '{self.camera_name}' exists in group '{self.camera_group_name}'.")
         else:
-            print(f"Validation failed: Camera '{camera_name}' does not exist in group '{camera_group_name}'.")        
-        
-        # validate_hierarchy 메서드를 사용하여 환경 그룹과 자식 객체 존재 여부 확인
-        if validate_hierarchy(group_name=group_name):
-            print(f"Validation passed: Env '{group_name}' exists.")
+            print(f"Validation failed: Camera '{self.camera_name}' does not exist in group '{self.camera_group_name}'.")
+
+        # 환경 그룹 검증
+        if validate_hierarchy(group_name=self.group_name):
+            print(f"Validation passed: Env '{self.group_name}' exists.")
         else:
-            print(f"Validation failed: Env '{group_name}' does not exist.")  
+            print(f"Validation failed: Env '{self.group_name}' does not exist.") 
 
 if __name__ == "__main__":
     matchmove = MatchMoveStep()
     matchmove.open()
+    matchmove.validate()

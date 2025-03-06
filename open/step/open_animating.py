@@ -5,7 +5,7 @@ import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
-from maya_utils import create_group, reference_file  # 유틸 함수 임포트
+from maya_utils import create_group, reference_file, validate_hierarchy # 유틸 함수 임포트
 
 class AnimatingStep(StepOpenMaya):
     def __init__(self):
@@ -17,7 +17,18 @@ class AnimatingStep(StepOpenMaya):
         create_group("rig")
         create_group("terrain")
         create_group("camera")
-        self.reference_camera()
+
+    def validate(self):
+        """Rig 그룹과 Terrain 그룹이 존재하는지 확인"""
+        if validate_hierarchy("rig"):
+            print("Validation passed: 'rig' group exists.")
+        else:
+            print("Validation failed: 'rig' group does not exist.")
+        
+        if validate_hierarchy("terrain"):
+            print("Validation passed: 'terrain' group exists.")
+        else:
+            print("Validation failed: 'terrain' group does not exist.")         
             
     def reference_rig(self):
         rig_file =""
@@ -34,4 +45,5 @@ class AnimatingStep(StepOpenMaya):
 if __name__ == "__main__":
     animation = AnimatingStep()
     animation.open()
-        
+    animation.validate()
+    animation.reference_camera()

@@ -12,4 +12,8 @@ class StepOpenMaya(ABC):
     @abstractmethod
     def open(self):
         pass
+
+    @abstractmethod
+    def validate(self):
+        pass
     
