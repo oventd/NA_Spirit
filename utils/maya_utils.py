@@ -110,6 +110,10 @@ def validate_anim_curve():
     else:
         print("Validation passed: 'animCurveTL' node exists.")
         return True
+def create_lighting_group(self):
+    create_group("light")
+    print("Created lighting group")
+
 
 def create_usd_proxy(usd_file, proxy_name="mayaUsdProxyShape"):
     # 기존에 같은 이름의 mayaUsdProxyShape 노드가 있는지 확인

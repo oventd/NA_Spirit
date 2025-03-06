@@ -2,6 +2,8 @@ import maya.mel as mel
 import maya.cmds as cmds
 import os
 import sys
+
+
 sys.path.append(STEP_PATH)
 from step_open_maya import StepOpenMaya
 sys.path.append(UTILS_PATH)
