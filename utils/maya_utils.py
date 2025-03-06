@@ -125,7 +125,7 @@ def validate_anim_curve():
         print("Validation passed: 'animCurveTL' node exists.")
         return True
 
-def create_unique_usd_proxy(usd_file, proxy_name="mayaUsdProxyShape"):
+def create_usd_proxy(usd_file, proxy_name="mayaUsdProxyShape"):
     # 기존에 같은 이름의 mayaUsdProxyShape 노드가 있는지 확인
     existing_nodes = cmds.ls(type="mayaUsdProxyShape")
     
@@ -141,4 +141,11 @@ def create_unique_usd_proxy(usd_file, proxy_name="mayaUsdProxyShape"):
     cmds.setAttr(f"{proxy_node}.filePath", usd_file, type="string")
     print(f"USD Proxy Node linked to: {usd_file}")
 
-    return proxy_node
+
+        # if os.path.exists(self.anim_cache_usd):
+        #     proxy_node = cmds.createNode("mayaUSDProxyShape", name = "animCacheProxy")
+        #     cmds.setAttr(f"{proxy_node}.proxyPath", self.anim_cache_usd, type="string")
+        #     print(f"animCache USD file found: {self.anim_cache_usd}")
+        # else:
+        #     cmds.warning(f"animCache USD file not found: {self.anim_cache_usd}")
+        
