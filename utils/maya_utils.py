@@ -124,3 +124,21 @@ def validate_anim_curve():
     else:
         print("Validation passed: 'animCurveTL' node exists.")
         return True
+
+def create_unique_usd_proxy(usd_file, proxy_name="mayaUsdProxyShape"):
+    # 기존에 같은 이름의 mayaUsdProxyShape 노드가 있는지 확인
+    existing_nodes = cmds.ls(type="mayaUsdProxyShape")
+    
+    if existing_nodes:
+        print(f"Existing USD Proxy Node found: {existing_nodes[0]}")
+        proxy_node = existing_nodes[0]
+    else:
+        # 새로운 노드 생성
+        proxy_node = cmds.createNode("mayaUsdProxyShape", name=proxy_name)
+        print(f"Created USD Proxy Node: {proxy_node}")
+
+    # USD 파일 경로 설정
+    cmds.setAttr(f"{proxy_node}.filePath", usd_file, type="string")
+    print(f"USD Proxy Node linked to: {usd_file}")
+
+    return proxy_node
