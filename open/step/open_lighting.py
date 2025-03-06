@@ -17,11 +17,10 @@ class Lighting(StepOpenMaya):
         print("Opening lighting step")
         self.env_usd = env_usd
 
-    def open(self):
-
+    def open(env_usd):
         print("Opening lighting step")
 
-    
+        
         # 라이트 그룹 생성 
         create_lighting_group()
 
@@ -29,10 +28,10 @@ class Lighting(StepOpenMaya):
         create_usd_proxy(None)
 
         # env USD 파일이 존재하는지 확인 후 레퍼런스
-        if not os.path.exists(self.env_usd):
+        if not os.path.exists(env_usd):
             cmds.warning(f"Environment USD file not found: {self.env_usd}")
         else:
-            reference_file(self.env_usd, "environment")
+            reference_file(env_usd, "environment")
 
         # USD Layer Editor 실행 전 플러그인 확인
         if not cmds.pluginInfo("mayaUsdPlugin", query=True, loaded=True):
@@ -47,4 +46,4 @@ if __name__ == "__main__":
     env_usd = "/home/rapa/3D_usd/Kitchen_set/assets/WallOrange/WallOrange.usd"
 
     lighting = Lighting(env_usd)
-    lighting.open()
+    lighting.open(env_usd)
