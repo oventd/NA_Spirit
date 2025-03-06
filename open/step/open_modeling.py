@@ -2,11 +2,11 @@ import maya.mel as mel
 import maya.cmds as cmds
 import os
 import sys
+from constant import * 
+from maya_utils import create_group, validate_hierarchy  # 유틸 함수 임포트
 sys.path.append(STEP_PATH)
 from step_open_maya import StepOpenMaya
 sys.path.append(UTILS_PATH)
-from constant import * 
-from maya_utils import create_group, validate_hierarchy  # 유틸 함수 임포트
 
 class ModelingStep(StepOpenMaya):
     def __init__(self):

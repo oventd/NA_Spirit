@@ -1,11 +1,11 @@
 import maya.cmds as cmds
 import os
 import sys
+from constant import * 
+from maya_utils import create_group, create_camera, validate_hierarchy  # 유틸 함수 임포트
 sys.path.append(STEP_PATH)
 from step_open_maya import StepOpenMaya
 sys.path.append(UTILS_PATH)
-from constant import * 
-from maya_utils import create_group, create_camera, validate_hierarchy  # 유틸 함수 임포트
 
 """각 스텝에 맞는 match move 파일을 불러올 클래스입니다."""
 class MatchMoveStep(StepOpenMaya):
