@@ -5,7 +5,7 @@ import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
-from maya_utils import create_group, reference_file, validate_hierarchy, validate_anim_curve, lock_camera # 유틸 함수 임포트
+from maya_utils import MayaUtils
 
 class AnimatingStep(StepOpenMaya):
     def __init__(self):
@@ -16,34 +16,39 @@ class AnimatingStep(StepOpenMaya):
         @staticmethod
         def setup(rig_group_name = "rig", terrain_group_name="terrain", camera_group_name="camera"):
             #리그 그룹
-            create_group(rig_group_name)
-            create_group(terrain_group_name)
-            create_group(camera_group_name)
+            MayaUtils.create_group(rig_group_name)
+            MayaUtils.create_group(terrain_group_name)
+            MayaUtils.create_group(camera_group_name)
 
         @staticmethod
         def reference_rig():
             rig_file =""
-            reference_file(rig_file, "rig")
+            MayaUtils.reference_file(rig_file, "rig")
         @staticmethod
         def reference_terrain():
             terrain_file =""
-            reference_file(terrain_file, "terrain")
+            MayaUtils.reference_file(terrain_file, "terrain")
         @staticmethod
         def reference_camera():
-            camera_file =""
-            lock_camera(camera_file)
+            camera_file = ""  # 경로 설정
+            camera_objects = MayaUtils.reference_file(camera_file, "camera")
+            
+            if camera_objects:  # 카메라 오브젝트가 있을 때만
+                MayaUtils.lock_transform([camera_objects])
+            else:
+                print("No camera objects found to lock.")
 
     class Publish:       
         @staticmethod 
         def validate(rig_group_name = "rig"):
             """Rig 그룹이 존재하는지 확인"""
-            if validate_hierarchy(rig_group_name):
+            if MayaUtils.validate_hierarchy(rig_group_name):
                 print(f"Validation passed: {rig_group_name} group exists.")
             else:
                 print(f"Validation failed: {rig_group_name} group does not exist.")
 
             # animCurveTL 노드 확인
-            if validate_anim_curve():
+            if MayaUtils.validate_anim_curve():
                 print("Validation passed: 'animCurveTL' node exists.")
             else:
                 print("Validation failed: 'animCurveTL' node does not exist.")
