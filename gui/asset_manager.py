@@ -1,0 +1,42 @@
+# 로거 파일 추가해서 유저가 중요한 
+##### json 파일은 나스피릿에 넣고 이그노어 에 포함
+
+from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
+from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
+from PySide6.QtGui import QPixmap, QPixmap, QIcon
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
+from PySide6.QtMultimedia import QMediaPlayer
+from PySide6.QtMultimediaWidgets import QVideoWidget
+from functools import partial
+import sys
+import os
+
+
+current_file_path = os.path.abspath(__file__)
+na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
+for root, dirs, files in os.walk(na_spirit_dir):
+    if '__pycache__' not in root:
+        sys.path.append(root)
+from asset_service import AssetService 
+from asset_service import ClickableLabel
+from PySide6.QtCore import QObject, QEvent, Qt
+from constant import *
+# from add_video_player import *
+from subwin_ui_manager import SubWinUiManager
+class AssetManager:
+    _instance = None  # 싱글톤 인스턴스 저장
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+
+            cls._instance = super(AssetManager, cls).__new__(cls)
+
+        return cls._instance
+    
+    def __init__(self,ui):
+        if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
+            super().__init__()
+            self.ui = ui
+            self._initialized = True  # 인스턴스가 초기화되었음을 표시
+
