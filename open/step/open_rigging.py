@@ -35,7 +35,11 @@ class MatchMoveStep(StepOpenMaya):
             if validate_hierarchy(group_name):
                 print(f"Validation passed: terrain '{group_name}' exists.")
             else:
-                print(f"Validation failed: terrain '{group_name}' does not exist.") 
+                print(f"Validation failed: terrain '{group_name}' does not exist.")
+
+        @staticmethod
+
+
 
 if __name__ == "__main__":
     matchmove = MatchMoveStep()

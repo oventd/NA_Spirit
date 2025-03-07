@@ -19,4 +19,8 @@ class StepOpenMaya(ABC):
         def validate(self):
             pass
         
+        @abstractmethod
+        def publish(self):
+            pass
+        
 
