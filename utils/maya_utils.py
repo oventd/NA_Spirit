@@ -37,7 +37,6 @@ def create_camera(group_name, camera_name=None):
         print(f"Camera group '{group_name}' was created with camera '{camera_name}'.")
     else:
         print(f"Camera group '{group_name}' already exists.")
-        
     return camera_name
 
 def reference_file(file_path, group_name):
@@ -110,7 +109,7 @@ def validate_anim_curve():
     else:
         print("Validation passed: 'animCurveTL' node exists.")
         return True
-def create_lighting_group(self):
+def create_lighting_group():
     create_group("light")
     print("Created lighting group")
 
