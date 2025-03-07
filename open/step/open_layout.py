@@ -50,6 +50,8 @@ class LayoutStep(StepOpenMaya):
                 print(f"Validation passed: Camera group '{camera_group_name}' exists.")
             else:
                 print(f"Validation failed: Camera group '{camera_group_name}' does not exist.")  
+        def publish():
+            
 
             
 if __name__ == "__main__":

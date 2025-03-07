@@ -52,7 +52,22 @@ class AnimatingStep(StepOpenMaya):
                 print("Validation passed: 'animCurveTL' node exists.")
             else:
                 print("Validation failed: 'animCurveTL' node does not exist.")
-                 
+        def publish(rig_group_name = "rig", export_path="/home/rapa/3D_usd/Overwatch_2_-_Ramattra"):
+            if not cmds.objExists(rig_group_name):
+                print(f"Error: Group '{rig_group_name}' does not exist.")
+                return False
+            
+            cmds.select("rig")
+            cmds.file(
+                export_path,
+                force=True,
+                type="USD Export",
+                exportSelected=True
+                )
+            print(f"{export_path}에서 USD export 완료")
+            
+            
+
                 
 
 if __name__ == "__main__":
