@@ -9,13 +9,10 @@ from maya_utils import MayaUtils
 
 
 class Lighting(StepOpenMaya):
-    @staticmethod
     def __init__(self, env_usd):
         super().__init__()
         print("Opening lighting step")
         self.env_usd = env_usd
-        # light 그룹 생성
-        self.create_lighting_group()
 
     class Open:
         @staticmethod
