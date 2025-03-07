@@ -21,9 +21,9 @@ for root, dirs, files in os.walk(na_spirit_dir):
         sys.path.append(root)
 
 from PySide6.QtWidgets import QApplication, QMainWindow
-from ui_manager import *
-from assetmanager import AssetManager
-from eventhandler import EventHandler
+from gui.trashcan.ui_manager import *
+from gui.trashcan.assetmanager import AssetManager
+from gui.trashcan.eventhandler import EventHandler
 import sys
 
 
