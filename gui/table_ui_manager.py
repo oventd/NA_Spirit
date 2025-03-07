@@ -35,7 +35,7 @@ from like_state import LikeState
 
 from asset import Asset
 from check import Check
-
+from subwin import SubWin
 class TableUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -53,11 +53,8 @@ class TableUiManager:
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
 
             self.ui.exit_btn.clicked.connect(self.exit_sub_win)
-            self.ui.image_l_btn.clicked.connect(self.prev_slide)
-            self.ui.image_r_btn.clicked.connect(self.next_slide)
-
-
-
+            self.ui.image_l_btn.clicked.connect(partial (SubWin.prev_slide, self.ui.stackedWidget_2))
+            self.ui.image_r_btn.clicked.connect(partial (SubWin.next_slide, self.ui.stackedWidget_2))
 
             self.image_labels = []
             self.make_label_list()
@@ -76,19 +73,18 @@ class TableUiManager:
             self.image_labels.append(label)
 
     def set_sorting_option(self, option):
-            #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
-            if option == "오래된 순":
-                print(f"오래된 순의 필터임 :{Check().dict}")
-                self.table_widget(Check().dict,UPDATED_AT, 40, 0,None)
+        #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
+        if option == "오래된 순":
+            print(f"오래된 순의 필터임 :{Check().dict}")
+            self.table_widget(Check().dict,UPDATED_AT, 40, 0,None)
 
-            elif option =="다운로드 순":
-                print("다운로드된 순서를 정렬할게요")
-                self.table_widget(Check().dict,DOWNLOADS, 40, 0,None)
+        elif option =="다운로드 순":
+            print("다운로드된 순서를 정렬할게요")
+            self.table_widget(Check().dict,DOWNLOADS, 40, 0,None)
 
-            else:
-                print("최신 순서를 정렬할게요")
-                self.table_widget(Check().dict,CREATED_AT, 40, 0, None)
-
+        else:
+            print("최신 순서를 정렬할게요")
+            self.table_widget(Check().dict,CREATED_AT, 40, 0, None)
     
     def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
         ui = self.ui
@@ -145,20 +141,14 @@ class TableUiManager:
 
         widget.setLayout(layout)  # 위젯에 레이아웃 설정
 
-        # 리뷰 엔터 개 길어
-
-
         pixmap = QPixmap(thumbnail_path)
         if pixmap.isNull():
             print(f" 이미지 로드 실패: {thumbnail_path}")
 
         Thum.setPixmap(pixmap)
         Thum.setFixedHeight(160)
-
         
         Thum.setAlignment(Qt.AlignCenter)
-        
-
 
         name.setText(asset_name)
         name.setAlignment(Qt.AlignCenter)
@@ -170,7 +160,6 @@ class TableUiManager:
             font-size: 14px;              /* 글자 크기 */
             font-weight: Thin;            /* 글자 굵기 */
         """)
-
 
         name.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
@@ -193,11 +182,9 @@ class TableUiManager:
         ui.tableWidget.resizeRowsToContents() 
 
     def exit_sub_win(self):
-        
         self.ui.stackedWidget.hide()
 
     def del_label(self, asset):
-
         Asset().current = asset
         ui=self.ui
         """라벨 클릭 이벤트 발생 시 실행"""
@@ -215,7 +202,6 @@ class TableUiManager:
         except TypeError:
             # set_detail_info(asset)
             print("error")
-
 
     def set_detail_info(self, asset):
         ui=self.ui
@@ -260,7 +246,7 @@ class TableUiManager:
                 asset["presetting_url2"],
                 asset["presetting_url3"]
             ]
-            self.show_asset_detail_image(detail_thum_urls)
+            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.image_labels)
 
         elif asset[ASSET_TYPE]=="3D Model":
             detail_thum_urls = [
@@ -274,70 +260,29 @@ class TableUiManager:
                 asset["applyhdri_url"],
                 asset["hdri_url"]
             ]
-            self.show_asset_detail_image(detail_thum_urls)
+            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls,  self.image_labels)
 
 
-    def show_asset_detail_image(self, detail_thum_urls):
-        ui = self.ui
-        for img_path in detail_thum_urls:
-            if img_path == None:
-                continue
-            label = QLabel()
-            pixmap = QPixmap(img_path)
-            label.setPixmap(pixmap)
-            label.setAlignment(Qt.AlignCenter)
-            ui.stackedWidget_2.addWidget(label)
 
-        for idx, label in enumerate(self.image_labels):
-            if idx < len(detail_thum_urls) and detail_thum_urls[idx]:  # URL이 있는 경우에만 설정
-                pixmap = QPixmap(detail_thum_urls[idx])
-                label.setPixmap(pixmap.scaled(60, 60, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-            else:
-                label.clear()
-        
-        ui.stackedWidget_2.setCurrentIndex(0)  # 0번째의 label을 보여준다. 
-
-
-    
-    def next_slide(self):
-        """다음 슬라이드 이동"""
-        current_index = self.ui.stackedWidget_2.currentIndex()
-        next_index = (current_index + 1) % self.ui.stackedWidget_2.count()
-        self.ui.stackedWidget_2.setCurrentIndex(next_index)
-        print(f"{next_index}다음 이미지로 변경됨")
-      
-    def prev_slide(self):
-        """이전 슬라이드 이동"""
-        current_index = self.ui.stackedWidget_2.currentIndex()
-        prev_index = (current_index - 1) % self.ui.stackedWidget_2.count()
-        self.ui.stackedWidget_2.setCurrentIndex(prev_index)
-        print("이전 이미지로 변경됨")
-      # 리뷰 순서를 정리를 
-
-
-            
             
     def toggle_like_icon(self):
         """하트 버튼을 누르는 시그널로 실행
         아이콘 변경 & 딕셔너리에 좋아요한 asset 정보 저장 """
-     
+        like_state = LikeState()
         asset = Asset().current
         asset_object_id = str(asset[OBJECT_ID])
         current_icon = self.ui.like_btn.icon()
-        if current_icon.cacheKey() == LikeState().like_icon_empty.cacheKey():  #빈하트 상태일때 
-            self.ui.like_btn.setIcon(LikeState().like_icon)
-            LikeState().like_asset_list.append(asset_object_id)
-           
+        if current_icon.cacheKey() == like_state.like_icon_empty.cacheKey():  #빈하트 상태일때 
+            self.ui.like_btn.setIcon(like_state.like_icon)
+            like_state.like_asset_list.append(asset_object_id)
                 
         else:  # 채워진 하트 상태일 때 (좋아요 취소)
-            self.ui.like_btn.setIcon(LikeState().like_icon_empty)  # 빈 하트로 변경
-            if asset_object_id in LikeState().like_asset_list:
-                index = LikeState().like_asset_list.index(asset_object_id)
-                LikeState().like_asset_list.pop(index)  # 리스트에서 제거
+            self.ui.like_btn.setIcon(like_state.like_icon_empty)  # 빈 하트로 변경
+            if asset_object_id in like_state.like_asset_list:
+                index = like_state.like_asset_list.index(asset_object_id)
+                like_state.like_asset_list.pop(index)  # 리스트에서 제거
                 
-        LikeState().set_like_icon(asset_object_id, self.ui.like_btn)
-
-
+        like_state.set_like_icon(asset_object_id, self.ui.like_btn)
 
     def toggle_change(self): 
 
@@ -346,7 +291,7 @@ class TableUiManager:
         - 토글 버튼의 toggle의 현재 상태에 따른 이미지 변경
         - true -> false 시 toggle_open, false -> true 시 toggle_like
         """
-
+        
         if LikeState().state == False:
             self.ui.toggle_btn.setPixmap(LikeState().toggle_like)
             LikeState().state = True

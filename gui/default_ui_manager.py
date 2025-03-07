@@ -35,7 +35,8 @@ from table_ui_manager import TableUiManager
 
 
 from like_state import LikeState
-from emitter_class import EmitterParent
+
+
 class DefaultUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -52,10 +53,6 @@ class DefaultUiManager:
 
             self.main_ui_setting()
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
-
-
-
-  
 
     def set_search_area_design(self):
         search_input =self. ui.search
@@ -94,9 +91,6 @@ class DefaultUiManager:
 
         LikeState()
         self.like_active = False
-
-
-
 
         info_list_bar_s=QPixmap("/nas/spirit/asset_project/source/info_list_bar.png")
         self.ui.info_list_bar_s.setPixmap(info_list_bar_s)

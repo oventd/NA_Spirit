@@ -47,7 +47,7 @@ class TreeUiManager:
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
 
             self.ui.treeWidget.itemClicked.connect(self.toggle_checkbox)
-            self.filter=self.ui.treeWidget.itemClicked.connect(self.get_checked_items)
+            self.ui.treeWidget.itemClicked.connect(self.get_checked_items)
          
     def get_checked_items(self):
         """QTreeWidget에서 체크된 항목들의 텍스트를 가져오는 함수"""
