@@ -11,6 +11,7 @@ utils_dir = os.path.abspath(os.path.join(spirit_dir, "utils"))
 sys.path.append(utils_dir)
 
 from class_loader import load_classes_from_json
+from sg_path_utils import SgPathUtils
 
 # 로깅 설정 (필요에 따라 파일 로깅 등 추가 가능)
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -103,30 +104,14 @@ class LoadManager:
         new_version = last_version + 1
         return f"v{new_version:03d}"
 
-    @staticmethod
-    def make_entity_file_path(root_path: str, entity_type: str, category: str, entity: str, step: str = None, version: str = None, dcc: str = None, file: str = None) -> str:
-        """
-        root_path와 나머지 인자들을 결합하여 파일 경로를 생성합니다.
-        """
-        path_parts = [entity_type, category, entity]
-        if step is not None:
-            path_parts.append(step)
-        if version is not None:
-            path_parts.append(version)
-        if dcc is not None:
-            path_parts.append(dcc)
-        if file is not None:
-            path_parts.append(file)
-        return os.path.join(root_path, *path_parts)
-
     def make_entity_dir(self, entity_type: str, category: str, entity: str, step: str, dcc: str) -> tuple[str, str]:
         """
         publish와 work 디렉토리를 생성합니다.
         """
-        publish_dir = self.make_entity_file_path(self._root_path, entity_type, category, entity, step, version="publish", dcc="cache")
+        publish_dir = SgPathUtils.make_entity_file_path(self._root_path, entity_type, category, entity, step, version="publish", dcc="cache")
         os.makedirs(publish_dir, exist_ok=True)
         
-        work_dir = self.make_entity_file_path(self._root_path, entity_type, category, entity, step, version="work", dcc=dcc)
+        work_dir = SgPathUtils.make_entity_file_path(self._root_path, entity_type, category, entity, step, version="work", dcc=dcc)
         os.makedirs(work_dir, exist_ok=True)
         
         return publish_dir, work_dir
@@ -178,8 +163,8 @@ class LoadManager:
         step = entity_info.get("step")
         dcc = entity_info.get("dcc")
         
-        step_path = self.make_entity_file_path(self._root_path, entity_type, category, entity, step)
-        asset_path = self.make_entity_file_path(self._root_path, entity_type, category, entity)
+        step_path = SgPathUtils.make_entity_file_path(self._root_path, entity_type, category, entity, step)
+        asset_path = SgPathUtils.make_entity_file_path(self._root_path, entity_type, category, entity)
 
         if not os.path.exists(step_path):
             logging.warning(f"Entity not found: {entity_info}")

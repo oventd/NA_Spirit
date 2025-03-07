@@ -77,33 +77,40 @@ def lock_camera(camera_file):
 
     # else:
     #     print(f"Validation passed: Group '{group_name}' exists.")
-def validate_hierarchy(group_name, valid_list=None):
+def validate_hierarchy(group_name, child_list=None, exception_group=None):
     """
     특정 그룹과 자식 객체들이 존재하는지 확인하는 함수.
     :param group_name: 부모 그룹 이름
-    :param valid_list: 확인할 자식 그룹들의 이름들 (가변 인자)
+    :param child_list: 확인할 자식 그룹들의 이름들 (가변 인자)
+    :param exception_groups: 자식이 없어도 통과할 그룹 리스트
     :return: 그룹이 존재하고, 자식 그룹들이 모두 존재하면 True, 아니면 False
     """
     # valid_list가 None이면 빈 리스트로 설정
-    if valid_list is None:
-        valid_list = []
+    if child_list is None:
+        child_list = []
 
+    if exception_group is None:
+        exception_group = set()  # None이면 빈 set으로 초기화
+        
     # 그룹 존재 여부 확인
     if not cmds.objExists(group_name):
         print(f"Validation failed: Group '{group_name}' does not exist.")
         return False
 
-    # valid_list가 있을 경우에만 자식 객체들 확인
-    if valid_list:
-        existing_children = cmds.listRelatives(group_name, children=True, fullPath=False) or []
 
-        # 각 자식 그룹들이 존재하는지 확인
-        for child in valid_list:
+    if group_name in exception_group:
+        print(f"Validation passed: Group '{group_name}' exists (empty check skipped).")
+        return True
+    
+    # valid_list가 있을 경우에만 자식 객체들 확인
+    if child_list:
+        existing_children = cmds.listRelatives(group_name, children=True, fullPath=False) or []
+        for child in child_list:
             if child not in existing_children:
                 print(f"Validation failed: '{child}' does not exist under group '{group_name}'.")
                 return False
         # valid_list에 있는 자식들이 모두 존재하면 True
-        print(f"Validation passed: All children in valid_list exist under group '{group_name}'.")
+        print(f"Validation passed: All children in child_list exist under group '{group_name}'.")
         return True
 
     # valid_list가 비어있을 경우 자식 객체 존재 여부 확인
@@ -124,6 +131,12 @@ def validate_anim_curve():
     else:
         print("Validation passed: 'animCurveTL' node exists.")
         return True
+
+# 누구시죠?
+def create_lighting_group(self):
+    create_group("light")
+    print("Created lighting group")
+
 
 def create_usd_proxy(usd_file, proxy_name="mayaUsdProxyShape"):
     # 기존에 같은 이름의 mayaUsdProxyShape 노드가 있는지 확인

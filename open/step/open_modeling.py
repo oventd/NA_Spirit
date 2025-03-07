@@ -2,35 +2,33 @@ import maya.mel as mel
 import maya.cmds as cmds
 import os
 import sys
-from constant import * 
-from maya_utils import create_group, validate_hierarchy  # 유틸 함수 임포트
-sys.path.append(STEP_PATH)
+sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
-sys.path.append(UTILS_PATH)
+sys.path.append('/home/rapa/NA_Spirit/utils')
+from maya_utils import create_group, validate_hierarchy  # 유틸 함수 임포트
 
 class ModelingStep(StepOpenMaya):
     def __init__(self):
         super().__init__()
-        print ("모델링 불러오기")
-        self.group_name = None
+        print ("Opening modeling step")
 
     class Open:
         @staticmethod
-        def setup(group_name=GEO):
-            create_group(group_name)
-            create_group(LOW, parent = GEO)
-            create_group(HIGH, parent = GEO)
+        def setup(geo_group_name="geo"):
+            create_group(geo_group_name)
+            create_group("Low", parent = "geo")
+            create_group("High", parent = "geo")
 
     class Publish:
         @staticmethod
-        def validate(group_name=GEO):
-            if validate_hierarchy(group_name=group_name):
-                print(f"Validation passed:'{group_name}' exists.")
+        def validate(geo_group_name="geo", child_list = ["Low", "High"]):
+            
+            if validate_hierarchy(geo_group_name):
+                print(f"Validation passed:'{geo_group_name}' exists.")
             else:
-                print(f"Validation failed:'{group_name}' does not exist.")
+                print(f"Validation failed:'{geo_group_name}' does not exist.")
 
-
-            if validate_hierarchy(GEO, [LOW, HIGH]):
+            if validate_hierarchy(geo_group_name, child_list):
                 print("Geo 그룹 하위에 Low와 High 그룹이 모두 존재합니다.")
             else:
                 print("Geo 그룹 하위에 Low와 High 그룹이 모두 존재하지 않습니다.")
@@ -38,6 +36,6 @@ class ModelingStep(StepOpenMaya):
 
 if __name__ == "__main__":
     modeling = ModelingStep()
-    ModelingStep.Open.setup(group_name=GEO)
-    ModelingStep.Publish.validate(group_name=GEO)
+    ModelingStep.Open.setup()
+    ModelingStep.Publish.validate()
     
