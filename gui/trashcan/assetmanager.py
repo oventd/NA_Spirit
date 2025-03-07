@@ -7,7 +7,7 @@ class AssetManager:
     def __init__(self, main_window):
         self.main_window = main_window
         self.ui = main_window.ui
-        self.like_asset_list = []
+
         
     def load_assets(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
         """자산 데이터를 테이블에 로드"""

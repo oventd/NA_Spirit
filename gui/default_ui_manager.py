@@ -32,10 +32,10 @@ from constant import *
 
 from tree_ui_manager import TreeUiManager
 from table_ui_manager import TableUiManager
-from subwin_ui_manager import SubWinUiManager
+
 
 from like_state import LikeState
-
+from emitter_class import EmitterParent
 class DefaultUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -45,24 +45,17 @@ class DefaultUiManager:
 
         return cls._instance
     
-    def __init__(self, ui, image_labels):
+    def __init__(self, ui):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
             super().__init__()
             self.ui = ui
-            self.image_labels = image_labels
+
             self.main_ui_setting()
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
-    def make_label_list(self): 
-        for _ in range(4):  # 4개의 QLabel을 미리 생성
-            label = QLabel()
-            label.setFixedSize(60, 60)
-            label.setAlignment(Qt.AlignCenter)
-            self.ui.image_widget_s.addWidget(label)  # 초기 레이아웃에 QLabel 추가
-            self.image_labels.append(label)
 
 
 
-   
+  
 
     def set_search_area_design(self):
         search_input =self. ui.search
@@ -90,26 +83,25 @@ class DefaultUiManager:
         self.sub_bar = False
         
         self.user_num()
-        self.make_label_list()
+        
         TreeUiManager.tree_widget(self.ui)
-        TableUiManager.table_widget(self.ui,None,UPDATED_AT, 50, 0,None)
+        TableUiManager(self.ui).table_widget(None,UPDATED_AT, 50, 0,None)
         self.set_search_area_design()
         
         self.ui.like_empty_notice.hide()
         
-        self.like_icon_empty = SubWinUiManager(self.ui).like_icon_empty
-        self.ui.like_btn.setIcon(self.like_icon_empty)
+        self.ui.like_btn.setIcon(LikeState().like_icon_empty)
 
-        # LikeState()
+        LikeState()
         self.like_active = False
 
-        self.toggle_open =QPixmap("/nas/spirit/asset_project/source/toggle_open.png")
-        self.toggle_like = QPixmap("/nas/spirit/asset_project/source/toggle_like.png")
+
+
 
         info_list_bar_s=QPixmap("/nas/spirit/asset_project/source/info_list_bar.png")
         self.ui.info_list_bar_s.setPixmap(info_list_bar_s)
     
-        self.ui.toggle_btn.setPixmap(self.toggle_open) 
+        self.ui.toggle_btn.setPixmap(LikeState().toggle_open) 
         bg =QPixmap("/nas/spirit/asset_project/source/bg.png")
         
         self.ui.label.setPixmap(bg)

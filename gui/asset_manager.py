@@ -23,7 +23,8 @@ from asset_service import ClickableLabel
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
 # from add_video_player import *
-from subwin_ui_manager import SubWinUiManager
+
+from emitter_class import EmitterParent
 class AssetManager:
     _instance = None  # 싱글톤 인스턴스 저장
 

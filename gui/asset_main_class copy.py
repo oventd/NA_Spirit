@@ -33,7 +33,7 @@ from constant import *
 from asset_manager import AssetManager
 # from data_manager import DataManager
 from default_ui_manager import DefaultUiManager
-from subwin_ui_manager import SubWinUiManager
+
 from table_ui_manager import TableUiManager
 from tree_ui_manager import TreeUiManager
 
@@ -53,20 +53,16 @@ class MainUi(QMainWindow):
 
             self.load_ui()
 
-            self.check_dict = {}    
-
             self.media_players = []  # 각 동영상 플레이어(QMediaPlayer) 리스트
             self.video_widgets = []  # 각 동영상을 표시할 `QVideoWidget` 리스트
             self.labels = [] 
 
-        
-            self.image_labels = []
             #"file_format", "updated_at", "downloads" << 가지고 있는 정렬 기준
 
             self.asset_manager = AssetManager(self.ui)
-            self.default_ui_manager = DefaultUiManager(self.ui , self.image_labels)
-            self.subwin_ui_manager = SubWinUiManager(self.ui, self.image_labels)
             self.table_ui_manager = TableUiManager(self.ui)
+            self.default_ui_manager = DefaultUiManager(self.ui )
+
             self.tree_ui_manager = TreeUiManager(self.ui)
 
             self._initialized = True  # 인스턴스가 초기화되었음을 표시

@@ -30,6 +30,8 @@ from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
 from add_video_player import *
 
+from check import Check
+from table_ui_manager import TableUiManager
 class TreeUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -44,25 +46,27 @@ class TreeUiManager:
             self.ui=ui
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
 
-         
-    def get_checked_items(self):
-            """QTreeWidget에서 체크된 항목들의 텍스트를 가져오는 함수"""
-            checked_items = []  # 체크된 항목을 저장할 리스트
-            root = self.ui.treeWidget.invisibleRootItem()  # 트리의 루트 아이템 가져오기
             self.ui.treeWidget.itemClicked.connect(self.toggle_checkbox)
             self.filter=self.ui.treeWidget.itemClicked.connect(self.get_checked_items)
-    
-    def traverse_tree(self,item):
-        """재귀적으로 트리의 모든 항목을 탐색"""
-        for i in range(item.childCount()):
-            child = item.child(i)
-            if child.checkState(0) == Qt.Checked:  #  체크된 항목 확인
-                checked_items.append(child.text(0))  #  항목의 텍스트 저장
-            self.traverse_tree(child)  #  자식 항목이 있을 경우 재귀적으로 탐색
+         
+    def get_checked_items(self):
+        """QTreeWidget에서 체크된 항목들의 텍스트를 가져오는 함수"""
+        checked_items = []  # 체크된 항목을 저장할 리스트
+        root = self.ui.treeWidget.invisibleRootItem()  # 트리의 루트 아이템 가져오기
 
-        self.traverse_tree(root)  # 트리 탐색 시작
+        def traverse_tree(item):
+            """재귀적으로 트리의 모든 항목을 탐색"""
+            for i in range(item.childCount()):
+                child = item.child(i)
+                if child.checkState(0) == Qt.Checked:  #  체크된 항목 확인
+                    checked_items.append(child.text(0))  #  항목의 텍스트 저장
+                traverse_tree(child)  #  자식 항목이 있을 경우 재귀적으로 탐색
 
+        traverse_tree(root)  # 트리 탐색 시작
+
+        Check.checked_items = checked_items
         return checked_items
+        
 
     @staticmethod
     def tree_widget(ui): # 리뷰 메서드 이름
@@ -116,11 +120,11 @@ class TreeUiManager:
                 item.setCheckState(column, new_state)  # 체크박스 상태 변경
                 
                 if new_state == Qt.Checked:  #체크 상태일 경우 부모 item을 키로 item을 list에 담아 value로 추가
-                    self.check_dict.setdefault(parent_item_convert, []).append(filter_name_convert)
+                    Check().dict.setdefault(parent_item_convert, []).append(filter_name_convert)
                 else:  #체크 해제 상태일 경우 부모 item의 키에서 해당하는 value 삭제
-                    self.check_dict[parent_item_convert].remove(filter_name_convert)
-                    if self.check_dict[parent_item_convert] == []:
-                        del self.check_dict[parent_item_convert]
+                    Check().dict[parent_item_convert].remove(filter_name_convert)
+                    if Check().dict[parent_item_convert] == []:
+                        del Check().dict[parent_item_convert]
             
                 sort_by = self.ui.comboBox.currentText()
                 if sort_by == "최신 순":
@@ -130,6 +134,6 @@ class TreeUiManager:
                 else:
                     sort_by = DOWNLOADS
                     
-                self.table_widget(filter_conditions = self.check_dict, sort_by= sort_by, limit = 20, skip = 0, fields =None)
+                TableUiManager(self.ui).table_widget(filter_conditions = Check().dict, sort_by= sort_by, limit = 20, skip = 0, fields =None)
 
                 #만들어 진 리스트를 필터로 table에 정렬해주기 + s실제 콤보박스의 정렬이랑도 섞여야함

@@ -30,6 +30,8 @@ from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
 from add_video_player import *
 
+from asset import Asset
+
 class MainUi(QMainWindow):
     clicked = Signal()
     def __init__(self):
@@ -100,7 +102,7 @@ class MainUi(QMainWindow):
         """하트 버튼을 누르는 시그널로 실행
         아이콘 변경 & 딕셔너리에 좋아요한 asset 정보 저장 """
      
-        asset = self.current_asset
+        asset = Asset().current
         current_icon = self.ui.like_btn.icon()
       
         if current_icon.cacheKey() == self.like_icon_empty.cacheKey():  #빈하트 상태일때 
@@ -337,7 +339,7 @@ class MainUi(QMainWindow):
         # for asset_id, asset_info in asset.items(): 
         self.set_like_icon(asset)
 
-        self.current_asset = asset
+        Asset().current = asset
         self.ui.info_name.setText(asset[NAME])
         self.ui.info_name_2.setText(asset[NAME])
         self.ui.description.setText(asset[DESCRIPTION])
