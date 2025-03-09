@@ -11,7 +11,6 @@ from PySide6.QtMultimediaWidgets import QVideoWidget
 from functools import partial
 import sys
 import os
-import vlc
 
 # 현재 파일(ui.py)의 절대 경로
 current_file_path = os.path.abspath(__file__)
@@ -24,20 +23,16 @@ for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
 
-
 from asset_service import AssetService  # AssetService 임포트
 from asset_service import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
 from add_video_player import *
-from video_player_manager import VLCVideoPlayer
 
 from like_state import LikeState
 
 from asset import Asset
-
-
 class SubWin:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -48,7 +43,9 @@ class SubWin:
         return cls._instance
     def __init__(self):
         pass
- 
+    # @staticmethod
+    # def exit_sub_win(stackedWidget):
+    #     stackedWidget.hide()
     @staticmethod 
     def next_slide(stackedWidget_2):
         """다음 슬라이드 이동"""
@@ -64,7 +61,7 @@ class SubWin:
         stackedWidget_2.setCurrentIndex(prev_index)
         print("이전 이미지로 변경됨")
       # 리뷰 순서를 정리를 
-
+    @staticmethod
     def show_asset_detail_image(stackedWidget_2, detail_thum_urls , image_labels):
 
         for img_path in detail_thum_urls:
@@ -84,23 +81,3 @@ class SubWin:
                 label.clear()
         
         stackedWidget_2.setCurrentIndex(0)  # 0번째의 label을 보여준다. 
-        print("디테일 썸네일 이미지 리스트>>>> " + str(detail_thum_urls))
-        print("이미지라벨 4개 >>>>"+str(image_labels))
-    
-    
-
-    def show_asset_detail_video(self, stackedWidget_2, turnaround_urls):
-        """QStackedWidget에 VLC 기반 동영상 플레이어 추가"""
-
-        for video_path in turnaround_urls:
-            if video_path is None:
-                continue  # 빈 값은 무시
-
-            # ✅ VLC 비디오 플레이어 위젯 생성
-            video_player = VLCVideoPlayer()
-            video_widget = video_player.set_video_source(video_path)
-
-            # ✅ QStackedWidget에 추가
-            stackedWidget_2.addWidget(video_widget)
-
-        stackedWidget_2.setCurrentIndex(0)  # 첫 번째 동영상을 표시

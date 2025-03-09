@@ -1,6 +1,5 @@
-# 로거 파일 추가해서 유저가 중요한
+# 로거 파일 추가해서 유저가 중요한 
 ##### json 파일은 나스피릿에 넣고 이그노어 에 포함
-#동영상 추가
 
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
 from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
@@ -56,7 +55,7 @@ class MainUi(QMainWindow):
 
             self.media_players = []  # 각 동영상 플레이어(QMediaPlayer) 리스트
             self.video_widgets = []  # 각 동영상을 표시할 `QVideoWidget` 리스트
-            self.labels = []
+            self.labels = [] 
             #"file_format", "updated_at", "downloads" << 가지고 있는 정렬 기준
 
             self.asset_manager = AssetManager(self.ui)
@@ -68,12 +67,13 @@ class MainUi(QMainWindow):
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
 
     def load_ui(self):
-        ui_file_path = "/home/llly/NA_Spirit/gui/asset_main2.ui"
-        ui_file = QFile(ui_file_path)
-        loader = QUiLoader()
-        self.ui = loader.load(ui_file)
 
-        self.ui.show()
+        ui_file_path = "./asset_main2.ui"
+        ui_file = QFile(ui_file_path)  
+        loader = QUiLoader() 
+        self.ui = loader.load(ui_file) 
+
+        self.ui.show()  
         ui_file.close()
 
 app = QApplication(sys.argv)

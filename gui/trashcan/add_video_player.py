@@ -40,11 +40,11 @@ class MultiVideoPlayer(QWidget):
         self.next_button.clicked.connect(self.next_video)
         self.next_button.setParent(self)
 
-    def show_asset_detail_video(self,stacked_widget, video_urls):
+    def show_asset_detail_video(self, video_urls):
         if not video_urls:
             print("❌ 동영상 목록이 비어 있습니다.")
             return
-        self.stacked_widget=stacked_widget
+
         self.media_players.clear()
         self.video_widgets.clear()
         self.labels.clear()
@@ -102,3 +102,18 @@ class MultiVideoPlayer(QWidget):
 
         self.play(next_index)
 
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    player = MultiVideoPlayer()
+
+    video_list = [
+        "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4",
+        "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4",
+        "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4"
+    ]
+
+    player.show_asset_detail_video(video_list)
+    player.show()
+    player.play(0)
+
+    sys.exit(app.exec())

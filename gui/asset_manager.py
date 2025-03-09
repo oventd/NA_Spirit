@@ -1,4 +1,5 @@
-
+# 로거 파일 추가해서 유저가 중요한 
+##### json 파일은 나스피릿에 넣고 이그노어 에 포함
 
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
 from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl

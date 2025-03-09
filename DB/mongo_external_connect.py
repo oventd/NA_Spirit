@@ -19,7 +19,7 @@
 import pymongo  # MongoDB 작업을 위한 라이브러리
 
 # MongoDB 연결
-client = pymongo.MongoClient("mongodb://localhost:27017/")  # 로컬 MongoDB 서버에 연결
+client = pymongo.MongoClient("mongodb://192.168.5.19:27017/")  # 로컬 MongoDB 서버에 연결
 db = client["filter_test"]  # 사용할 데이터베이스 'filter_test'에 연결
 asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 
