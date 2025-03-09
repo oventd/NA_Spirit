@@ -39,10 +39,11 @@ class MultiVideoPlayer(QWidget):
 
         self.setLayout(layout)  # 전체 레이아웃 설정
 
-    def show_asset_detail_video(self, video_urls):
+    def show_asset_detail_video(self, stacked_widget, video_urls):
         """
         여러 개의 동영상을 `QMediaPlayer`를 사용하여 관리하는 함수
         """
+        self.stacked_widget = stacked_widget
         if not video_urls:
             print("❌ 동영상 목록이 비어 있습니다.")
             return
