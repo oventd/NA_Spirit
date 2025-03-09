@@ -11,6 +11,9 @@ from PySide6.QtMultimediaWidgets import QVideoWidget
 from functools import partial
 import sys
 import os
+from PySide6.QtMultimedia import QMediaPlayer
+from PySide6.QtMultimediaWidgets import QVideoWidget
+from PySide6.QtCore import QUrl
 
 # 현재 파일(ui.py)의 절대 경로
 current_file_path = os.path.abspath(__file__)
@@ -56,21 +59,88 @@ class TableUiManager:
             self.ui.image_l_btn.clicked.connect(partial (SubWin.prev_slide, self.ui.stackedWidget_2))
             self.ui.image_r_btn.clicked.connect(partial (SubWin.next_slide, self.ui.stackedWidget_2))
 
-            self.image_labels = []
-            self.make_label_list()
+            
+            
 
             self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
 
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
+#라벨 초기화 함수 실행
+    def remove_lable(self):
 
-    def make_label_list(self): 
-        for _ in range(4):  # 4개의 QLabel을 미리 생성
+        while self.ui.image_widget_s.count() > 0:
+            item = self.ui.image_widget_s.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()  # QLabel 메모리 해제
+
+      
+        for label in self.ui.stackedWidget_2.findChildren(QLabel):
+            label.deleteLater()
+
+        while self.ui.image_widget_s.count() > 0:
+            item = self.ui.image_widget_s.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        # ✅ 기존 stackedWidget_2 내부의 QLabel 삭제
+        for label in self.ui.stackedWidget_2.findChildren(QLabel):
+            label.deleteLater()
+
+        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        for video_widget in self.ui.stackedWidget_2.findChildren(QVideoWidget):
+            video_widget.deleteLater()
+
+        # ✅ 비디오 플레이어 리스트도 정리
+        self.video_widgets = []
+        self.video_players = []
+
+    def make_label_list(self, list_len): 
+        self.remove_lable()
+        self.make_labels = []  # 리스트 초기화
+
+        for _ in range(list_len):  
             label = QLabel()
             label.setFixedSize(60, 60)
             label.setAlignment(Qt.AlignCenter)
-            self.ui.image_widget_s.addWidget(label)  # 초기 레이아웃에 QLabel 추가
-            self.image_labels.append(label)
+            self.ui.image_widget_s.addWidget(label)  # 레이아웃에 QLabel 추가
+            self.make_labels.append(label)
+
+    def make_video_label_list(self, list_len):
+        ui = self.ui  # UI 객체 참조
+        print(f"여기 리스트 랜의 갯수를 알려줍니당 {list_len}")
+
+        # ✅ 기존 image_widget_s 내부의 위젯 삭제
+        while ui.image_widget_s.count() > 0:
+            item = ui.image_widget_s.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        for widget in ui.stackedWidget_2.findChildren(QVideoWidget):
+            widget.deleteLater()
+
+        self.make_video_labels = []  # 리스트 초기화
+        self.video_players = []  # QMediaPlayer 객체 리스트
+
+        # ✅ 새로운 QVideoWidget 추가
+        for _ in range(list_len):  
+            video_widget = QVideoWidget(ui.stackedWidget_2)  # 부모 설정
+            video_widget.setGeometry(0, 0, 380, 291)  # 📌 위치 (0, 53) 크기 (380x291) 설정
+            video_widget.show()  # 반드시 show() 호출해야 표시됨
+
+            player = QMediaPlayer()
+            player.setVideoOutput(video_widget)
+
+            # ✅ UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
+
+            # ✅ 리스트에 저장
+            self.make_video_labels.append(video_widget)
+            self.video_players.append(player)
+
+        print("✅ 비디오 위젯 생성 완료")
+
+
 
     def set_sorting_option(self, option):
         #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
@@ -131,9 +201,9 @@ class TableUiManager:
         name = ClickableLabel("이름", parent=widget)
         type = ClickableLabel("타입", parent=widget)
 
-        Thum.clicked.connect(lambda: self.del_label(asset))
-        name.clicked.connect(lambda: self.del_label(asset))
-        type.clicked.connect(lambda: self.del_label(asset))
+        Thum.clicked.connect(lambda: self.set_detail_info(asset))
+        name.clicked.connect(lambda: self.set_detail_info(asset))
+        type.clicked.connect(lambda: self.set_detail_info(asset))
 
         layout.addWidget(Thum)
         layout.addWidget(name)
@@ -184,26 +254,10 @@ class TableUiManager:
     def exit_sub_win(self):
         self.ui.stackedWidget.hide()
 
-    def del_label(self, asset):
-        Asset().current = asset
-        ui=self.ui
-        """라벨 클릭 이벤트 발생 시 실행"""
-        
-       # 기존 라벨 개수 확인
-        for label in ui.image_widget_s.findChildren(QWidget):
-            print(f" QLabel 위치 확인: {label} (부모: {label.parent()})")
-
-        try:
-            for label in ui.stackedWidget_2.findChildren(QLabel):
-                label.deleteLater()
-
-            self.set_detail_info(asset)
-
-        except TypeError:
-            # set_detail_info(asset)
-            print("error")
+   
 
     def set_detail_info(self, asset):
+        Asset().current = asset
         ui=self.ui
         ui.stackedWidget.show()
         detail_thum_urls=[]
@@ -246,21 +300,16 @@ class TableUiManager:
                 asset["presetting_url2"],
                 asset["presetting_url3"]
             ]
-            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.image_labels)
+            self.make_label_list(len(detail_thum_urls))
+            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
 
         elif asset[ASSET_TYPE]=="3D Model":
-            detail_thum_urls = [
+            turnaround_urls = [
                 asset["turnaround_url"],
                 asset["rig_url"]
             ]
-            # SubWinUiManager.show_asset_detail_media(ui,detail_thum_urls)
-
-        elif asset[ASSET_TYPE]=="3D Model":
-            detail_thum_urls = [
-                asset["applyhdri_url"],
-                asset["hdri_url"]
-            ]
-            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls,  self.image_labels)
+            self.make_video_label_list(len(turnaround_urls))
+            SubWin.show_asset_detail_video(self.ui.stackedWidget_2,turnaround_urls)
 
 
 
