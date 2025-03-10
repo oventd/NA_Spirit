@@ -80,3 +80,14 @@ LAY = 'LAY' # Layout
 ANM = 'ANM' # Animation
 LGT = 'LGT' # Light
 CMP = 'CMP' # Compositing
+
+shot_step_dict = {
+    MODELING: MDL,
+    RIGGING: RIG,
+    LOOKDEV: LDV,
+    MATCHMOVE: MMV,
+    LAYOUT: LAY,
+    ANIMATING: ANM,
+    LIGHTING: LGT,
+    COMPOSITING: CMP
+}

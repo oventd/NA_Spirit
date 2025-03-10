@@ -20,7 +20,6 @@ class PublishUsd2StepUsdConnector:
         result = os.path.join(dir_path, file_name+ext)
         return result
     
-    
     @staticmethod
     def connect(publish_file_path):
         root_path = PublishUsd2StepUsdConnector.get_root_path(published_version)
