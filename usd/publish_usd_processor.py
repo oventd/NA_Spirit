@@ -16,7 +16,6 @@ class PublishUsdProcessor:
 
         self.entity_type = SgPathUtils.get_entity_type(entity_path)
         
-
         self.publish_dir = os.path.join(self.entity_path, "publish")
 
         self.step_publish_data_dict = {

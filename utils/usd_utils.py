@@ -2,9 +2,13 @@ from pxr import Usd, UsdGeom, Sdf, Gf
 
 class UsdUtils:
     @staticmethod
-    def create_usd_file(file_path):
+    def create_usd_file(file_path, ascii=True):
         # USD 파일을 ASCII(.usda)로 저장하지만 확장자는 .usd
-        layer = Sdf.Layer.CreateNew(file_path, args={"format": "usda"})
+        if ascii:
+            args = {"format": "usda"}
+        else:
+            args = {"format": "usdc"}
+        layer = Sdf.Layer.CreateNew(file_path, args=args)
         # USD Stage 생성 (ASCII 모드)
         stage = Usd.Stage.Open(layer)
         # USD 파일 저장
@@ -17,7 +21,11 @@ class UsdUtils:
     
     @staticmethod
     def get_stage(file_path):
-        return Usd.Stage.Open(file_path)
+        try:
+            stage = Usd.Stage.Open(file_path)
+            return stage
+        except:
+            return None
     
     @staticmethod
     def create_stage(file_path):
@@ -28,8 +36,8 @@ class UsdUtils:
         return stage.GetPrimAtPath(path)
 
     @staticmethod
-    def create_xfrom(stage, name = "Root", parent_prim = None):
-        xform = UsdGeom.Xform.Define(stage, f"/{name}")
+    def create_xfrom(stage, path = "/Root", parent_prim = None):
+        xform = UsdGeom.Xform.Define(stage, path)
         
         defaltPrim = stage.GetDefaultPrim()
         if not defaltPrim:
@@ -39,8 +47,8 @@ class UsdUtils:
         return xform.GetPrim()
         
     @staticmethod
-    def create_scope(stage, name = "Root", parent_prim = None):
-        scope = UsdGeom.Scope.Define(stage, f"/{name}")
+    def create_scope(stage, path = "/Root", parent_prim = None):
+        scope = UsdGeom.Scope.Define(stage, path)
         
         defaltPrim = stage.GetDefaultPrim()
         if not defaltPrim:

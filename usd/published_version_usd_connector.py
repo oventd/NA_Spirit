@@ -26,12 +26,22 @@ class PublishUsd2StepUsdConnector:
         root_path = PublishUsd2StepUsdConnector.get_root_path(published_version)
         version = SgPathUtils.get_version(published_version)
 
-        if os.path.exists(root_path):
+        if not os.path.exists(root_path):
             UsdUtils.create_usd_file(root_path)
+
+        stage = UsdUtils.get_stage(root_path)
+        if not stage:
+            stage = UsdUtils.create_stage(root_path)
         
-        root = UsdUtils.create_scope(root_path, "Root")
-        UsdUtils.add_refernce_to_variant_set(root,"version", {version: publish_file_path}, set_default = True)
-    
+        root_prim_path = "/Root"
+        root_scope = UsdUtils.get_prim(stage, root_path)
+        if not root_scope:
+            root_scope = UsdUtils.create_scope(stage, root_prim_path)
+
+        UsdUtils.add_refernce_to_variant_set(root_scope,"version", {version: publish_file_path}, set_default = True)
+
+        return root_path
+
     
 if __name__ == "__main__":
     published_version = "/nas/spirit/spirit/assets/Prop/apple/MDL/publish/maya/scene.v001.usd"
@@ -39,4 +49,4 @@ if __name__ == "__main__":
     root_path = PublishUsd2StepUsdConnector.get_root_path(published_version)
     print(root_path)
 
-    PublishUsd2StepUsdConnector.connect(published_version)
+    print(PublishUsd2StepUsdConnector.connect(published_version))
