@@ -3,7 +3,6 @@ import os  # os 모듈 임포트 추가
 
 class MayaUtils:
     """maya에서 공통 기능을 모아둔 메서드입니다."""
-
     @staticmethod
     def create_group(name, parent=None):
         """
@@ -186,7 +185,7 @@ class MayaUtils:
             print(f"USD Proxy Node linked to: {usd_file}")
 
     @staticmethod
-    def file_save(file_path, file_format, export_options=None):
+    def file_export(file_path, file_format, export_options=None):
         """
         파일을 지정된 포맷으로 저장하는 함수.
         :param file_path: 저장할 파일의 경로
@@ -198,34 +197,99 @@ class MayaUtils:
             return False
         
         if file_format.lower() == "mb":
-            return MayaUtils.save_maya_binary(file_path)  # 호출 방식 확인
+            return MayaUtils.export_maya_binary(file_path)  # 호출 방식 확인
+        
         elif file_format.lower() == "ma":
-            return MayaUtils.save_maya_ascii(file_path)  # 호출 방식 확인
-        elif file_format.lower() == "usd":
-            return MayaUtils.save_usd(file_path, export_options)  # 호출 방식 확인
+            return MayaUtils.export_maya_ascii(file_path)  # 호출 방식 확인
+        
+        elif file_format.lower() == "usd":       
+            return MayaUtils.export_usd(file_path, export_options)  # 호출 방식 확인
         else:
             print(f"Error: Unsupported file format {file_format}")
             return False
 
     @staticmethod
-    def save_maya_binary(file_path):
+    def export_maya_binary(file_path):
         """Maya Binary 형식으로 파일을 저장하는 함수."""
         cmds.file(file_path, force=True, type="mayaBinary", exportSelected=True)
-        print(f"Saved {file_path} as Maya Binary.")
+        print(f"Export {file_path} as Maya Binary.")
         return True
 
     @staticmethod
-    def save_maya_ascii(file_path):
+    def export_maya_ascii(file_path):
         """Maya ASCII 형식으로 파일을 저장하는 함수."""
         cmds.file(file_path, force=True, type="mayaAscii", exportSelected=True)
-        print(f"Saved {file_path} as Maya ASCII.")
+        print(f"Export {file_path} as Maya ASCII.")
         return True
 
     @staticmethod
-    def save_usd(file_path, export_options=None):
+    def export_usd(file_path, export_options=None):
         """USD 형식으로 파일을 저장하는 함수."""
         if export_options is None:
+            export_options = ""
             print("Error: No export options provided for USD.")
         cmds.file(file_path, force=True, options=export_options, type="USD Export", exportSelected=True)
-        print(f"Saved {file_path} as USD.")
+        print(f"Export {file_path} as USD.")
         return True
+    
+
+
+
+
+    @staticmethod
+    def all_false(group_name):
+        """all = false 시 나오는 메서드"""
+        children = cmds.listRelatives(group_name, children=True) or []
+        if not children:
+            print(f"No children found in group '{group_name}'.")
+        return children
+
+    @staticmethod
+    def all_true(group_name):
+        """all = false 시 나오는 메서드"""
+        children = cmds.listRelatives(group_name, children=False) or []
+        if not children:
+            print(f"No children found in group '{group_name}'.")
+        return children
+    
+    def isReferenced_false():
+        pass
+
+    def isReferenced_true():
+        reference_file()
+
+
+"""exportUVs=1;                 # UV 좌표 내보내기 (1=활성화, 0=비활성화)
+        exportSkels=none;              # 스켈레톤 내보내기 옵션 (none, auto, explicit)
+        exportSkin=none;               # 스킨 데이터 포함 여부 (none, auto, explicit)
+        exportBlendShapes=0;           # 블렌드쉐이프 내보내기 (0=비활성화, 1=활성화)
+        exportDisplayColor=0;          # Display Color 내보내기 (0=비활성화, 1=활성화)
+        filterTypes=nurbsCurve;        # 내보낼 객체 유형 필터 (여기서는 NurbsCurve만 포함)
+        exportColorSets=0;             # 컬러 세트 포함 여부 (0=비활성화, 1=활성화)
+        exportComponentTags=0;         # 컴포넌트 태그 내보내기 여부 (0=비활성화, 1=활성화)
+        defaultMeshScheme=catmullClark;# 기본 메시 스킴 (catmullClark, none, bilateral 등)
+        animation=0;                   # 애니메이션 내보내기 (0=비활성화, 1=활성화)
+        eulerFilter=0;                 # 오일러 필터 적용 여부 (0=비활성화, 1=활성화)
+        staticSingleSample=0;          # 정적 프레임 샘플링 (0=비활성화, 1=활성화)
+        startTime=1;                    # 내보내기 시작 프레임
+        endTime=1;                      # 내보내기 종료 프레임
+        frameStride=1;                  # 프레임 간격
+        frameSample=0.0;                # 프레임 샘플링 간격
+        defaultUSDFormat=usda;         # 기본 USD 포맷 (usda=텍스트, usdc=바이너리, usdz=압축)
+        rootPrim=;                     # 루트 Prim 설정 (기본값: 없음)
+        rootPrimType=scope;            # 루트 Prim 타입 설정 (scope, xform 등)
+        defaultPrim=geo;               # 기본 Prim 지정
+        exportMaterials=0;             # 머티리얼 내보내기 여부 (0=비활성화, 1=활성화)
+        shadingMode=useRegistry;       # 쉐이딩 모드 (useRegistry, none, displayColor 등)
+        convertMaterialsTo=[UsdPreviewSurface]; # 변환할 머티리얼 유형
+        exportAssignedMaterials=1;     # 할당된 머티리얼 내보내기 여부 (0=비활성화, 1=활성화)
+        exportRelativeTextures=automatic; # 상대 텍스처 경로 변환 여부 (automatic, absolute 등)
+        exportInstances=1;             # 인스턴스 내보내기 (0=비활성화, 1=활성화)
+        exportVisibility=0;            # 가시성 내보내기 (0=비활성화, 1=활성화)
+        mergeTransformAndShape=0;      # Transform과 Shape 병합 여부 (0=비활성화, 1=활성화)
+        includeEmptyTransforms=0;      # 빈 Transform 포함 여부 (0=비활성화, 1=활성화)
+        stripNamespaces=1;             # 네임스페이스 제거 (0=비활성화, 1=활성화)
+        worldspace=0;                  # 월드 공간 변환 여부 (0=비활성화, 1=활성화)
+        exportStagesAsRefs=0;          # USD 스테이지를 참조로 내보낼지 여부 (0=비활성화, 1=활성화)
+        excludeExportTypes=[Cameras,Lights]; # 내보내지 않을 객체 유형 (카메라, 라이트 제외)
+        legacyMaterialScope=0"""      # 레거시 머티리얼 스코프 사용 여부 (0=비활성화, 1=활성화)

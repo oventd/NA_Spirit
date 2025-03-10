@@ -1,0 +1,41 @@
+{
+    "modeling": {
+      "geo": {
+        "all": false,
+        "isReferenced": false
+      }
+    },
+    "rig": {},
+    "match_move": {
+      "camera": {
+        "all": false,
+        "isReferenced": false
+      },
+      "terrain": {
+        "all": true,
+        "isReferenced": false
+      }
+    },
+    "layout": {
+      "camera": {
+        "all": false,
+        "isReferenced": true
+      },
+      "asset": {
+        "all": false,
+        "isReferenced": true
+      }
+    },
+    "animating": {
+      "rig": {
+        "all": false,
+        "isReferenced": true
+      }
+    },
+    "light": {
+      "light": {
+        "all": true
+      }
+    }
+  }
+  
