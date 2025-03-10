@@ -2,10 +2,8 @@ import maya.mel as mel
 import maya.cmds as cmds
 import os
 import sys
-
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
-
 sys.path.append('/home/rapa/NA_Spirit/utils')
 from maya_utils import create_group,reference_file, create_usd_proxy # 유틸 함수 임포트
 

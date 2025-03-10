@@ -34,39 +34,43 @@ class ModelingStep(StepOpenMaya):
                 print("Geo 그룹 하위에 Low와 High 그룹이 모두 존재하지 않습니다.")
 
         @staticmethod
-        def publish(geo_group_name="geo", export_path="/home/rapa/3D_usd/Kitchen_set/assets/WallOrange/test/export_file.usd"):
-            """ 특정 그룹을 USD 바이너리로 export"""
+        def publish(geo_group_name="geo", export_path="/home/rapa/maya_pub/modeling"):
+            """ 특정 그룹을 USD와 MB 파일로 export """
             
-            # Ensure the export file has the correct .usdc extension
-            # if not export_path.lower().endswith(".usdc"):
-            #     export_path = os.path.splitext(export_path)[0] + ".usdc"
-            
-            # Check if the geo group exists
+            # geo 그룹이 존재하는지 확인
             if not cmds.objExists(geo_group_name):
                 print(f"Error: Group '{geo_group_name}' does not exist.")
                 return False
-
+            
+            # MB 파일 내보내기
+            mb_export_path = os.path.splitext(export_path)[0] + ".mb"
+            if not MayaUtils.file_save(mb_export_path, file_format="mb"):
+                return False
+            
             # USD Export 옵션 설정
             export_options = ";".join([
-            "defaultUSDFormat=usdc",  # ✅ 바이너리 포맷을 맨 앞에 배치
-            "shd=none",               # 쉐이딩 데이터 없음
-            "mt=0",                   # 머티리얼 포함 안 함
-            "vis=1",                  # 가시성 유지
-            "uvs=1"                   # UV 포함
-        ])
+                "defaultUSDFormat=usdc",  # ✅ 바이너리 포맷을 맨 앞에 배치
+                "shd=none",               # 쉐이딩 데이터 없음
+                "mt=0",                   # 머티리얼 포함 안 함
+                "vis=1",                  # 가시성 유지
+                "uvs=1"                   # UV 포함
+            ])
             
-            cmds.select("geo")
-            cmds.file(
-                    export_path,
-                    force=True, 
-                    options=export_options,
-                    type="USD Export",
-                    exportSelected=True
-                    
-                )
-            print(f"{export_path}에서 USD 바이너리로 export 완료")
-    
+            # USD 파일 내보내기
+            usd_export_path = os.path.splitext(export_path)[0] + ".usdc"
+            usd_export_options = ";".join([
+                "defaultUSDFormat=usdc",  # 바이너리 포맷
+                "shd=none",               # 쉐이딩 데이터 없음
+                "mt=1",                   # 머티리얼 포함
+                "vis=0",                  # 가시성 비활성화
+                "uvs=1"                   # UV 포함
+            ])
+            if not MayaUtils.file_save(usd_export_path, file_format="usd", export_options=usd_export_options):
+                return False
             
+            print(f"Modeling publish completed for {geo_group_name}.")
+            return True
+   
 if __name__ == "__main__":
     modeling = ModelingStep()
     ModelingStep.Open.setup()

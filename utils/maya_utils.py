@@ -185,3 +185,47 @@ class MayaUtils:
             cmds.setAttr(f"{proxy_node}.filePath", usd_file, type="string")
             print(f"USD Proxy Node linked to: {usd_file}")
 
+    @staticmethod
+    def file_save(file_path, file_format, export_options=None):
+        """
+        파일을 지정된 포맷으로 저장하는 함수.
+        :param file_path: 저장할 파일의 경로
+        :param file_format: 저장할 파일 포맷 (기본값: mayaBinary)
+        :param export_options: 포맷에 해당하는 추가 옵션 (기본값: None)
+        """
+        if not os.path.exists(os.path.dirname(file_path)):
+            print(f"Error: Path {file_path} does not exist")
+            return False
+        
+        if file_format.lower() == "mb":
+            return MayaUtils.save_maya_binary(file_path)  # 호출 방식 확인
+        elif file_format.lower() == "ma":
+            return MayaUtils.save_maya_ascii(file_path)  # 호출 방식 확인
+        elif file_format.lower() == "usd":
+            return MayaUtils.save_usd(file_path, export_options)  # 호출 방식 확인
+        else:
+            print(f"Error: Unsupported file format {file_format}")
+            return False
+
+    @staticmethod
+    def save_maya_binary(file_path):
+        """Maya Binary 형식으로 파일을 저장하는 함수."""
+        cmds.file(file_path, force=True, type="mayaBinary", exportSelected=True)
+        print(f"Saved {file_path} as Maya Binary.")
+        return True
+
+    @staticmethod
+    def save_maya_ascii(file_path):
+        """Maya ASCII 형식으로 파일을 저장하는 함수."""
+        cmds.file(file_path, force=True, type="mayaAscii", exportSelected=True)
+        print(f"Saved {file_path} as Maya ASCII.")
+        return True
+
+    @staticmethod
+    def save_usd(file_path, export_options=None):
+        """USD 형식으로 파일을 저장하는 함수."""
+        if export_options is None:
+            print("Error: No export options provided for USD.")
+        cmds.file(file_path, force=True, options=export_options, type="USD Export", exportSelected=True)
+        print(f"Saved {file_path} as USD.")
+        return True
