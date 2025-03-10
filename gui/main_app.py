@@ -68,7 +68,7 @@ class MainUi(QMainWindow):
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
 
     def load_ui(self):
-        ui_file_path = "./asset_main2.ui"
+        ui_file_path = "/home/rapa/NA_Spirit/gui/asset_main2.ui"
         ui_file = QFile(ui_file_path)
         loader = QUiLoader()
         self.ui = loader.load(ui_file)

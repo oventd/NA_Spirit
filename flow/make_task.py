@@ -1,6 +1,8 @@
 from shotgun_api3 import Shotgun
+import os
 
 # ShotGrid 서버 정보 입력
+
 SERVER_PATH = "https://hi.shotgrid.autodesk.com"  # 실제 ShotGrid 서버 주소
 SCRIPT_NAME = "nayeon_key"  # ShotGrid 관리자에게 받은 스크립트 이름
 API_KEY = "syeswcrleslhjbh4bd!poRvde"  # ShotGrid 관리자에게 받은 API 키
@@ -9,31 +11,58 @@ API_KEY = "syeswcrleslhjbh4bd!poRvde"  # ShotGrid 관리자에게 받은 API 키
 sg = Shotgun(SERVER_PATH, SCRIPT_NAME, API_KEY)
 PROJECT_ID = 124  # 실제 프로젝트 ID로 변경하세요
 
+        
+current_id =5911 
+current_fomat =".abc"
 
 
-# Step의 code 값만 리스트로 저장
-TASK_ID =121  #모델링
-
-steps = sg.find("Step", [], ["id", "code", "short_name"])
-print(steps)
-tasks= sg.find("Task", [], ["id", "code", "short_name"])
-print(tasks)
-# task = sg.find_one("Step", [["id", "is", PROJECT_ID]], ["id", "content", "task_dependencies"])  # 애니메이션
-# print(task)
-
-# 프로젝트 ID 설정 (비어 있는 프로젝트의 ID 확인 필요)
 
 
-# for step in steps:
-#     print(f"현재 project의 Step Code: {step['code']}, Step Name: {step['short_name']}")
+def find_published_file(current_id, current_format):
+    """
+    특정 Task ID와 파일 확장자에 맞는 PublishedFile의 경로를 반환하는 함수
+    """
 
-# existing_step = sg.find_one("Step", [["code", "is", "Design"]], ["id", "code"])
-# print(existing_step)   # step 코드를 find_one
-# step_id=existing_step["id"]
+    current_steps = sg.find(
+        "PublishedFile",
+        [["task", "is", {"type": "Task", "id": current_id}]], 
+        ["id", "path"]
+    )
 
-# tasks = sg.find("Task", [["step", "is", {"type": "Step", "id": step_id}]], ["id", "content", "entity"])
+    if not current_steps:
+        print(f"No Published File Found for Task ID: {current_id}")
+        return None
 
 
-# print(tasks)
+    for current_step in current_steps:
+        path_data = current_step.get("path", {})
 
-#desktop sg를 통해 파일을 열때 속해져있는 step의 값을 알아낼수 있다고함
+
+        local_path = path_data.get("local_path")
+        if not local_path:
+            continue 
+
+        _, file_extension = os.path.splitext(local_path)
+
+        if file_extension == current_format:
+            return local_path
+
+    
+    print(f"No {current_format} file found for Task ID: {current_id}")
+    return None
+
+
+
+file_path = find_published_file(5911, ".abc")
+
+print(f"Found File: {file_path}")
+
+      
+
+      
+
+
+
+
+
+
