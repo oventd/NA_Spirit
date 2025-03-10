@@ -184,6 +184,8 @@ class TableUiManager:
             col_index = index % max_columns   # 나머지를 통해 몇번째 열에 있는지 정의
             self.add_thumbnail(row_index, col_index, asset)
 
+               
+
     def add_thumbnail(self, row, col, asset):
         ui = self.ui
         thumbnail_path = asset["preview_url"]
