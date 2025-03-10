@@ -4,7 +4,7 @@ utils_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), "../../"))+'
 sys.path.append(utils_dir)
 
 from constant import *
-
+from usd_utils import UsdUtils
 from sg_path_utils import SgPathUtils
 
 class PublishUsdProcessor:
@@ -16,10 +16,8 @@ class PublishUsdProcessor:
 
         self.entity_type = SgPathUtils.get_entity_type(entity_path)
         
-        self.entity_usd = os.path.join(self.entity_path, f"{self.entity_name}.usd")
+
         self.publish_dir = os.path.join(self.entity_path, "publish")
-
-
 
         self.step_publish_data_dict = {
             MODELING : ['geo'],
@@ -30,8 +28,9 @@ class PublishUsdProcessor:
             ANIMATING : ["camera", "terrain", "anim_cache"],
             LIGHTING : ["light"],
         }
+        self.step_usd_dict = {}
+        
     
-
     @staticmethod
     def get_arg_dict(
         geo= None, 
@@ -52,8 +51,6 @@ class PublishUsdProcessor:
         }
         return provided_args
 
-
-
     def validate_args(self, step, provided_args):
         if self.step_publish_data_dict.get(step) is None:
             raise ValueError(f"Invalid step: {step}")
@@ -67,7 +64,17 @@ class PublishUsdProcessor:
 
         if len(un_provied_keys) > 0:
             raise ValueError(f"Required keys not provided: {un_provied_keys}")
-        
+    
+    def open_setup(self, step):
+        # entity usd를 만듬
+        self.entity_usd = os.path.join(self.entity_path, f"{self.entity_name}.usda")
+        UsdUtils.create_usd_file(self.entity_usd)
+
+        # step usd를 만듬
+        step_usd = os.path.join(self.publish_dir, step, f"{self.entity_name}_{step}.usda")
+        UsdUtils.create_usd_file(step_usd)
+        self.step_usd_dict[step] = step_usd
+
     def process(self, step, provided_args):
         self.validate_args(step, provided_args)
 
@@ -84,11 +91,9 @@ class PublishUsdProcessor:
         elif step == LIGHTING:
             print("UsdProcessor Lighting")
 
-    
-
 if __name__ == "__main__":
     root_path = "/nas/sam/show/applestore/assets/Character/Bille/RIG/work/maya/scene.v012.ma"
     root1_path = "/nas/sam/show/applestore/assets/Character/Bille"
-    print(    SgPathUtils.trim_entity_path(root1_path))
+    print( SgPathUtils.trim_entity_path(root1_path))
     # usd = UsdProcessor(root_path)
     # usd.process(MODELING, geo = "", camera= "")

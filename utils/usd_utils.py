@@ -9,15 +9,26 @@ class UsdUtils:
         stage = Usd.Stage.Open(layer)
         # USD 파일 저장
         stage.GetRootLayer().Save()
-
         return stage
+    
     @staticmethod
     def set_default_prim(stage, prim):
         stage.SetDefaultPrim(prim)
     
     @staticmethod
-    def create_xfrom(stage, name = "Root", parent_prim = None):
+    def get_stage(file_path):
+        return Usd.Stage.Open(file_path)
+    
+    @staticmethod
+    def create_stage(file_path):
+        return Usd.Stage.CreateNew(file_path)
+    
+    @staticmethod
+    def get_prim(stage, path):
+        return stage.GetPrimAtPath(path)
 
+    @staticmethod
+    def create_xfrom(stage, name = "Root", parent_prim = None):
         xform = UsdGeom.Xform.Define(stage, f"/{name}")
         
         defaltPrim = stage.GetDefaultPrim()
@@ -29,15 +40,13 @@ class UsdUtils:
         
     @staticmethod
     def create_scope(stage, name = "Root", parent_prim = None):
-
-        xform = UsdGeom.Scope.Define(stage, f"/{name}")
-
+        scope = UsdGeom.Scope.Define(stage, f"/{name}")
         
         defaltPrim = stage.GetDefaultPrim()
         if not defaltPrim:
-            UsdUtils.set_default_prim(stage, xform.GetPrim())
+            UsdUtils.set_default_prim(stage, scope.GetPrim())
         stage.GetRootLayer().Save()
-        return xform.GetPrim()
+        return scope.GetPrim()
     
     @staticmethod
     def add_reference(prim, path):
@@ -98,9 +107,7 @@ class UsdUtils:
     def add_sublayer(stage, path):
         stage.GetRootLayer().subLayerPaths.append(path)
         stage.GetRootLayer().Save()
-from pxr import Usd, UsdGeom, Sdf
 
-class UsdUtils:
     @staticmethod
     def deepcopy_prim(stage, old_prim, new_parent_path):
         """
@@ -135,8 +142,8 @@ class UsdUtils:
         # ✅ 기존 Prim의 References 복사
         new_prim.GetReferences().ClearReferences()
         print(dir(old_prim.GetReferences()))
-        # for reference in old_prim.GetReferences():
-        #     new_prim.GetReferences().AddReference(reference.assetPath)
+        for reference in old_prim.GetReferences():
+            new_prim.GetReferences().AddReference(reference.assetPath)
 
         # # ✅ 기존 Prim의 Variant Set 복사
         # old_variant_sets = old_prim.GetVariantSets()
@@ -161,62 +168,18 @@ class UsdUtils:
 
         # return new_prim
 
-    @staticmethod
-    def parent_prim(stage, prim_path, new_parent_path):
-        """
-        기존 Prim을 새로운 부모 아래로 Parent 시키는 함수 (Deep Copy 방식)
-
-        Args:
-            stage (Usd.Stage): USD Stage 객체
-            prim_path (str): 이동할 Prim의 경로
-            new_parent_path (str): 새로운 부모 Prim의 경로
-        """
-        old_prim = stage.GetPrimAtPath(prim_path)
-        new_parent = stage.GetPrimAtPath(new_parent_path)
-
-        if not old_prim or not new_parent:
-            print(f"❌ '{prim_path}' 또는 '{new_parent_path}' 가 존재하지 않습니다.")
-            return None
-
-        # ✅ Deep Copy 실행
-        new_prim = UsdUtils.deepcopy_prim(stage, old_prim, new_parent_path)
-
-        # ✅ 기존 Prim 제거
-        stage.RemovePrim(prim_path)
-
-        # 저장
-        stage.GetRootLayer().Save()
-
-        print(f"✅ '{prim_path}' → '{new_parent_path}' 로 Parent 완료!")
-        return new_prim
 
 
 if __name__ == "__main__":
-    # USD 파일 생성
-    stage = Usd.Stage.CreateNew("deepcopy_parent_example.usda")
-
-    # 기존 Xform 노드 생성
-    root = UsdGeom.Xform.Define(stage, "/Root")
-    child = UsdGeom.Xform.Define(stage, "/Child")
-    grandchild = UsdGeom.Xform.Define(stage, "/Child/GrandChild")
-
-    # Parent 설정 실행
-    UsdUtils.parent_prim(stage, "/Child", "/Root")
-
-    # 저장
-    stage.GetRootLayer().Save()
-    print("✅ Deep Copy 기반 Parent 설정 완료: deepcopy_parent_example.usda")
-
-# if __name__ == "__main__":
-#     stage = UsdUtils.create_usd_file("output.usd")
-#     stage1 = UsdUtils.create_usd_file("output1.usd")
-#     xform_a = UsdUtils.create_xfrom(stage, "asset_a")
-#     xform_b = UsdUtils.create_xfrom(stage, "asset_b")
-#     # UsdUtils.add_reference(xform_a, "output1.usd")
-#     # # UsdUtils.create_variants_set(xform_b, "version")
-#     UsdUtils.add_refernce_to_variant_set(xform_a, "version", {"v001": "path", "v002": "path2", "v003": "path"})
-#     UsdUtils.add_refernce_to_variant_set(xform_a, "version", { "v004": "path4"}, set_default=False)
-#     UsdUtils.set_translate(xform_a, 10, 5, 2)
-#     UsdUtils.create_scope(stage, "asset_c")
-#     UsdUtils.add_sublayer(stage, "output1.usd")
+    stage = UsdUtils.create_usd_file("output.usd")
+    stage1 = UsdUtils.create_usd_file("output1.usd")
+    xform_a = UsdUtils.create_xfrom(stage, "asset_a")
+    xform_b = UsdUtils.create_xfrom(stage, "asset_b")
+    UsdUtils.add_reference(xform_a, "output1.usd")
+    # UsdUtils.create_variants_set(xform_b, "version")
+    UsdUtils.add_refernce_to_variant_set(xform_a, "version", {"v001": "path", "v002": "path2", "v003": "path"})
+    UsdUtils.add_refernce_to_variant_set(xform_a, "version", { "v004": "path4"}, set_default=False)
+    UsdUtils.set_translate(xform_a, 10, 5, 2)
+    UsdUtils.create_scope(stage, "asset_c")
+    UsdUtils.add_sublayer(stage, "output1.usd")
 

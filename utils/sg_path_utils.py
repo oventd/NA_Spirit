@@ -82,3 +82,7 @@ class SgPathUtils:
         trimed_path = SgPathUtils.trim_entity_path(entity_path)
         return os.path.join(trimed_path, "publish", step)
         
+    @staticmethod
+    def get_version(publish_file):
+        return os.path.splitext(publish_file)[0].split(".")[1]
+    
