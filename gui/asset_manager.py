@@ -17,8 +17,8 @@ na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
 for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:
         sys.path.append(root)
-from asset_service import AssetService 
-from asset_service import ClickableLabel
+from assetmanager import AssetService 
+from assetmanager import ClickableLabel
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
 # from add_video_player import *

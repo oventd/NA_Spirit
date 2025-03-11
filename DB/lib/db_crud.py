@@ -72,7 +72,7 @@ class DbCrud:
             {"$limit": limit},         # 🔹 필요한 개수만 남김
             {"$skip": skip},           # 🔹 지정된 개수만큼 건너뜀
             {"$project": projection} if projection else None,  # 🔹 필요한 필드만 선택하여 메모리 사용 절감
-            {"$sort": {sort_by: pymongo.DESCENDING}} if sort_by else None,  # 🔹 정렬 수행 (최대한 데이터를 줄인 후)
+            {"$sort": {sort_by: pymongo.ASCENDING}} if sort_by else None,  # 🔹 정렬 수행 (최대한 데이터를 줄인 후)
         ]
 
         # None 값 제거
@@ -210,8 +210,8 @@ class DbCrud:
         :user_query: 검색을 진행할 데이터
         :return: 검색 결과
         """
-        query = { "$text": { "$search": user_query } }
-        projection = { NAME: 1, "_id": 0, SCORE: { "$meta": "textScore" } }  # name 필드와 점수 가져오기
+        query = { "$text": { "$search": user_query }}
+        projection = { NAME: 1, "_id": 1, SCORE: { "$meta": "textScore" } }  # name 필드와 점수 가져오기
         
         results = (
             self.asset_collection.find(query, projection)
@@ -219,25 +219,29 @@ class DbCrud:
             .limit(10)  # 최대 10개 제한
         )
         result_list = list(results)
+        print("result",result_list)
         return result_list
 
 
-class UserDb(DbCrud):
+class AssetDb(DbCrud):
     def __init__(self, log_path=None):
         super().__init__(ASSET_LOGGER_NAME, ASSET_LOGGER_DIR)  # 부모 클래스의 생성자 호출
         self.setup_indexes()
 
     def setup_indexes(self):
-        """자산 컬렉션에 대한 인덱스 설정"""
-        self.asset_collection.create_index([(FILE_FORMAT, pymongo.ASCENDING)])
-        self.asset_collection.create_index([(UPDATED_AT, pymongo.DESCENDING)])
-        self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
-        self.asset_collection.create_index([(NAME, TEXT), (DESCRIPTION, TEXT)])
-        self.logger.info("Indexes set up for UserDb")
+            """자산 컬렉션에 대한 인덱스 설정"""
+            # self.asset_collection.create_index([(FILE_FORMAT, pymongo.ASCENDING)])
+            # self.asset_collection.create_index([(UPDATED_AT, pymongo.DESCENDING)])
+            # self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
+            # self.asset_collection.create_index(
+            #     [(NAME, TEXT), (DESCRIPTION, TEXT)],
+            #     weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
+            # )
+            self.logger.info("Indexes set up for AssetDb")
 
     def find_one(self, object_id, fields=None):
         """
-        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환 (UserDb에서만 사용)
+        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환 (AssetDb에서만 사용)
         :param object_id: 자산의 고유 ID
         :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
         :return: 자산의 상세 정보 (object_id, asset_type, description, price 등)

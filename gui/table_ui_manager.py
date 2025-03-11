@@ -26,8 +26,8 @@ for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
 
-from asset_service import AssetService  # AssetService 임포트
-from asset_service import ClickableLabel
+from assetmanager import AssetService  # AssetService 임포트
+from assetmanager import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
@@ -58,14 +58,34 @@ class TableUiManager:
             self.ui.exit_btn.clicked.connect(self.exit_sub_win)
             self.ui.image_l_btn.clicked.connect(partial (SubWin.prev_slide, self.ui.stackedWidget_2))
             self.ui.image_r_btn.clicked.connect(partial (SubWin.next_slide, self.ui.stackedWidget_2))
-
-            
-            
-
             self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
+            self.ui.search.textEdited.connect(self.search_input)
+            
 
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
+            self.asset_dict = {}
+
+    def search_input(self, text):
+        
+        """서치 텍스트를 받아오고 table을 업데이트하는 함수"""
+        self.search_list = []
+        self.search_dict={}
+        
+
+        assets=AssetService.search_asset(text)
+        print("search_assets: ",assets)
+        print( "search_input: ",self.search_list)
+        for asset in assets:
+            
+            self.search_list.append(asset[OBJECT_ID])
+            self.search_dict[OBJECT_ID]=self.search_list
+        
+        self.ui.like_empty_notice.hide()
+        self.ui.tableWidget.clear()
+        print( "search_input22: ",self.search_list)
+        self.table_widget(self.search_dict, None, 40, 0, None)
+
 #라벨 초기화 함수 실행
     def remove_lable(self):
 
@@ -83,15 +103,15 @@ class TableUiManager:
             if item.widget():
                 item.widget().deleteLater()
 
-        # ✅ 기존 stackedWidget_2 내부의 QLabel 삭제
+        #  기존 stackedWidget_2 내부의 QLabel 삭제
         for label in self.ui.stackedWidget_2.findChildren(QLabel):
             label.deleteLater()
 
-        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
         for video_widget in self.ui.stackedWidget_2.findChildren(QVideoWidget):
             video_widget.deleteLater()
 
-        # ✅ 비디오 플레이어 리스트도 정리
+        #  비디오 플레이어 리스트도 정리
         self.video_widgets = []
         self.video_players = []
 
@@ -110,20 +130,20 @@ class TableUiManager:
         ui = self.ui  # UI 객체 참조
         print(f"여기 리스트 랜의 갯수를 알려줍니당 {list_len}")
 
-        # ✅ 기존 image_widget_s 내부의 위젯 삭제
+        # 기존 image_widget_s 내부의 위젯 삭제
         while ui.image_widget_s.count() > 0:
             item = ui.image_widget_s.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
 
-        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
         for widget in ui.stackedWidget_2.findChildren(QVideoWidget):
             widget.deleteLater()
 
         self.make_video_labels = []  # 리스트 초기화
         self.video_players = []  # QMediaPlayer 객체 리스트
 
-        # ✅ 새로운 QVideoWidget 추가
+        # 새로운 QVideoWidget 추가
         for _ in range(list_len):  
             video_widget = QVideoWidget(ui.stackedWidget_2)  # 부모 설정
             video_widget.setGeometry(0, 0, 380, 291)  # 📌 위치 (0, 53) 크기 (380x291) 설정
@@ -132,13 +152,13 @@ class TableUiManager:
             player = QMediaPlayer()
             player.setVideoOutput(video_widget)
 
-            # ✅ UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
+            #  UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
 
-            # ✅ 리스트에 저장
+            #  리스트에 저장
             self.make_video_labels.append(video_widget)
             self.video_players.append(player)
 
-        print("✅ 비디오 위젯 생성 완료")
+        print(" 비디오 위젯 생성 완료")
 
 
 
@@ -156,14 +176,17 @@ class TableUiManager:
             print("최신 순서를 정렬할게요")
             self.table_widget(Check().dict,CREATED_AT, 40, 0, None)
     
-    def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
+    def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None, search = False):
         ui = self.ui
         # 리뷰 이거 셀프로 init에 구현 이거 근데 저장하는 변수명이 쫌...... 
         # 리뷰 static밖에 없는데 왜 객체 생성????
         ui.like_empty_notice.hide()
     
-        assets = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
-        print(f"asset입니다 >>>>>>> {assets}")
+        assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+
+        if search == True:
+            
+            AssetService.search_asset()
         self.make_table(assets)
     
     def make_table(self, assets):
@@ -188,9 +211,9 @@ class TableUiManager:
 
     def add_thumbnail(self, row, col, asset):
         ui = self.ui
-        thumbnail_path = asset["preview_url"]
-        asset_name = asset["name"] 
-        aseet_type = asset["asset_type"]
+        thumbnail_path = asset[PREVIEW_URL]
+        asset_name = asset[NAME] 
+        aseet_type = asset[ASSET_TYPE]
 
         widget = QWidget()  # 셀 안에 넣을 위젯 생성
         layout = QVBoxLayout()  # 세로 정렬을 위한 레이아웃 생성
@@ -312,6 +335,24 @@ class TableUiManager:
             ]
             self.make_video_label_list(len(turnaround_urls))
             SubWin.show_asset_detail_video(self.ui.stackedWidget_2,turnaround_urls)
+
+        elif asset[ASSET_TYPE]=="HDRI":
+            detail_thum_urls = [
+                asset["applyhdri_url"],
+                asset["hdri_url"]
+            ]
+            self.make_label_list(len(detail_thum_urls))
+            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
+
+        else:
+            for url in asset["material_urls"]:
+                detail_thum_urls.append(url)
+               
+
+            detail_thum_urls.append(asset["preview_url"])
+          
+            self.make_label_list(len(detail_thum_urls))
+            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
 
 
 
