@@ -74,7 +74,7 @@ class TableUiManager:
         self.search_dict={}
         
 
-        assets=AssetService.search_asset(text)
+        assets=AssetService.search_asset(user_query=text)
         print("search_assets: ",assets)
         print( "search_input: ",self.search_list)
         for asset in assets:

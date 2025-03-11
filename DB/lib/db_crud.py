@@ -41,22 +41,10 @@ class DbCrud:
 
 
 
-
     def construct_query_pipeline(self, filter_conditions=None, sort_by=None, sort_order=None,
-                                limit=40, skip=0, fields=None, search_query=None):
-        """
-        MongoDB 쿼리 파이프라인을 생성하는 공통 함수.
-        - filter_conditions: 필터 조건
-        - sort_by: 정렬 기준 필드
-        - sort_order: 정렬 순서 (ASCENDING or DESCENDING)
-        - limit: 최대 조회 개수
-        - skip: 건너뛸 개수
-        - fields: 반환할 필드 목록
-        - search_query: 검색어 (search()에서만 사용)
-        """
+                                  limit=40, skip=0, fields=None, search_query=None):
         query_filter = {}
 
-        # 전달 받은 필터 조건을 적용
         if filter_conditions:
             for key, value in filter_conditions.items():
                 if isinstance(value, list):
@@ -64,7 +52,6 @@ class DbCrud:
                 else:
                     query_filter[key] = value
 
-        # 검색어 적용 (search() 전용)
         if search_query:
             query_filter["$text"] = {"$search": search_query}
 
@@ -76,33 +63,27 @@ class DbCrud:
 
         pipeline = [{"$match": query_filter}]
 
-        if sort_by and sort_order is None:
-            default_sort_orders = {
-                CREATED_AT: (CREATED_AT, pymongo.DESCENDING),  # 최신순
-                UPDATED_AT: (UPDATED_AT, pymongo.DESCENDING),    # 오래된순
-                DOWNLOADS: (DOWNLOADS, pymongo.DESCENDING),         # 다운로드 많은 순
-            }
-            sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, sort_order))  # 기본값 오름차순
+        if sort_by:
+            # sort_order가 없으면 기본적으로 1(오름차순)로 설정
+            if sort_order is None:
+                sort_order = 1  # 기본 오름차순으로 설정
 
-        # "score" 기준 정렬 적용*(search() 전용)
-        if search_query:
-            pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})
+            # sort_order가 1 또는 -1이 아니면 1로 강제 설정
+            if sort_order not in [1, -1]:
+                self.logger.warning(f"Invalid sort order: {sort_order}. Setting to default (1: ascending).")
+                sort_order = 1  # 기본 오름차순으로 설정
 
-        # 일반적인 정렬 적용 (sort조건으로 적용)
-        elif sort_by and sort_order:
             pipeline.append({"$sort": {sort_by: sort_order}})
 
-        # 제한 및 스킵 적용
         if limit:
             pipeline.append({"$limit": limit})
         if skip:
             pipeline.append({"$skip": skip})
 
-        # 특정 필드만 반환하도록 설정
         if projection:
             pipeline.append({"$project": projection})
 
-        self.logger.debug(f"Generated Query Pipeline: {pipeline}")  # 디버깅을 위한 로깅
+        self.logger.debug(f"Generated Query Pipeline: {pipeline}")
         return pipeline
 
     def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=40, skip=0, fields=None):

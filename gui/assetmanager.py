@@ -12,6 +12,7 @@ for root, dirs, files in os.walk(na_spirit_dir):
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
 from db_crud import AssetDb  # 수정된 db_crud에서 Asset 클래스를 import
+from constant import *
 
 
 from PySide6.QtWidgets import QLabel
@@ -172,5 +173,5 @@ class AssetService:
         :return: 검색 성공 여부
         """
         asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        return asset_manager.search(user_query)  # 자산 데이터 업데이트
+        return asset_manager.search(sort_by=SCORE, user_query=user_query)  # 자산 데이터 업데이트
 
