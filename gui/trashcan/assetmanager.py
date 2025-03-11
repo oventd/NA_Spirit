@@ -9,7 +9,6 @@ for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
 
-from assetmanager import AssetService
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
 from db_crud import AssetDb  # 수정된 db_crud에서 Asset 클래스를 import
@@ -110,7 +109,7 @@ class AssetService:
         :param skip: 건너뛸 데이터 수 (기본값은 0, 첫 번째 페이지)
         :return: 조회된 자산 리스트
         """
-        asset_manager =   # Asset 클래스의 인스턴스를 생성
+        # asset_manager =   # Asset 클래스의 인스턴스를 생성
         return AssetDb().find(filter_conditions=filter_conditions, sort_by=sort_by, limit=limit, skip=skip)
             
     @staticmethod
