@@ -404,7 +404,7 @@ class TableUiManager:
 
                 # ✅ 새로운 DynamicCircleLabel 추가
                 label = DynamicCircleLabel(str(len(LikeState().like_asset_list)))
-                self.ui.like_asset_number.addWidget(label)  # ✅ 새로운 라벨 추가
+                self.ui.like_asset_number.addWidget(label)  #  새로운 라벨 추가
                 
                 self.ui.like_download_btn.setPixmap(LikeState().like_download_image)
 
