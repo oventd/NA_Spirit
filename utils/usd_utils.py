@@ -8,7 +8,7 @@ class UsdUtils:
             args = {"format": "usda"}
         else:
             args = {"format": "usdc"}
-        layer = Sdf.Layer.CreateNew(file_path, args=args)
+        layer = Sdf.Layer.CreateNew(file_path, args)
         # USD Stage 생성 (ASCII 모드)
         stage = Usd.Stage.Open(layer)
         # USD 파일 저장
@@ -36,7 +36,7 @@ class UsdUtils:
         return stage.GetPrimAtPath(path)
 
     @staticmethod
-    def create_xfrom(stage, path = "/Root", parent_prim = None):
+    def create_xform(stage, path = "/Root", parent_prim = None):
         xform = UsdGeom.Xform.Define(stage, path)
         
         defaltPrim = stage.GetDefaultPrim()
@@ -70,7 +70,7 @@ class UsdUtils:
         stage.GetRootLayer().Save()
         return variant_set
     @staticmethod
-    def add_refernce_to_variant_set(prim, variant_set_name, variants : dict, set_default = True):
+    def add_reference_to_variant_set(prim, variant_set_name, variants : dict, set_default = True):
         variant_set = prim.GetVariantSets().GetVariantSet(variant_set_name)
 
         if not variant_set:
@@ -91,25 +91,32 @@ class UsdUtils:
         stage.GetRootLayer().Save()
 
     @staticmethod
-    def set_translate(prim, x,y,z):
+    def set_transform(prim, translate=None, rotate=None, scale=None):
+        """
+        prim의 변환(이동, 회전, 스케일)을 설정하는 함수
+        """
         xform = UsdGeom.Xform(prim)
-        xform.AddTranslateOp().Set(Gf.Vec3f(10, 5, 2))  # 이동
-        
+
+        if translate:
+            translate_op = xform.GetTranslateOp()
+            if not translate_op:
+                translate_op = xform.AddTranslateOp()
+            translate_op.Set(Gf.Vec3f(*translate))
+
+        if rotate:
+            rotate_xyz_op = xform.GetRotateXYZOp()
+            if not rotate_xyz_op:
+                rotate_xyz_op = xform.AddRotateXYZOp()
+            rotate_xyz_op.Set(Gf.Vec3f(*rotate))
+
+        if scale:
+            scale_op = xform.GetScaleOp()
+            if not scale_op:
+                scale_op = xform.AddScaleOp()
+            scale_op.Set(Gf.Vec3f(*scale))
+
         prim.GetStage().GetRootLayer().Save()
 
-    @staticmethod
-    def set_rotate(prim, x,y,z):
-        xform = UsdGeom.Xform(prim)
-        xform.AddRotateOp().Set(Gf.Vec3f(10, 5, 2))
-
-        prim.GetStage().GetRootLayer().Save()
-
-    @staticmethod
-    def set_scale(prim, x,y,z):
-        xform = UsdGeom.Xform(prim)
-        xform.AddScaleOp().Set(Gf.Vec3f(10, 5, 2))
-
-        prim.GetStage().GetRootLayer().Save()
     
     @staticmethod
     def add_sublayer(stage, path):
@@ -175,19 +182,21 @@ class UsdUtils:
         #     UsdUtils.deepcopy_prim(stage, child, new_prim_path)
 
         # return new_prim
-
+    def get_prim_path(prim):
+        return prim.GetPath()
 
 
 if __name__ == "__main__":
     stage = UsdUtils.create_usd_file("output.usd")
     stage1 = UsdUtils.create_usd_file("output1.usd")
-    xform_a = UsdUtils.create_xfrom(stage, "asset_a")
-    xform_b = UsdUtils.create_xfrom(stage, "asset_b")
-    UsdUtils.add_reference(xform_a, "output1.usd")
-    # UsdUtils.create_variants_set(xform_b, "version")
-    UsdUtils.add_refernce_to_variant_set(xform_a, "version", {"v001": "path", "v002": "path2", "v003": "path"})
-    UsdUtils.add_refernce_to_variant_set(xform_a, "version", { "v004": "path4"}, set_default=False)
-    UsdUtils.set_translate(xform_a, 10, 5, 2)
-    UsdUtils.create_scope(stage, "asset_c")
-    UsdUtils.add_sublayer(stage, "output1.usd")
+    xform_a = UsdUtils.create_xform(stage, "/Sphere")
+    UsdGeom.Sphere.Define(stage, "/Sphere/Shape")
+    stage.GetRootLayer().Save()
+
+    xform_b = UsdUtils.create_xform(stage1, "/ref")
+    UsdUtils.add_reference(xform_b, "/home/rapa/NA_Spirit/test_maya_export.usd")
+    
+
+
+
 
