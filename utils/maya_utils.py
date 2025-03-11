@@ -238,7 +238,7 @@ class MayaUtils:
 
     @staticmethod
     def all_false(group_name):
-        """all = false 시 나오는 메서드"""
+        """all = false 시 나오는 메서드 (그룹의 자식 모두 반환)"""
         children = cmds.listRelatives(group_name, children=True) or []
         if not children:
             print(f"No children found in group '{group_name}'.")
@@ -246,17 +246,19 @@ class MayaUtils:
 
     @staticmethod
     def all_true(group_name):
-        """all = false 시 나오는 메서드"""
+        """all = true 시 나오는 메서드 (각 자식 반환)"""
         children = cmds.listRelatives(group_name, children=False) or []
         if not children:
             print(f"No children found in group '{group_name}'.")
         return children
     
     def isReferenced_false():
-        pass
+        """isReferenced: false 시 나오는 메서드"""
+        print("No referenced objects found. Proceeding with non-referenced objects.")
 
-    def isReferenced_true():
-        reference_file()
+    def isReferenced_true(file_path, group_name):
+        """isReferenced: true 시 나오는 메서드"""
+        return MayaUtils.reference_file(file_path, group_name)
 
 
 """exportUVs=1;                 # UV 좌표 내보내기 (1=활성화, 0=비활성화)
