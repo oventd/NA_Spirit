@@ -61,22 +61,30 @@ class TableUiManager:
             self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
             self.ui.search.textEdited.connect(self.search_input)
+            
 
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.asset_dict = {}
-            self.search_list = []
-            self.search_dict={}
 
     def search_input(self, text):
         
         """서치 텍스트를 받아오고 table을 업데이트하는 함수"""
+        self.search_list = []
+        self.search_dict={}
+        
+
         assets=AssetService.search_asset(text)
+        print(assets)
+        print(self.search_list)
         for asset in assets:
+            
             self.search_list.append(asset["name"])
             self.search_dict['name']=self.search_list
+        
         self.ui.like_empty_notice.hide()
         self.ui.tableWidget.clear()
-        self.table_widget(self.search_dict,CREATED_AT, 40, 0, None)
+        print(self.search_dict)
+        self.table_widget(self.search_dict, None, 40, 0, None)
 
 #라벨 초기화 함수 실행
     def remove_lable(self):
@@ -174,8 +182,8 @@ class TableUiManager:
         # 리뷰 static밖에 없는데 왜 객체 생성????
         ui.like_empty_notice.hide()
     
-        assets = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
-        print(f"asset입니다 >>>>>>> {assets}")
+        reversed_assets = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+        assets = reversed_assets[::-1]
         self.make_table(assets)
     
     def make_table(self, assets):

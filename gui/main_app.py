@@ -56,7 +56,6 @@ class MainUi(QMainWindow):
 
             self.load_ui()
             
-
             self.media_players = []  # 각 동영상 플레이어(QMediaPlayer) 리스트
             self.video_widgets = []  # 각 동영상을 표시할 `QVideoWidget` 리스트
             self.labels = []
