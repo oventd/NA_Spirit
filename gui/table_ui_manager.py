@@ -336,6 +336,24 @@ class TableUiManager:
             self.make_video_label_list(len(turnaround_urls))
             SubWin.show_asset_detail_video(self.ui.stackedWidget_2,turnaround_urls)
 
+        elif asset[ASSET_TYPE]=="HDRI":
+            detail_thum_urls = [
+                asset["applyhdri_url"],
+                asset["hdri_url"]
+            ]
+            self.make_label_list(len(detail_thum_urls))
+            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
+
+        else:
+            for url in asset["material_urls"]:
+                detail_thum_urls.append(url)
+               
+
+            detail_thum_urls.append(asset["preview_url"])
+          
+            self.make_label_list(len(detail_thum_urls))
+            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
+
 
 
             
