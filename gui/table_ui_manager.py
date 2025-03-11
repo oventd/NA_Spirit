@@ -385,10 +385,12 @@ class TableUiManager:
 
         if LikeState().state == False:
             self.ui.toggle_btn.setPixmap(LikeState().toggle_like)
+            
             LikeState().state = True
             if not LikeState().like_asset_list:
                 self.ui.tableWidget.clear()
                 self.ui.like_empty_notice.show()
+                
             else:
                 self.ui.tableWidget.clear()
                 like_asset_dict = []
@@ -408,6 +410,8 @@ class TableUiManager:
 
                 self.ui.like_empty_notice.hide()
         else: 
+            self.ui.like_download_btn.hide()
+            self.ui.like_download_btn_area.hide()
             if LikeState().state == True:
                 self.ui.toggle_btn.setPixmap(LikeState().toggle_open)
                 LikeState().state = False

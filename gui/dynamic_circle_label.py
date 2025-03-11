@@ -7,7 +7,7 @@ class DynamicCircleLabel(QLabel):
     
     def __init__(self, text="", parent=None):
         super().__init__(text, parent)
-        self.setFont(QFont("Pretendard", 6, QFont.Weight.Light))  # 글꼴 설정
+        self.setFont(QFont("Pretendard", 7, QFont.Weight.Thin))  # 글꼴 설정
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)  # 텍스트 중앙 정렬
         self.setStyleSheet("""
             background-color: #6E3AEF;
