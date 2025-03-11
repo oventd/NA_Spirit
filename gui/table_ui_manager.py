@@ -26,8 +26,8 @@ for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
 
-from asset_service import AssetService  # AssetService 임포트
-from asset_service import ClickableLabel
+from assetmanager import AssetService  # AssetService 임포트
+from assetmanager import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
@@ -74,16 +74,16 @@ class TableUiManager:
         
 
         assets=AssetService.search_asset(text)
-        print(assets)
-        print(self.search_list)
+        print("search_assets: ",assets)
+        print( "search_input: ",self.search_list)
         for asset in assets:
             
-            self.search_list.append(asset["name"])
-            self.search_dict['name']=self.search_list
+            self.search_list.append(asset[OBJECT_ID])
+            self.search_dict[OBJECT_ID]=self.search_list
         
         self.ui.like_empty_notice.hide()
         self.ui.tableWidget.clear()
-        print(self.search_dict)
+        print( "search_input22: ",self.search_list)
         self.table_widget(self.search_dict, None, 40, 0, None)
 
 #라벨 초기화 함수 실행
@@ -176,14 +176,17 @@ class TableUiManager:
             print("최신 순서를 정렬할게요")
             self.table_widget(Check().dict,CREATED_AT, 40, 0, None)
     
-    def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
+    def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None, search = False):
         ui = self.ui
         # 리뷰 이거 셀프로 init에 구현 이거 근데 저장하는 변수명이 쫌...... 
         # 리뷰 static밖에 없는데 왜 객체 생성????
         ui.like_empty_notice.hide()
     
-        reversed_assets = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
-        assets = reversed_assets[::-1]
+        assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+
+        if search == True:
+            
+            AssetService.search_asset()
         self.make_table(assets)
     
     def make_table(self, assets):
@@ -208,9 +211,9 @@ class TableUiManager:
 
     def add_thumbnail(self, row, col, asset):
         ui = self.ui
-        thumbnail_path = asset["preview_url"]
-        asset_name = asset["name"] 
-        aseet_type = asset["asset_type"]
+        thumbnail_path = asset[PREVIEW_URL]
+        asset_name = asset[NAME] 
+        aseet_type = asset[ASSET_TYPE]
 
         widget = QWidget()  # 셀 안에 넣을 위젯 생성
         layout = QVBoxLayout()  # 세로 정렬을 위한 레이아웃 생성

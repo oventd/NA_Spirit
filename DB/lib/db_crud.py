@@ -210,8 +210,8 @@ class DbCrud:
         :user_query: 검색을 진행할 데이터
         :return: 검색 결과
         """
-        query = { "$text": { "$search": user_query } }
-        projection = { NAME: 1, "_id": 0, SCORE: { "$meta": "textScore" } }  # name 필드와 점수 가져오기
+        query = { "$text": { "$search": user_query }}
+        projection = { NAME: 1, "_id": 1, SCORE: { "$meta": "textScore" } }  # name 필드와 점수 가져오기
         
         results = (
             self.asset_collection.find(query, projection)
@@ -219,10 +219,11 @@ class DbCrud:
             .limit(10)  # 최대 10개 제한
         )
         result_list = list(results)
+        print("result",result_list)
         return result_list
 
 
-class UserDb(DbCrud):
+class AssetDb(DbCrud):
     def __init__(self, log_path=None):
         super().__init__(ASSET_LOGGER_NAME, ASSET_LOGGER_DIR)  # 부모 클래스의 생성자 호출
         self.setup_indexes()
@@ -236,11 +237,11 @@ class UserDb(DbCrud):
             #     [(NAME, TEXT), (DESCRIPTION, TEXT)],
             #     weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
             # )
-            self.logger.info("Indexes set up for UserDb")
+            self.logger.info("Indexes set up for AssetDb")
 
     def find_one(self, object_id, fields=None):
         """
-        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환 (UserDb에서만 사용)
+        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환 (AssetDb에서만 사용)
         :param object_id: 자산의 고유 ID
         :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
         :return: 자산의 상세 정보 (object_id, asset_type, description, price 등)

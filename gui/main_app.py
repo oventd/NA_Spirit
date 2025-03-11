@@ -24,7 +24,7 @@ for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
 
-from asset_service import ClickableLabel
+from assetmanager import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
@@ -37,7 +37,7 @@ from default_ui_manager import DefaultUiManager
 from table_ui_manager import TableUiManager
 from tree_ui_manager import TreeUiManager
 
-from asset_service import AssetService
+from assetmanager import AssetService
 
 
 class MainUi(QMainWindow):
