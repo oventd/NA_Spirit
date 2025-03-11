@@ -1,5 +1,12 @@
 import maya.cmds as cmds
+import os
+import sys
+utils_dir = '/home/rapa/NA_Spirit/utils'
+sys.path.append(utils_dir)
 
+from constant import *
+from usd_utils import UsdUtils
+from sg_path_utils import SgPathUtils
 def print_references():
     """현재 씬의 모든 Reference 정보를 출력"""
     # 씬에서 로드된 모든 레퍼런스 가져오기
@@ -82,16 +89,34 @@ print("Time, Value Nodes:", tl_nodes)
 
 # 테스트 실행
 selected_objects = tl_nodes
+key_existing_objects = []
 if selected_objects:
     for obj in selected_objects:
         hierarchy = get_parent_hierarchy(obj)
-        print(f"Hierarchy for {obj}: {hierarchy}")
+        key_existing_objects.append(hierarchy[-3])
+        
+
 else:
     print("No object selected.")
 
-key_existing_objects = hierarchy[-3]
-print(key_existing_objects)
+print("key existing: ",key_existing_objects)
 
-start, end = find_scene_animation_range()
-print(f"Animation Range: {start} - {end}")
+root_path = "/home/rapa/NA_Spirit"
+usd_test_path = os.path.join(root_path, "test.usda")
+if not os.path.exists(usd_test_path):
+    UsdUtils.create_usd_file(os.path.join(usd_test_path))
+stage = UsdUtils.get_stage(os.path.join(usd_test_path))
+UsdUtils.create_scope(stage, "/Root")
+
+if not cmds.objExists("Assets"):
+    raise ValueError("Assets already exists.")
+types = cmds.listRelatives("Assets", children=True)
+assets = cmds.listRelatives(types, children=True)
+for asset in assets:
+    print(asset)
+    if asset in key_existing_objects:
+        print("Key existing object found.")
+        break
+    else:
+        print("Key existing object not found.")
 
