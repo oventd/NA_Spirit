@@ -87,122 +87,56 @@ Published File Type : ShotGrid에서 특정 유형이 필요하지 않다면 생
 
 # def published_file_info(PUBLISHED_FILE_ID,description=None, downstream_published_files=None, link=None, local_path, published_file_name, status, tags, task, upstream_published_files, version, version_number):
 
-published_file = sg.find_one("PublishedFile", [["id", "is", 54]], ["id", "published_file_name", "path"])
-path_cache_storage_data = published_file['path']["local_storage"]["name"]
 
-#자동 생성과 수동 생성 항목의 추가 순서를 달리해서 자동으로 생성된 부분의 데이터를 가지고 노는 방법이 좋을듯
- 
+# PUBLISHED_FILE_ID = 180  # 수정할 Published File ID
 
+# updated_published_file = sg.update("PublishedFile", PUBLISHED_FILE_ID, {
+#     "description": "음 설명을 추가해볼까요"}, {"name":"이름이라고 합니당"},{"sg_local_path":"/mnt/storage/spirit/scene.v001.abc"})
 
-
-
-
-
-# published_filetype = {published_file['published_file_type']}
-
-# print(published_filename)
- 
-
-#     local_path = "/mnt/storage/spirit/scene.v001.abc"
-#     path = os.path.basename(local_path)
-#     published_file_data = {
-#     "name": "scene.abc",  # 파일 이름
-#     "path_cache": "spirit/assets/Character/Hero/MDL/publish/caches/scene.v001.abc",  # 파일 경로  #샷그리드 내부의 주소 /// 자동 생성
-#     "path_cache_storage": published_filetype  ###"Nas_Spirit",  # 저장소 정보
-#     "description": "Final version of model",  # 설명
-#     "downstream_published_files": [],  # 하위 의존 파일
-#     "link": {"type": "Asset", "id": 301, "name": "Hero"},  # 연결된 Asset
-#     "local_path": local_path,  # 로컬 경로
-#     "path": path,  # 파일 경로 (파일명)    <<<받아와서 변경 
-#     "published_file_name": published_filename,  # ShotGrid에 등록된 파일명  <<<받아와서 변경 
-#     "published_file_type": published_filetype,   # 파일 유형 <<<받아와서 변경 
-#     "status": "Ready",  # 상태
-#     "tags": ["Modeling", "Cache"],  # 태그
-#     "task": {"type": "Task", "id": 6219, "name": "Model"},  # 연결된 Task
-#     "upstream_published_files": [{"type": "PublishedFile", "id": 50}],  # 상위 파일
-#     "version": {"type": "Version", "id": 201},  # 연결된 Version
-#     }
-
-
-#     # ✅ None 값 제거 (ShotGrid에서 None을 허용하지 않는 필드를 자동 제거)
-#     published_file_data = {k: v for k, v in published_file_data.items() if v is not None and v != []}
-
-#     # ✅ ShotGrid에 Published File 생성
-#     new_published_file = sg.create("PublishedFile", published_file_data)
-#     print(f"✅ Published File created: {new_published_file['id']}")
-
-
-
-# published_file_info(PUBLISHED_FILE_ID = 54,
-#                     path_cache_storage="Nas_Spirit",
-#                     description="움하하_엘런빅의 맛이 어때",
-#                     link={"type": "Asset", "id": 301, "name": "Hero"}),
-#                     local_path = "nas/spirit/assets/Character/Hero/MDL/publish/caches/scene.v001.abc",
+# print(f"✅ Updated Published File {PUBLISHED_FILE_ID} with new description.")
 
 
 
 
+PUBLISHED_FILE_ID = 180  # 수정할 Published File ID
+
+def update_published_file(published_file_data):
+    updated_published_file = sg.update(
+        "PublishedFile", 
+        PUBLISHED_FILE_ID, published_file_data,  # 연결된 엔티티
+        
+    )
+
+    print(f"✅ Updated Published File {PUBLISHED_FILE_ID} with new values.")
 
 
-# ✅ 파일 정보
-file_path = "/mnt/storage/spirit/scene.v001.abc"
-
-local_storage = sg.find_one("LocalStorage", [["code", "is", "Nas_Spirit"]], ["id"])
-
-path = {
-    "local_path": "/mnt/storage/spirit/scene.v001.abc",  # 실제 파일 경로
-    "local_storage": {
-        "type": "LocalStorage",
-        "id": 2  # ShotGrid에서 조회한 LocalStorage ID
-    }
-}
-
- 
-default_version = 1  # 기본 버전 번호
-task_id = 6219
-ling = 301
+if __name__ == "__main__":
+    
+    description ="테스트중입니다."
+    file_name = "파일이름입니다"
+    local_path = "/mnt/storage/spirit/scene.v003.abc"
+    cache_path = "spirit/assets/Character/Hero/MDL/publish/caches/scene.v003.abc"
+    published_file_type_id = 1
+    upstram_file_id = 100
+    downstream_file_id = 101
+    image_path = "/nas/spirit/DB/thum/3d_assets/thum001.png"
+    asset_id= 1419
+    
 
 
-local_storage = sg.find_one("LocalStorage", [["code", "is", "Nas_Spirit"]], ["id"])
+    published_file_data={
 
-if not local_storage:
-    raise ValueError(" LocalStorage 'Nas_Spirit' not found in ShotGrid.")
+        "description": "테스트중입니다",
+        "name": "파일이름입니다",
+        "sg_local_path": "/mnt/storage/spirit/scene.v003.abc",  # 유효한 파일 경로
+        "path_cache": "spirit/assets/Character/Hero/MDL/publish/caches/scene.v003.abc",  # 상대 경로
+        "version_number": 2,  # 버전 번호 업데이트
+        "published_file_type": {"type":"PublishedFileType", "id": 1},  # 유효한 파일 유형
+        "upstream_published_files": [{"type": "PublishedFile", "id": 100}],  # 상위 PublishedFile ID 배열
+        "downstream_published_files": [{"type": "PublishedFile", "id": 101}],  # 하위 PublishedFile ID 배열
+        "image": "/nas/spirit/DB/thum/3d_assets/thum001.png",  # 이미지 경로
+        "entity": {"type": "Asset", "id": 1419}
+        }
+    
+    update_published_file(published_file_data)
 
-local_storage_id = local_storage["id"]
-print(f" Found LocalStorage: Nas_Spirit (ID: {local_storage_id})")
-
-# ✅ 필수 데이터 확인 후 기본값 설정
-published_file_data = {
-    "name": os.path.basename(file_path),  # 파일명 자동 설정
-    "path": file_path,  # 파일 경로
-    "path_cache": "spirit/assets/Character/Hero/MDL/publish/caches/" + os.path.basename(file_path),  # ShotGrid 내부 경로
-    "path_cache_storage": local_storage_id,  # 저장소 기본값 설정
-    "published_file_type": "Alembic Cache",  # 기본 파일 유형
-    "task": {"type": "Task", "id": 6219},  # Task ID (필수)
-    "link": {"type": "Asset", "id": 301},  # 연결된 Asset (필수)
-    "version_number": default_version,  # 기본 버전 설정
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ✅ ShotGrid에 Published File 생성
-new_published_file = sg.create("PublishedFile", published_file_data)
-PUBLISHED_FILE_ID = new_published_file["id"]
-print(f"✅ Published File created: {PUBLISHED_FILE_ID}")
-
-
-updated_published_file = sg.find_one("PublishedFile", [["id", "is", PUBLISHED_FILE_ID]], ["id", "name", "path_cache", "path_cache_storage"])
-
-print(f"생성 후 조회: {updated_published_file['id']}")
-print(f"Path Cache Storage: {updated_published_file.get('path_cache_storage', 'Not Assigned')}")
