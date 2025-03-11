@@ -30,7 +30,7 @@ from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
 
 
-from asset_manager import AssetManager
+from trashcan.asset_manager import AssetManager
 # from data_manager import DataManager
 from default_ui_manager import DefaultUiManager
 
