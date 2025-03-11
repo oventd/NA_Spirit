@@ -24,7 +24,6 @@ class DbCrud:
             log_path = default_log_dir
 
         self.logger = create_logger(logger_name, log_path)
-        
 
     # 데이터 삽입 (Create)
     def insert_one(self, asset_data):
@@ -37,8 +36,8 @@ class DbCrud:
         asset_data[CREATED_AT] = datetime.utcnow()  # 생성 시간 추가
         asset_data[UPDATED_AT] = datetime.utcnow()  # 수정 시간 추가
         result = self.asset_collection.insert_one(asset_data)  # asset_data를 MongoDB 컬렉션에 삽입
-        self.logger.info(f"Inserted document ID: {result.inserted_id}")
-        return str(result.inserted_id)  # 삽입된 자산의 고유 ID를 반환
+        self.logger.info(f"Inserted document ID: {result.inserted_id} | Asset Data: {asset_data}")
+        return str(result.inserted_id)
 
     # 데이터 조회 (필터 조건에 맞는 자산 리스트 반환)
     """
@@ -67,24 +66,22 @@ class DbCrud:
         
         projection = {field: 1 for field in fields} if fields else None
         
-        pipeline = [
-            {"$match": query_filter},  # 🔹 필터링을 먼저 수행하여 데이터 수를 줄임
-            {"$limit": limit},         # 🔹 필요한 개수만 남김
-            {"$skip": skip},           # 🔹 지정된 개수만큼 건너뜀
-            {"$project": projection} if projection else None,  # 🔹 필요한 필드만 선택하여 메모리 사용 절감
-            {"$sort": {sort_by: pymongo.ASCENDING}} if sort_by else None,  # 🔹 정렬 수행 (최대한 데이터를 줄인 후)
-        ]
+        pipeline = [{"$match": query_filter}]  # 필터 조건은 항상 필요
+        if limit:
+            pipeline.append({"$limit": limit})  # limit 값이 0이 아니면 추가
+        if skip:
+            pipeline.append({"$skip": skip})  # skip 값이 0이 아니면 추가
+        if projection:
+            pipeline.append({"$project": projection})  # projection이 있으면 추가
+        if sort_by:
+            pipeline.append({"$sort": {sort_by: pymongo.ASCENDING}})  # sort가 있으면 추가
 
-        # None 값 제거
-        pipeline = [step for step in pipeline if step]
-
-            # 🔹 디버깅용 출력
         print(f"[DEBUG] Query Filter: {query_filter}")
         print(f"[DEBUG] Projection Fields: {projection}")
         print(f"[DEBUG] Aggregation Pipeline: {pipeline}")
         
         result = list(self.asset_collection.aggregate(pipeline))
-        self.logger.info(f"Query executed: {query_filter} | Found: {len(result)}")
+        self.logger.info(f"Query executed with filter: {query_filter} | Found: {len(result)} documents")
         return result
 
     def find_one(self, object_id, fields=None):
@@ -107,7 +104,7 @@ class DbCrud:
         
         # 디버깅을 위한 자산 정보 출력
         print(f"[DEBUG] Retrieved Asset Details: {details}")
-        self.logger.info(f"Retrieved document ID: {object_id}")
+        self.logger.info(f"Retrieved document ID: {object_id} | Document Details: {details}")
         return details
     
     def find_and_sort(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
@@ -135,31 +132,19 @@ class DbCrud:
         projection = {field: 1 for field in fields} if fields else None
         
         # 파이프라인 생성
-        pipeline = [
-            {"$match": query_filter},  # _id 필터링
-            {"$limit": limit},         # 제한된 개수만 조회
-            {"$skip": skip},           # 건너뛰기
-            {"$project": projection} if projection else None,  # 필드 선택
-            {"$sort": {sort_by: pymongo.DESCENDING}} if sort_by else None,  # 정렬
-        ]
-
-        # None 값 제거 (필요한 단계만 파이프라인에 추가)
-        pipeline = [step for step in pipeline if step]
+        pipeline = [{"$match": query_filter}]  # _id 필터링은 항상 필요
+        if limit:
+            pipeline.append({"$limit": limit})   # limit이 0이 아니면 추가
+        if skip:
+            pipeline.append({"$skip": skip})     # skip이 0이 아니면 추가
+        if projection:
+            pipeline.append({"$project": projection})  # projection이 있으면 추가
+        if sort_by:
+            pipeline.append({"$sort": {sort_by: pymongo.DESCENDING}})  # sort가 있으면 추가
 
         # 쿼리 실행
         result = list(self.asset_collection.aggregate(pipeline))
-        
         return result
-
-
-
-
-
-
-
-
-
-
 
     # 데이터 수정 (Update)
     def update_one(self, object_id, update_data):
@@ -176,7 +161,7 @@ class DbCrud:
             upsert=False
         )
         self.logger.info(f"Updated document ID: {object_id} | Modified: {result.acknowledged}")
-        return result.acknowledged  # 수정 작업이 성공했으면 True, 실패하면 False 반환
+        return result.acknowledged
 
     # 데이터 삭제 (Delete)
     def delete_one(self, object_id):
@@ -187,7 +172,7 @@ class DbCrud:
         """
         result = self.asset_collection.delete_one({OBJECT_ID: ObjectId(object_id)})  # 자산 ID를 기준으로 삭제
         self.logger.info(f"Deleted document ID: {object_id} | Acknowledged: {result.acknowledged}")
-        return result.acknowledged  # 삭제 작업이 성공했으면 True, 실패하면 False 반환
+        return result.acknowledged
 
     # 다운로드 수 증가 (Increment Download Count)
     def increment_count(self, object_id, field):
@@ -200,27 +185,54 @@ class DbCrud:
             {OBJECT_ID: ObjectId(object_id)},
             {"$inc": {field: 1}},
         )
-        self.logger.info(f"Deleted document ID: {object_id} | Acknowledged: {result.modified_count}")
+        self.logger.info(f"Incremented download count for document ID: {object_id}")
         return result.modified_count > 0  # 다운로드 수가 증가했으면 True 반환
 
     # 데이터 검색 (Search)
-    def search(self, user_query):
+    def search(self, user_query=None, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
         """
         데이터에 대한 검색 기능을 수행합니당.
-        :user_query: 검색을 진행할 데이터
-        :return: 검색 결과
+        :param user_query: 검색어 (기본값: None, 모든 데이터 조회)
+        :param sort_by: 정렬 기준 (기본값: None, 정렬하지 않음)
+        :param limit: 최대 검색 개수 (기본값: 0, 즉 제한 없음)
+        :param skip: 건너뛸 개수 (기본값: 0)
+        :param fields: 반환할 필드 목록 (기본값: None, 즉 모든 필드 포함)
+        :return: 검색 결과 리스트
         """
-        query = { "$text": { "$search": user_query }}
-        projection = { NAME: 1, "_id": 1, SCORE: { "$meta": "textScore" } }  # name 필드와 점수 가져오기
+        query = {}
+
+        # 텍스트 검색어가 있을 경우 텍스트 검색 쿼리 적용
+        if user_query and user_query.strip():
+            query = {"$text": {"$search": user_query}}
+
+        # 필터 조건이 있을 경우 쿼리 필터에 추가
+        if filter_conditions:
+            query.update(filter_conditions)
+
+        # 프로젝션 설정: 반환할 필드 목록을 동적으로 처리
+        projection = {field: 1 for field in fields} if fields else None
+
+        # 파이프라인 생성
+        pipeline = [
+            {"$match": query},  # 필터 조건 적용
+            {"$limit": limit},   # 제한된 개수만 조회
+            {"$skip": skip}     # 건너뛰기
+        ]
         
-        results = (
-            self.asset_collection.find(query, projection)
-            .sort([(SCORE, {"$meta": "textScore"})])  # 정확도 순 정렬
-            .limit(10)  # 최대 10개 제한
-        )
-        result_list = list(results)
-        print("result",result_list)
-        return result_list
+        # 텍스트 검색이 있을 때만 score 기반으로 정렬
+        if user_query:
+            pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})      # 점수 기반 정렬
+
+        # 필드 선택이 있으면 프로젝트 단계 추가
+        if projection:
+            pipeline.append({"$project": projection})
+
+        # None 값 제거 (필요 없는 단계는 제외)
+        pipeline = [step for step in pipeline if step]
+
+        result = list(self.asset_collection.aggregate(pipeline))
+        self.logger.info(f"Search executed with query: {query} | Found: {len(result)} documents")
+        return result
 
 
 class AssetDb(DbCrud):
@@ -239,23 +251,24 @@ class AssetDb(DbCrud):
             # )
             self.logger.info("Indexes set up for AssetDb")
 
-    def find_one(self, object_id, fields=None):
+    def set_url_fields(self, data):
         """
-        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환 (AssetDb에서만 사용)
-        :param object_id: 자산의 고유 ID
-        :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
-        :return: 자산의 상세 정보 (object_id, asset_type, description, price 등)
+        자산의 URL 필드를 확인하고, 없는 경우 기본값(None)으로 처리합니다.
+        :param data: 자산 데이터 (단일 자산 또는 자산 리스트)
+        :return: URL 필드가 설정된 자산 데이터
         """
-        # 부모 클래스의 find_one 호출
-        details = super().find_one(object_id, fields)
+        url_fields = [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
+                    PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]
 
-        # URL 필드가 없는 경우 기본값 처리
-        if details:
-            for url_field in [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
-                              PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]:
-                details[url_field] = details.get(url_field, None)
-
-        return details
+        if isinstance(data, list):  # 결과가 리스트인 경우
+            for item in data:
+                for url_field in url_fields:
+                    item[url_field] = item.get(url_field, None)
+        else:  # 단일 자산인 경우
+            for url_field in url_fields:
+                data[url_field] = data.get(url_field, None)
+        
+        return data
     
     def find(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
         """
@@ -268,20 +281,20 @@ class AssetDb(DbCrud):
         :return: 자산들의 상세 정보 리스트
         """
         details = super().find(filter_conditions, sort_by, limit, skip, fields)
-        
-        # URL 필드가 없는 경우 기본값 처리
-        if details:
-            if isinstance(details, list):  # 결과가 리스트인 경우
-                for item in details:
-                    for url_field in [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
-                                      PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]:
-                        item[url_field] = item.get(url_field, None)
-            else:  # 단일 자산인 경우
-                for url_field in [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
-                                  PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]:
-                    details[url_field] = details.get(url_field, None)
-
-        return details
+        return self.set_url_fields(details)
     
-    def search(self, user_query):
-        return super().search(user_query)
+    def find_one(self, object_id, fields=None):
+        """
+        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환 (AssetDb에서만 사용)
+        :param object_id: 자산의 고유 ID
+        :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
+        :return: 자산의 상세 정보 (object_id, asset_type, description, price 등)
+        """
+        # 부모 클래스의 find_one 호출
+        details = super().find_one(object_id, fields)
+        return self.set_url_fields(details)
+    
+    def search(self, user_query=None, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
+        # 부모 클래스의 search 호출
+        result = super().search(user_query, filter_conditions, sort_by, limit, skip, fields)
+        return self.set_url_fields(result)
