@@ -1,57 +1,66 @@
 from pxr import Usd, UsdGeom
 
-def get_prim_references(stage, prim_path):
-    """ 특정 Prim이 가지고 있는 Reference 리스트를 반환 """
-    prim = stage.GetPrimAtPath(prim_path)
-    if not prim:
-        print(f"Prim not found: {prim_path}")
-        return []
+class UsdUtils:
+    @staticmethod
+    def create_usd_file(file_path, geom_type, position, ascii=True):
+        """
+        지정된 형상의 USD 파일을 생성.
+        
+        :param file_path: USD 파일 경로
+        :param geom_type: "Sphere" 또는 "Cylinder"
+        :param position: (x, y, z) 위치 좌표
+        :param ascii: True면 ASCII(.usda), False면 바이너리(.usdc)로 저장
+        """
+        extension = ".usda" if ascii else ".usdc"
+        if not file_path.endswith(extension):
+            file_path += extension
 
-    references = prim.GetReferences()
-    reference_list = []
-    
-    for ref in references.GetAddedReferences():
-        reference_list.append(ref.assetPath)
+        stage = Usd.Stage.CreateNew(file_path, format="usda" if ascii else "usdc")
 
-    return reference_list
-from pxr import Usd, UsdGeom, Sdf
+        # Xform 노드 생성
+        xform = UsdGeom.Xform.Define(stage, f"/{geom_type}")
 
-def create_usd_with_references(output_path):
-    """ USD 파일을 생성하고 특정 Prim에 Reference 추가 """
-    stage = Usd.Stage.CreateNew(output_path)
+        # 변환 설정 (위치 이동)
+        xform_op = xform.AddTranslateOp()
+        xform_op.Set(position)
 
-    # Root Prim 생성
-    root_prim = stage.DefinePrim("/Root", "Xform")
+        # 도형 추가
+        if geom_type == "Sphere":
+            UsdGeom.Sphere.Define(stage, f"/{geom_type}/Shape")
+        elif geom_type == "Cylinder":
+            UsdGeom.Cylinder.Define(stage, f"/{geom_type}/Shape")
 
-    # 참조할 대상 Prim 생성
-    referenced_prim_path = "/ReferencedModel"
-    referenced_prim = stage.DefinePrim(referenced_prim_path, "Xform")
+        stage.GetRootLayer().Save()
+        print(f"USD file created: {file_path}")
 
-    # 참조할 USD 파일 생성
-    referenced_usd_path = output_path.replace(".usda", "_ref.usda")
-    ref_stage = Usd.Stage.CreateNew(referenced_usd_path)
-    ref_stage.DefinePrim("/Model", "Xform")
-    ref_stage.GetRootLayer().Save()
+    @staticmethod
+    def create_main_usd(main_file_path, ref_file1, ref_file2, ascii=True):
+        """
+        두 개의 USD 파일을 Reference로 불러와 새로운 USD 파일을 생성.
+        
+        :param main_file_path: 메인 USD 파일 경로
+        :param ref_file1: 첫 번째 참조 파일 경로
+        :param ref_file2: 두 번째 참조 파일 경로
+        :param ascii: True면 ASCII(.usda), False면 바이너리(.usdc)로 저장
+        """
+        extension = ".usda" if ascii else ".usdc"
+        if not main_file_path.endswith(extension):
+            main_file_path += extension
 
-    # Root Prim에 Reference 추가
-    references = root_prim.GetReferences()
-    references.AddReference(referenced_usd_path)
+        stage = Usd.Stage.CreateNew(main_file_path, format="usda" if ascii else "usdc")
 
-    # 저장
-    stage.GetRootLayer().Save()
-    print(f"USD file created: {output_path}")
-    print(f"Referenced USD file created: {referenced_usd_path}")
+        # 첫 번째 Reference 추가 (Sphere)
+        xform1 = UsdGeom.Xform.Define(stage, "/Ref1")
+        xform1.GetPrim().GetReferences().AddReference(ref_file1)
 
-# 테스트용 USD 파일 생성
-create_usd_with_references("test.usda")
+        # 두 번째 Reference 추가 (Cylinder)
+        xform2 = UsdGeom.Xform.Define(stage, "/Ref2")
+        xform2.GetPrim().GetReferences().AddReference(ref_file2)
 
-# USD 스테이지 열기
-usd_file = "test.usda"
-stage = Usd.Stage.Open(usd_file)
+        stage.GetRootLayer().Save()
+        print(f"Main USD file created: {main_file_path}")
 
-# 특정 Prim의 Reference 가져오기
-prim_path = "/Root/MyPrim"
-references = get_prim_references(stage, prim_path)
-
-# 결과 출력
-print("References:", references)
+# 실행 예제
+UsdUtils.create_usd_file("home/rapa/NA_Spirit/file1", "Sphere", (0, 0, 0), ascii=True)   # 구 (0, 0, 0)
+UsdUtils.create_usd_file("home/rapa/NA_Spirit/file2", "Cylinder", (2, 0, 0), ascii=True) # 원기둥 (2, 0, 0)
+UsdUtils.create_main_usd("home/rapa/NA_Spirit/main", "home/rapa/NA_Spirit/file1.usda", "home/rapa/NA_Spirit/file2.usda", ascii=True) # Main USD

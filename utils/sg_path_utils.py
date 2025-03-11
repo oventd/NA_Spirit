@@ -76,7 +76,8 @@ class SgPathUtils:
             raise ValueError(f"Invalid entity path (too short): {entity_path}")
 
         trimmed_path = os.sep.join(dirs[:symbolic_index_added])
-        return trimmed_path
+        trimmed_after = os.sep.join(dirs[symbolic_index_added:])
+        return trimmed_path ,trimmed_after
     @staticmethod
     def get_publish_dir(entity_path, step):
         trimed_path = SgPathUtils.trim_entity_path(entity_path)
@@ -86,3 +87,26 @@ class SgPathUtils:
     def get_version(publish_file):
         return os.path.splitext(publish_file)[0].split(".")[1]
     
+    @staticmethod
+    def get_usd_publish_from_maya_publish(publish_file):
+        return publish_file.replace("maya", "usd")
+    
+    @staticmethod
+    def get_maya_publish_from_usd_publish(publish_file):
+        return publish_file.replace("usd", "maya")
+    
+    @staticmethod
+    def set_step(publish_file, step):
+        entity_path, after_path= SgPathUtils.trim_entity_path(publish_file)
+        step_changed = after_path.split("/")
+        step_changed[0] = step
+        step_changed_path = "/".join(step_changed)
+        result =  os.path.join(entity_path, step_changed_path)
+        return result
+    
+
+    
+
+if __name__ == "__main__":
+    path = "/nas/spirit/spirit/assets/Prop/apple/MDL/publish/usd/scene.v005.usd"
+    print(SgPathUtils.set_step(path,"LGT"))

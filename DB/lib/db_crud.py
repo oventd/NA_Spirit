@@ -39,50 +39,152 @@ class DbCrud:
         self.logger.info(f"Inserted document ID: {result.inserted_id} | Asset Data: {asset_data}")
         return str(result.inserted_id)
 
+
+
+
+    def construct_query_pipeline(self, filter_conditions=None, sort_by=None, sort_order=None,
+                                limit=40, skip=0, fields=None, search_query=None):
+        """
+        MongoDB 쿼리 파이프라인을 생성하는 공통 함수.
+        - filter_conditions: 필터 조건
+        - sort_by: 정렬 기준 필드
+        - sort_order: 정렬 순서 (ASCENDING or DESCENDING)
+        - limit: 최대 조회 개수
+        - skip: 건너뛸 개수
+        - fields: 반환할 필드 목록
+        - search_query: 검색어 (search()에서만 사용)
+        """
+        query_filter = {}
+
+        # 전달 받은 필터 조건을 적용
+        if filter_conditions:
+            for key, value in filter_conditions.items():
+                if isinstance(value, list):
+                    query_filter[key] = {"$in": value}
+                else:
+                    query_filter[key] = value
+
+        # 검색어 적용 (search() 전용)
+        if search_query:
+            query_filter["$text"] = {"$search": search_query}
+
+        projection = None
+        if fields:
+            projection = {}
+            for field in fields:
+                projection[field] = 1
+
+        pipeline = [{"$match": query_filter}]
+
+        if sort_by and sort_order is None:
+            default_sort_orders = {
+                CREATED_AT: (CREATED_AT, pymongo.DESCENDING),  # 최신순
+                UPDATED_AT: (UPDATED_AT, pymongo.DESCENDING),    # 오래된순
+                DOWNLOADS: (DOWNLOADS, pymongo.DESCENDING),         # 다운로드 많은 순
+            }
+            sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, sort_order))  # 기본값 오름차순
+
+        # "score" 기준 정렬 적용*(search() 전용)
+        if search_query:
+            pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})
+
+        # 일반적인 정렬 적용 (sort조건으로 적용)
+        elif sort_by and sort_order:
+            pipeline.append({"$sort": {sort_by: sort_order}})
+
+        # 제한 및 스킵 적용
+        if limit:
+            pipeline.append({"$limit": limit})
+        if skip:
+            pipeline.append({"$skip": skip})
+
+        # 특정 필드만 반환하도록 설정
+        if projection:
+            pipeline.append({"$project": projection})
+
+        self.logger.debug(f"Generated Query Pipeline: {pipeline}")  # 디버깅을 위한 로깅
+        return pipeline
+
+    def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=40, skip=0, fields=None):
+        pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields)
+        result = list(self.asset_collection.aggregate(pipeline))
+        self.logger.info(f"Query executed with filter: {filter_conditions} | Found: {len(result)} documents")
+        return result
+
+    def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
+                    limit=40, skip=0, fields=None):
+        object_ids = []
+        if filter_conditions:
+            for value in filter_conditions:
+                object_ids.append(ObjectId(value))
+
+        query_filter = {"_id": {"$in": object_ids}}
+        pipeline = self.construct_query_pipeline(query_filter, sort_by, sort_order, limit, skip, fields)
+        result = list(self.asset_collection.aggregate(pipeline))
+        return result
+    
+    def search(self, user_query=None, filter_conditions=None, limit=40, skip=0, fields=None):
+        """
+        검색어 기반으로 데이터를 조회. 검색 점수를 기준으로 정렬됨.
+        """
+        pipeline = self.construct_query_pipeline(filter_conditions, None, limit=limit, skip=skip, fields=fields, search_query=user_query)
+        result = list(self.asset_collection.aggregate(pipeline))
+        self.logger.info(f"Search executed with query: {user_query} | Found: {len(result)} documents")
+        return result
+
+
+
+
+
+
+
+
+
+
     # 데이터 조회 (필터 조건에 맞는 자산 리스트 반환)
     """
     find()는 필터링 된 모든 문서를 가져온 후 limit를 적용하기에 효율성 저하
     aggregate()는 필터링 후 정렬하고, limit를 사용해서 메모리 사용을 줄인다.
     """
-    def find(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
-        """
-        필터 조건에 맞는 자산들을 조회합니다.
-        :param filter_conditions: 필터 조건 (기본값은 None, 모든 자산 조회)
-        :param sort_by: 정렬 기준 (기본값은 None, 정렬하지 않음)
-        :param limit: 조회할 데이터 수 (기본값은 20)
-        :param skip: 건너뛸 데이터 수 (기본값은 0)
-        :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
-        :return: 조회된 자산 리스트
-        """
-        if filter_conditions is None:
-            filter_conditions = {}
+    # def find(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
+    #     """
+    #     필터 조건에 맞는 자산들을 조회합니다.
+    #     :param filter_conditions: 필터 조건 (기본값은 None, 모든 자산 조회)
+    #     :param sort_by: 정렬 기준 (기본값은 None, 정렬하지 않음)
+    #     :param limit: 조회할 데이터 수 (기본값은 20)
+    #     :param skip: 건너뛸 데이터 수 (기본값은 0)
+    #     :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
+    #     :return: 조회된 자산 리스트
+    #     """
+    #     if filter_conditions is None:
+    #         filter_conditions = {}
         
-        query_filter = {}
-        for key, value in filter_conditions.items():
-            if isinstance(value, list):
-                query_filter[key] = {"$in": value}
-            else:
-                query_filter[key] = value
+    #     query_filter = {}
+    #     for key, value in filter_conditions.items():
+    #         if isinstance(value, list):
+    #             query_filter[key] = {"$in": value}
+    #         else:
+    #             query_filter[key] = value
         
-        projection = {field: 1 for field in fields} if fields else None
+    #     projection = {field: 1 for field in fields} if fields else None
         
-        pipeline = [{"$match": query_filter}]  # 필터 조건은 항상 필요
-        if limit:
-            pipeline.append({"$limit": limit})  # limit 값이 0이 아니면 추가
-        if skip:
-            pipeline.append({"$skip": skip})  # skip 값이 0이 아니면 추가
-        if projection:
-            pipeline.append({"$project": projection})  # projection이 있으면 추가
-        if sort_by:
-            pipeline.append({"$sort": {sort_by: pymongo.ASCENDING}})  # sort가 있으면 추가
+    #     pipeline = [{"$match": query_filter}]  # 필터 조건은 항상 필요
+    #     if limit:
+    #         pipeline.append({"$limit": limit})  # limit 값이 0이 아니면 추가
+    #     if skip:
+    #         pipeline.append({"$skip": skip})  # skip 값이 0이 아니면 추가
+    #     if projection:
+    #         pipeline.append({"$project": projection})  # projection이 있으면 추가
+    #     if sort_by:
+    #         pipeline.append({"$sort": {sort_by: pymongo.ASCENDING}})  # sort가 있으면 추가
 
-        print(f"[DEBUG] Query Filter: {query_filter}")
-        print(f"[DEBUG] Projection Fields: {projection}")
-        print(f"[DEBUG] Aggregation Pipeline: {pipeline}")
+    #     print(f"[DEBUG] Query Filter: {query_filter}")
+    #     print(f"[DEBUG] Projection Fields: {projection}")
+    #     print(f"[DEBUG] Aggregation Pipeline: {pipeline}")
         
-        result = list(self.asset_collection.aggregate(pipeline))
-        self.logger.info(f"Query executed with filter: {query_filter} | Found: {len(result)} documents")
-        return result
+    #     result = list(self.asset_collection.aggregate(pipeline))
+    #     self.logger.info(f"Query executed with filter: {query_filter} | Found: {len(result)} documents")
+    #     return result
 
     def find_one(self, object_id, fields=None):
         """
@@ -107,44 +209,44 @@ class DbCrud:
         self.logger.info(f"Retrieved document ID: {object_id} | Document Details: {details}")
         return details
     
-    def find_and_sort(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
-        """
-        필터 조건에 맞는 자산들을 조회하고, 해당 자산들을 정렬합니다.
-        :param filter_conditions: ObjectId 리스트 (기본값은 None, 모든 자산 조회)
-        :param sort_by: 정렬 기준 (기본값은 None, 정렬하지 않음)
-        :param limit: 조회할 데이터 수 (기본값은 40)
-        :param skip: 건너뛸 데이터 수 (기본값은 0)
-        :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
-        :return: 조회된 자산 리스트
-        """
-        if filter_conditions is None:
-            filter_conditions = []
+    # def find_and_sort(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
+    #     """
+    #     필터 조건에 맞는 자산들을 조회하고, 해당 자산들을 정렬합니다.
+    #     :param filter_conditions: ObjectId 리스트 (기본값은 None, 모든 자산 조회)
+    #     :param sort_by: 정렬 기준 (기본값은 None, 정렬하지 않음)
+    #     :param limit: 조회할 데이터 수 (기본값은 40)
+    #     :param skip: 건너뛸 데이터 수 (기본값은 0)
+    #     :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
+    #     :return: 조회된 자산 리스트
+    #     """
+    #     if filter_conditions is None:
+    #         filter_conditions = []
 
-        object_ids = []
-        for value in filter_conditions:
-            object_id = ObjectId(value)  # value를 ObjectId로 변환
-            object_ids.append(object_id)  # 변환된 ObjectId를 리스트에 추가
+    #     object_ids = []
+    #     for value in filter_conditions:
+    #         object_id = ObjectId(value)  # value를 ObjectId로 변환
+    #         object_ids.append(object_id)  # 변환된 ObjectId를 리스트에 추가
 
-        # _id 필드를 ObjectId 값들로 필터링하기 위한 쿼리 작성
-        query_filter = {"_id": {"$in": object_ids}}
+    #     # _id 필드를 ObjectId 값들로 필터링하기 위한 쿼리 작성
+    #     query_filter = {"_id": {"$in": object_ids}}
 
-        # 필요한 필드를 선택할 프로젝션 설정 (동적 필드 지정)
-        projection = {field: 1 for field in fields} if fields else None
+    #     # 필요한 필드를 선택할 프로젝션 설정 (동적 필드 지정)
+    #     projection = {field: 1 for field in fields} if fields else None
         
-        # 파이프라인 생성
-        pipeline = [{"$match": query_filter}]  # _id 필터링은 항상 필요
-        if limit:
-            pipeline.append({"$limit": limit})   # limit이 0이 아니면 추가
-        if skip:
-            pipeline.append({"$skip": skip})     # skip이 0이 아니면 추가
-        if projection:
-            pipeline.append({"$project": projection})  # projection이 있으면 추가
-        if sort_by:
-            pipeline.append({"$sort": {sort_by: pymongo.DESCENDING}})  # sort가 있으면 추가
+    #     # 파이프라인 생성
+    #     pipeline = [{"$match": query_filter}]  # _id 필터링은 항상 필요
+    #     if limit:
+    #         pipeline.append({"$limit": limit})   # limit이 0이 아니면 추가
+    #     if skip:
+    #         pipeline.append({"$skip": skip})     # skip이 0이 아니면 추가
+    #     if projection:
+    #         pipeline.append({"$project": projection})  # projection이 있으면 추가
+    #     if sort_by:
+    #         pipeline.append({"$sort": {sort_by: pymongo.DESCENDING}})  # sort가 있으면 추가
 
-        # 쿼리 실행
-        result = list(self.asset_collection.aggregate(pipeline))
-        return result
+    #     # 쿼리 실행
+    #     result = list(self.asset_collection.aggregate(pipeline))
+    #     return result
 
     # 데이터 수정 (Update)
     def update_one(self, object_id, update_data):
@@ -184,55 +286,56 @@ class DbCrud:
         result = self.asset_collection.update_one(
             {OBJECT_ID: ObjectId(object_id)},
             {"$inc": {field: 1}},
+            upsert=True
         )
         self.logger.info(f"Incremented download count for document ID: {object_id}")
         return result.modified_count > 0  # 다운로드 수가 증가했으면 True 반환
 
-    # 데이터 검색 (Search)
-    def search(self, user_query=None, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
-        """
-        데이터에 대한 검색 기능을 수행합니당.
-        :param user_query: 검색어 (기본값: None, 모든 데이터 조회)
-        :param sort_by: 정렬 기준 (기본값: None, 정렬하지 않음)
-        :param limit: 최대 검색 개수 (기본값: 0, 즉 제한 없음)
-        :param skip: 건너뛸 개수 (기본값: 0)
-        :param fields: 반환할 필드 목록 (기본값: None, 즉 모든 필드 포함)
-        :return: 검색 결과 리스트
-        """
-        query = {}
+    # # 데이터 검색 (Search)
+    # def search(self, user_query=None, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
+    #     """
+    #     데이터에 대한 검색 기능을 수행합니당.
+    #     :param user_query: 검색어 (기본값: None, 모든 데이터 조회)
+    #     :param sort_by: 정렬 기준 (기본값: None, 정렬하지 않음)
+    #     :param limit: 최대 검색 개수 (기본값: 0, 즉 제한 없음)
+    #     :param skip: 건너뛸 개수 (기본값: 0)
+    #     :param fields: 반환할 필드 목록 (기본값: None, 즉 모든 필드 포함)
+    #     :return: 검색 결과 리스트
+    #     """
+    #     query = {}
 
-        # 텍스트 검색어가 있을 경우 텍스트 검색 쿼리 적용
-        if user_query and user_query.strip():
-            query = {"$text": {"$search": user_query}}
+    #     # 텍스트 검색어가 있을 경우 텍스트 검색 쿼리 적용
+    #     if user_query and user_query.strip():
+    #         query = {"$text": {"$search": user_query}}
 
-        # 필터 조건이 있을 경우 쿼리 필터에 추가
-        if filter_conditions:
-            query.update(filter_conditions)
+    #     # 필터 조건이 있을 경우 쿼리 필터에 추가
+    #     if filter_conditions:
+    #         query.update(filter_conditions)
 
-        # 프로젝션 설정: 반환할 필드 목록을 동적으로 처리
-        projection = {field: 1 for field in fields} if fields else None
+    #     # 프로젝션 설정: 반환할 필드 목록을 동적으로 처리
+    #     projection = {field: 1 for field in fields} if fields else None
 
-        # 파이프라인 생성
-        pipeline = [
-            {"$match": query},  # 필터 조건 적용
-            {"$limit": limit},   # 제한된 개수만 조회
-            {"$skip": skip}     # 건너뛰기
-        ]
+    #     # 파이프라인 생성
+    #     pipeline = [
+    #         {"$match": query},  # 필터 조건 적용
+    #         {"$limit": limit},   # 제한된 개수만 조회
+    #         {"$skip": skip}     # 건너뛰기
+    #     ]
         
-        # 텍스트 검색이 있을 때만 score 기반으로 정렬
-        if user_query:
-            pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})      # 점수 기반 정렬
+    #     # 텍스트 검색이 있을 때만 score 기반으로 정렬
+    #     if user_query:
+    #         pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})      # 점수 기반 정렬
 
-        # 필드 선택이 있으면 프로젝트 단계 추가
-        if projection:
-            pipeline.append({"$project": projection})
+    #     # 필드 선택이 있으면 프로젝트 단계 추가
+    #     if projection:
+    #         pipeline.append({"$project": projection})
 
-        # None 값 제거 (필요 없는 단계는 제외)
-        pipeline = [step for step in pipeline if step]
+    #     # None 값 제거 (필요 없는 단계는 제외)
+    #     pipeline = [step for step in pipeline if step]
 
-        result = list(self.asset_collection.aggregate(pipeline))
-        self.logger.info(f"Search executed with query: {query} | Found: {len(result)} documents")
-        return result
+    #     result = list(self.asset_collection.aggregate(pipeline))
+    #     self.logger.info(f"Search executed with query: {query} | Found: {len(result)} documents")
+    #     return result
 
 
 class AssetDb(DbCrud):
