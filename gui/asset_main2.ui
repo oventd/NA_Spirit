@@ -979,7 +979,7 @@ color:#ffffff;
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>871</x>
+      <x>300</x>
       <y>0</y>
       <width>380</width>
       <height>851</height>
@@ -1702,6 +1702,59 @@ resolution     |</string>
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;아직 관심있는 에셋이 없어요!&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;에셋 상세페이지에서 하트를 눌러주세요&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>1103</x>
+      <y>67</y>
+      <width>114</width>
+      <height>37</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string extracomment="&quot;좋아요한 에셋을 일괄 다운받을 수 있어요!&quot;"/>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string/>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background: transparent;  /* 배경 투명 */
+    border: none;  /* 테두리 제거 */
+}</string>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../../다운로드/Group 14063.png</normaloff>../../다운로드/Group 14063.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>114</width>
+      <height>37</height>
+     </size>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+    <property name="autoRepeat">
+     <bool>false</bool>
+    </property>
+    <property name="autoExclusive">
+     <bool>false</bool>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
+   </widget>
    <zorder>label</zorder>
    <zorder>tableWidget</zorder>
    <zorder>user_num</zorder>
@@ -1712,6 +1765,7 @@ resolution     |</string>
    <zorder>search</zorder>
    <zorder>stackedWidget</zorder>
    <zorder>like_empty_notice</zorder>
+   <zorder>pushButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
