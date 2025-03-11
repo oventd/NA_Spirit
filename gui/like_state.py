@@ -14,6 +14,7 @@ class LikeState:
 
         self._toggle_like = QPixmap("/nas/spirit/asset_project/source/toggle_like.png")
         self._toggle_open =QPixmap("/nas/spirit/asset_project/source/toggle_open.png")
+        self._like_download_image = QPixmap("/nas/spirit/asset_project/source/download_btn.png")
         self._like_icon_empty = QIcon("/nas/spirit/asset_project/source/like_icon.png")
         self._like_icon = QIcon("/nas/spirit/asset_project/source/like_icon_on.png")
         self._initialized = True
@@ -48,6 +49,10 @@ class LikeState:
     @property
     def like_icon(self):
         return self._like_icon
+    
+    @property
+    def like_download_image(self):
+        return self._like_download_image
     
 
     

@@ -399,6 +399,11 @@ class TableUiManager:
                     like_asset_dict.append(asset_info)
                     
                 self.make_table(like_asset_dict)
+                self.ui.like_download_btn.show()
+                self.ui.like_download_btn_area.show()
+                
+                self.ui.like_download_btn.setPixmap(LikeState().like_download_image)
+
                 self.ui.like_empty_notice.hide()
         else: 
             if LikeState().state == True:
