@@ -165,12 +165,12 @@ class AssetService:
         return asset_manager.increment_count(asset_id)  # 자산 데이터 업데이트
     
     @staticmethod
-    def search_asset(user_query):
+    def search_asset(user_query, filter_conditions, limit, skip, fields):
         """
         데이터를 검색합니다.
         :param user_query: 검색어
         :return: 검색 성공 여부
         """
         asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        return asset_manager.search(user_query)  # 자산 데이터 업데이트
+        return asset_manager.search(user_query=user_query , filter_conditions=filter_conditions, limit=limit, skip=skip, fields=fields)  # 자산 데이터 업데이트
 
