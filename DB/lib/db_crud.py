@@ -210,6 +210,7 @@ class DbCrud:
         :user_query: 검색을 진행할 데이터
         :return: 검색 결과
         """
+        user_query = user_query.strip()
         query = { "$text": { "$search": user_query } }
         projection = { NAME: 1, "_id": 0, SCORE: { "$meta": "textScore" } }  # name 필드와 점수 가져오기
         
@@ -232,7 +233,10 @@ class UserDb(DbCrud):
         self.asset_collection.create_index([(FILE_FORMAT, pymongo.ASCENDING)])
         self.asset_collection.create_index([(UPDATED_AT, pymongo.DESCENDING)])
         self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
-        self.asset_collection.create_index([(NAME, TEXT), (DESCRIPTION, TEXT)])
+        self.asset_collection.create_index(
+            [(NAME, TEXT), (DESCRIPTION, TEXT)],
+            weights={NAME: 10, DESCRIPTION: 2}  # 'name' 필드에 10, 'description' 필드에 2의 가중치 부여
+        )
         self.logger.info("Indexes set up for UserDb")
 
     def find_one(self, object_id, fields=None):
