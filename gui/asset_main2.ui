@@ -486,7 +486,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::FocusPolicy::NoFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">background: #080808;
@@ -494,13 +494,13 @@
 </string>
     </property>
     <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAsNeeded</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAsNeeded</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
     </property>
     <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::AdjustIgnored</enum>
+     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
     </property>
     <property name="autoScroll">
      <bool>false</bool>
@@ -509,7 +509,7 @@
      <number>0</number>
     </property>
     <property name="textElideMode">
-     <enum>Qt::ElideLeft</enum>
+     <enum>Qt::TextElideMode::ElideLeft</enum>
     </property>
     <property name="showGrid">
      <bool>true</bool>
@@ -698,10 +698,10 @@ color:#ffffff;
 </string>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
+     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::NoSelection</enum>
+     <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
     </property>
     <property name="indentation">
      <number>10</number>
@@ -970,7 +970,7 @@ color:#ffffff;
      </font>
     </property>
     <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
+     <enum>Qt::LayoutDirection::LeftToRight</enum>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -986,7 +986,7 @@ color:#ffffff;
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
+     <enum>QFrame::Shape::NoFrame</enum>
     </property>
     <property name="currentIndex">
      <number>0</number>
@@ -1005,7 +1005,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1055,7 +1054,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1087,7 +1085,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1114,6 +1111,9 @@ color:#ffffff;
         <width>380</width>
         <height>291</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <widget class="QWidget" name="page"/>
       <widget class="QWidget" name="page_2"/>
@@ -1167,7 +1167,7 @@ color:#ffffff;
         <number>0</number>
        </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
+        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
        </property>
        <property name="topMargin">
         <number>0</number>
@@ -1187,7 +1187,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1225,7 +1224,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1267,7 +1265,6 @@ color:#ffffff;
        <font>
         <family>Pretendard</family>
         <pointsize>9</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1291,7 +1288,6 @@ color:#ffffff;
        <font>
         <family>Pretendard</family>
         <pointsize>9</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1315,7 +1311,6 @@ color:#ffffff;
        <font>
         <family>Sans</family>
         <pointsize>15</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -1340,7 +1335,7 @@ color:#ffffff;
         <number>12</number>
        </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
+        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
        </property>
        <item>
         <widget class="QLabel" name="license_type">
@@ -1493,7 +1488,7 @@ color:#ffffff;
         <x>141</x>
         <y>748</y>
         <width>145</width>
-        <height>21</height>
+        <height>20</height>
        </rect>
       </property>
       <property name="font">
@@ -1503,7 +1498,7 @@ color:#ffffff;
        </font>
       </property>
       <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
+       <enum>Qt::LayoutDirection::LeftToRight</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">QComboBox {
@@ -1528,7 +1523,7 @@ QComboBox QAbstractItemView {
        <string>4096x4096 (281MB)</string>
       </property>
       <property name="sizeAdjustPolicy">
-       <enum>QComboBox::AdjustToContents</enum>
+       <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
       </property>
       <item>
        <property name="text">
@@ -1582,7 +1577,6 @@ resolution     |</string>
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1627,7 +1621,7 @@ resolution     |</string>
        <number>1</number>
       </property>
       <property name="orientation">
-       <enum>Qt::Vertical</enum>
+       <enum>Qt::Orientation::Vertical</enum>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
@@ -1666,7 +1660,6 @@ resolution     |</string>
      <zorder>label_2</zorder>
      <zorder>exit_btn</zorder>
      <zorder>name</zorder>
-     <zorder>stackedWidget_2</zorder>
      <zorder>info_list_bar_s</zorder>
      <zorder>info_name</zorder>
      <zorder>image_l_btn</zorder>
@@ -1684,6 +1677,7 @@ resolution     |</string>
      <zorder>download_btn</zorder>
      <zorder>comboBox_3</zorder>
      <zorder>label_4</zorder>
+     <zorder>stackedWidget_2</zorder>
     </widget>
     <widget class="QWidget" name="page_4"/>
    </widget>
@@ -1725,7 +1719,7 @@ resolution     |</string>
      <x>0</x>
      <y>0</y>
      <width>1250</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>

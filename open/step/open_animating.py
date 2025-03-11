@@ -68,7 +68,11 @@ class AnimatingStep(StepOpenMaya):
             
             
 
-                
+                            
+            # sframe = int( cmds.playbackOptions( q=1, min=1 ) )
+            # eframe = int( cmds.playbackOptions( q=1, max=1 ) )
+            # handle = int(5)
+            # step = float(0.25)
 
 if __name__ == "__main__":
     animation = AnimatingStep()
@@ -77,3 +81,4 @@ if __name__ == "__main__":
     AnimatingStep.Open.reference_terrain()
     AnimatingStep.Open.reference_camera()
     AnimatingStep.Publish.validate()
+    AnimatingStep.Publish.publish()
