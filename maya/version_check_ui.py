@@ -101,8 +101,11 @@ class VersionCheckUI(QMainWindow):
             print(f"❌ 파일 목록 조회 중 오류 발생: {str(e)}")
             return []
 
-    def get_latest_version(directory, asset_name):
+    def get_latest_version(directory, asset_dir, asset_name):
         """디렉토리에서 특정 에셋의 최신 버전 찾기"""
+        if not os.path.exists(asset_dir):
+            return
+        
         asset_base = re.sub(r"v\d+", "", asset_name)  # 버전 번호 제거
         versions = []
 
@@ -114,6 +117,31 @@ class VersionCheckUI(QMainWindow):
 
         return max(versions) if versions else 1
     
+    def get_available_versions(self, asset_dir, asset_name):
+        """디렉토리에서 해당 에셋의 모든 버전 목록을 가져오기"""
+        if not os.path.exists(asset_dir):
+            print(f"❌ 경로 없음: {asset_dir}")
+            return ["v001"]  # 기본 버전
+
+        print(f"🔍 검색 중: {asset_dir}")
+
+        # 정확한 파일명 패턴을 얻기 위해 파일 확장자 분리
+        asset_base, ext = os.path.splitext(asset_name)
+        asset_base = re.sub(r"_v\d+(?:\.\d+)?", "", asset_base)  # 버전 제거 (정확한 이름 추출)
+
+        versions = []
+        for file in os.listdir(asset_dir):
+            if file.startswith(asset_base) and file.endswith(ext):  # 확장자까지 일치해야 함
+                match = re.search(r"v(\d+)", file)
+                if match:
+                    version_number = int(match.group(1))
+                    versions.append(version_number)
+
+        versions.sort()  # 정렬
+        print(f"✅ {asset_base} - 발견된 버전 목록: {versions}")
+        return [f"v{str(v).zfill(3)}" for v in versions] if versions else ["v001"]
+
+        
     def update_table(self):
         version_data = self.get_referenced_assets()
         self.set_table_items(version_data)
@@ -138,6 +166,7 @@ class VersionCheckUI(QMainWindow):
         return asset_data
 
     def get_latest_version(self, asset_dir, asset_name):
+      
         """디렉토리 내에서 최신 버전을 찾기"""
         if not os.path.exists(asset_dir):
             return 1  # 기본 버전 반환
@@ -150,6 +179,9 @@ class VersionCheckUI(QMainWindow):
                 match = re.search(r"v(\d+)", file)
                 if match:
                     versions.append(int(match.group(1)))
+                    version_num = int(match.group(1))
+                    if version_num > 1:
+                        versions.append(version_num)
 
         return max(versions) if versions else 1
 
@@ -184,11 +216,6 @@ class VersionCheckUI(QMainWindow):
             )
 
             checkbox.setFixedSize(15, 15)
-            
-            # checkbox.stateChanged.connect(self.update_checkbox_state)
-            
-            # checkbox.stateChanged.connect(self.update_checkbox_state)
-            
             check_layout.addWidget(checkbox)
             check_widget.setLayout(check_layout)
             self.table.setCellWidget(row, 0, check_widget)
@@ -198,15 +225,16 @@ class VersionCheckUI(QMainWindow):
             asset_item.setTextAlignment(Qt.AlignCenter)
             self.table.setItem(row, 1, asset_item)
 
-            # 현재 버전 추가
+            # 현재 버전 추가 (콤보박스 수정)
             combo = QComboBox()
-            available_versions = [f"v{str(i).zfill(3)}" for i in range(1, latest_version + 1)]
+            asset_dir = USD_DIRECTORY  # 고정된 경로 사용
+            available_versions = self.get_available_versions(asset_dir, asset_name)
             combo.addItems(available_versions)
-            combo.setCurrentText(f"v{current_version:03d}")
+            combo.setCurrentText(f"v{current_version:03d}")  # 현재 버전 설정
             self.table.setCellWidget(row, 2, combo)
 
             # 최신 버전 표시
-            latest_status = "🟢" if current_version == latest_version else "🟡"
+            latest_status = "🟢" if f"v{latest_version:03d}" == f"v{current_version:03d}" else "🟡"
             latest_item = QTableWidgetItem(f"{latest_status} v{latest_version:03d}")
             latest_item.setTextAlignment(Qt.AlignCenter)
             self.table.setItem(row, 3, latest_item)
