@@ -979,7 +979,7 @@ color:#ffffff;
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>870</x>
       <y>0</y>
       <width>380</width>
       <height>851</height>
@@ -1409,7 +1409,7 @@ color:#ffffff;
         <x>29</x>
         <y>608</y>
         <width>321</width>
-        <height>91</height>
+        <height>94</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -1605,25 +1605,6 @@ resolution     |</string>
        </size>
       </property>
      </widget>
-     <widget class="Line" name="line">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>717</y>
-        <width>391</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">c</string>
-      </property>
-      <property name="lineWidth">
-       <number>1</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Orientation::Vertical</enum>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
@@ -1658,25 +1639,24 @@ resolution     |</string>
      </widget>
      <zorder>label_3</zorder>
      <zorder>label_2</zorder>
-     <zorder>exit_btn</zorder>
      <zorder>name</zorder>
      <zorder>info_list_bar_s</zorder>
      <zorder>info_name</zorder>
      <zorder>image_l_btn</zorder>
      <zorder>image_r_btn</zorder>
      <zorder>horizontalLayoutWidget</zorder>
-     <zorder>like_btn</zorder>
-     <zorder>exit_btn_3</zorder>
      <zorder>description</zorder>
      <zorder>asset_type</zorder>
      <zorder>info_name_2</zorder>
      <zorder>horizontalLayoutWidget_2</zorder>
      <zorder>verticalLayoutWidget</zorder>
-     <zorder>line</zorder>
      <zorder>label_5</zorder>
-     <zorder>download_btn</zorder>
      <zorder>comboBox_3</zorder>
      <zorder>label_4</zorder>
+     <zorder>download_btn</zorder>
+     <zorder>like_btn</zorder>
+     <zorder>exit_btn_3</zorder>
+     <zorder>exit_btn</zorder>
      <zorder>stackedWidget_2</zorder>
     </widget>
     <widget class="QWidget" name="page_4"/>
@@ -1702,13 +1682,13 @@ resolution     |</string>
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;아직 관심있는 에셋이 없어요!&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;에셋 상세페이지에서 하트를 눌러주세요&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="like_download_btn_area">
     <property name="geometry">
      <rect>
-      <x>1103</x>
-      <y>67</y>
-      <width>114</width>
-      <height>37</height>
+      <x>1084</x>
+      <y>60</y>
+      <width>160</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="toolTip">
@@ -1727,15 +1707,11 @@ resolution     |</string>
 }</string>
     </property>
     <property name="text">
-     <string>PushButton</string>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>../../다운로드/Group 14063.png</normaloff>../../다운로드/Group 14063.png</iconset>
+     <string/>
     </property>
     <property name="iconSize">
      <size>
-      <width>114</width>
+      <width>16</width>
       <height>37</height>
      </size>
     </property>
@@ -1755,6 +1731,33 @@ resolution     |</string>
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QLabel" name="like_download_btn">
+    <property name="geometry">
+     <rect>
+      <x>1090</x>
+      <y>65</y>
+      <width>148</width>
+      <height>38</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: transmission;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>1135</x>
+      <y>70</y>
+      <width>21</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="like_asset_number"/>
+   </widget>
    <zorder>label</zorder>
    <zorder>tableWidget</zorder>
    <zorder>user_num</zorder>
@@ -1763,9 +1766,11 @@ resolution     |</string>
    <zorder>toggle_btn</zorder>
    <zorder>toggle_btn_touch_area</zorder>
    <zorder>search</zorder>
-   <zorder>stackedWidget</zorder>
    <zorder>like_empty_notice</zorder>
-   <zorder>pushButton</zorder>
+   <zorder>like_download_btn_area</zorder>
+   <zorder>like_download_btn</zorder>
+   <zorder>stackedWidget</zorder>
+   <zorder>horizontalLayoutWidget_3</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

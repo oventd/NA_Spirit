@@ -39,6 +39,7 @@ from like_state import LikeState
 from asset import Asset
 from check import Check
 from subwin import SubWin
+from dynamic_circle_label import DynamicCircleLabel
 class TableUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -377,15 +378,14 @@ class TableUiManager:
         like_state.set_like_icon(asset_object_id, self.ui.like_btn)
 
     def toggle_change(self): 
+        """토글 버튼 변경 이벤트 - 내부 위젯도 삭제"""
 
-        """
-        토글 버튼 토글 이벤트
-        - 토글 버튼의 toggle의 현재 상태에 따른 이미지 변경
-        - true -> false 시 toggle_open, false -> true 시 toggle_like
-        """
-        
+        # ✅ 기존 위젯 삭제 (내부 요소 포함)
+        self.clear_layout(self.ui.like_asset_number)
+
         if LikeState().state == False:
             self.ui.toggle_btn.setPixmap(LikeState().toggle_like)
+            
             LikeState().state = True
             if not LikeState().like_asset_list:
                 self.ui.tableWidget.clear()
@@ -397,10 +397,21 @@ class TableUiManager:
                 for object_id in LikeState().like_asset_list:
                     asset_info = AssetService.get_asset_by_id(object_id)
                     like_asset_dict.append(asset_info)
-                    
+
                 self.make_table(like_asset_dict)
+                self.ui.like_download_btn.show()
+                self.ui.like_download_btn_area.show()
+
+                # ✅ 새로운 DynamicCircleLabel 추가
+                label = DynamicCircleLabel(str(len(LikeState().like_asset_list)))
+                self.ui.like_asset_number.addWidget(label)  # ✅ 새로운 라벨 추가
+                
+                self.ui.like_download_btn.setPixmap(LikeState().like_download_image)
+
                 self.ui.like_empty_notice.hide()
         else: 
+            self.ui.like_download_btn.hide()
+            self.ui.like_download_btn_area.hide()
             if LikeState().state == True:
                 self.ui.toggle_btn.setPixmap(LikeState().toggle_open)
                 LikeState().state = False
@@ -408,3 +419,25 @@ class TableUiManager:
                 self.ui.tableWidget.clear()
                 self.table_widget(Check().dict,UPDATED_AT, 40, 0,None)
                 #사용자 pc에 저장해두고 라이크 받을때 마다 오브젝트 id를 json에 저장해두고 
+
+    def remove_widget_with_children(self,widget):
+        """위젯과 그 내부 요소 삭제"""
+        if widget is not None:
+            layout = widget.layout()  # ✅ 위젯에 레이아웃이 있는 경우 가져오기
+            if layout:
+                while layout.count():
+                    item = layout.takeAt(0)
+                    child_widget = item.widget()
+                    if child_widget:
+                        child_widget.deleteLater()  # ✅ 내부 요소 삭제
+            widget.setParent(None)  # ✅ 부모에서 제거
+            widget.deleteLater()  # ✅ 위젯 자체도 삭제
+
+    def clear_layout(self, layout):
+        """레이아웃 내부의 모든 요소 삭제"""
+        while layout.count():  # 레이아웃에 위젯이 남아있는 동안 반복
+            item = layout.takeAt(0)  # 첫 번째 아이템 가져오기
+            widget = item.widget()  # 아이템이 위젯인지 확인
+            if widget is not None:
+                widget.setParent(None)  # ✅ 부모에서 제거
+                widget.deleteLater()  # ✅ 메모리에서 완전 삭제

@@ -76,7 +76,8 @@ class DefaultUiManager:
         - 토글 버튼에 토글 이미지를 설정/ 디폴트 이미지는 toggle_open.png
         - 메인 ui의 이미지 bg.png 배경으로 설정
         """
-
+        self.ui.like_download_btn.hide()
+        self.ui.like_download_btn_area.hide()
         self.sub_bar = False
         
         self.user_num()
