@@ -1,3 +1,4 @@
+import numpy as np
 import sys
 import cv2
 from PySide6.QtCore import Qt, QTimer
@@ -56,3 +57,29 @@ class VideoPlayer(QLabel):
         self.cap.release()  # 비디오 캡처 객체 해제
         event.accept()
 
+class VideoToImageExtractor(QLabel):
+    def __init__(self, img_path):
+        super().__init__()
+
+
+        # 비디오 캡처 객체 (동영상 파일 경로 설정)
+        self.cap = cv2.VideoCapture(img_path)
+
+    def save_frame(self):
+        ret, frame = self.cap.read()
+        rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image_array = np.array(rgb_image, dtype=np.uint8)
+
+     
+        height, width, channels = image_array.shape
+        bytes_per_line = channels * width
+        qimg = QImage(image_array.data, width, height, bytes_per_line, QImage.Format_RGB888)
+        pixmap = QPixmap.fromImage(qimg)
+        return pixmap
+ 
+
+
+
+
+
+   

@@ -38,7 +38,7 @@ from video_player_manager import VLCVideoPlayer
 from like_state import LikeState
 
 from asset import Asset
-from lunch_test import VideoPlayer
+from lunch_test import VideoPlayer, VideoToImageExtractor
 
 
 class SubWin:
@@ -68,38 +68,55 @@ class SubWin:
         print("이전 이미지로 변경됨")
       # 리뷰 순서를 정리를 
 
-    def show_asset_detail_image(stackedWidget_2, detail_thum_urls , image_labels):
+    def show_asset_detail_image(stackedWidget_2, detail_thum_urls, image_labels):
+        detail_pixmap_urls = []  # 비디오에서 추출한 이미지를 저장할 리스트
 
         for img_path in detail_thum_urls:
-            
             ext = os.path.splitext(img_path)[1]
-            if ext == ".mp4":
 
+            if ext == ".mp4":
                 label = VideoPlayer(img_path)
                 label.setAlignment(Qt.AlignCenter)
                 label.setFixedSize(380, 291)  # 500x300 해상도로 고정
                 stackedWidget_2.addWidget(label)
-                image=  VideoPlayer.save_frame()
-                
-                
-            if ext == ".png":
-            
-                if img_path == None:
+
+                # 비디오에서 프레임 추출
+                image = VideoToImageExtractor(img_path)
+                output_image_pixmap = image.save_frame()
+                detail_pixmap_urls.append(output_image_pixmap)
+
+                # 출력된 이미지 유효성 검사
+                if output_image_pixmap.isNull():
+                    print("Error: Failed to extract image from video.")
+                else:
+                    print("Image extracted successfully.")
+
+                # detail_pixmap_urls에 저장된 이미지를 image_labels에 설정
+                for idx, label in enumerate(image_labels):
+                    if idx < len(detail_pixmap_urls):  # detail_pixmap_urls와 image_labels의 길이가 맞을 때
+                        pixmap = detail_pixmap_urls[idx]
+                        label.setPixmap(pixmap.scaled(80, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                    else:
+                        label.clear()
+
+            elif ext == ".png":
+                if img_path is None:
                     continue
+
                 label = QLabel()
                 pixmap = QPixmap(img_path)
                 label.setPixmap(pixmap)
                 label.setAlignment(Qt.AlignCenter)
                 stackedWidget_2.addWidget(label)
 
-        for idx, label in enumerate(image_labels):
-            if idx < len(detail_thum_urls) and detail_thum_urls[idx]:  # URL이 있는 경우에만 설정
-                pixmap = QPixmap(detail_thum_urls[idx])
-                label.setPixmap(pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-            else:
-                label.clear()
-        
-        stackedWidget_2.setCurrentIndex(0)  # 0번째의 label을 보여준다. 
+                # 썸네일을 이미지 레이블에 설정
+                for idx, label in enumerate(image_labels):
+                    if idx < len(detail_thum_urls) and detail_thum_urls[idx]:  # URL이 있는 경우에만 설정
+                        pixmap = QPixmap(detail_thum_urls[idx])
+                        label.setPixmap(pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                    else:
+                        label.clear()
 
+        stackedWidget_2.setCurrentIndex(0)  # 0번째의 label을 보여준다.
 
  
