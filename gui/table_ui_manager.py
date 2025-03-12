@@ -86,7 +86,7 @@ class TableUiManager:
         self.search_dict={}
         
 
-        assets=AssetService.search_input(text)
+        assets=AssetService.search_input(search_word)
         print("search_assets: ",assets)
         print( "search_input: ",self.search_list)
         for asset in assets:
@@ -181,7 +181,7 @@ class TableUiManager:
         #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
         if option == "오래된 순":
             print(f"오래된 순의 필터임 :{Check().dict}")
-            self.table_widget(Check().dict,UPDATED_AT, 40, 0,None)
+            self.table_widget(Check().dict,CREATED_AT, 40, 0,None)
 
         elif option =="다운로드 순":
             print("다운로드된 순서를 정렬할게요")
@@ -189,7 +189,7 @@ class TableUiManager:
 
         else:
             print("최신 순서를 정렬할게요")
-            self.table_widget(Check().dict,CREATED_AT, 40, 0, None)
+            self.table_widget(Check().dict,UPDATED_AT, 40, 0, None)
     
     def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None, search = False):
         ui = self.ui

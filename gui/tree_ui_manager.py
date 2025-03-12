@@ -129,10 +129,10 @@ class TreeUiManager:
                 sort_by = self.ui.comboBox.currentText()
                 if sort_by == "최신 순":
                     sort_by=CREATED_AT
-                elif sort_by == "오래된 순":
-                    sort_by = UPDATED_AT
-                else:
+                elif sort_by == "다운로드 순":
                     sort_by = DOWNLOADS
+                else:
+                    sort_by = UPDATED_AT
                     
                 TableUiManager(self.ui).table_widget(filter_conditions = Check().dict, sort_by= sort_by, limit = 20, skip = 0, fields =None)
 

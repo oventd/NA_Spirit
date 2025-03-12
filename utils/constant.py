@@ -46,6 +46,14 @@ DB_LOGGER_DIR = "/nas/spirit/DB/db_logger" # 로거 저장 경로
 ASSET_LOGGER_NAME = "user_db" # 로거 저장 이름
 ASSET_LOGGER_DIR = "/nas/spirit/DB/log/asset_library.log" # 에셋 로거 저장 경로
 
+
+# ux logger 관련 상수
+UX_Like_ASSET_LOGGER_NAME = "ux_like_asset" # user_ux(객체 생성용) 로거 이름
+UX_Like_ASSET_LOGGER_DIR = "/nas/spirit/gui/log/like_asset_logger.log" # 로거 저장 이름
+
+UX_DOWNLOAD_LOGGER_NAME = "ux_download" # user_ux(객체 생성용) 로거 이름
+UX_DOWNLOAD_LOGGER_DIR = "/nas/spirit/gui/log/download_logger.log" # 로거 저장 이름
+
 # Shotgrid Pipeline Step 상수
 MODELING = 'Model'
 RIGGING = 'Rig'

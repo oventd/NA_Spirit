@@ -81,7 +81,7 @@ class DbCrud:
             default_sort_orders = {
                 "CREATED_AT": ("UPDATED_AT", pymongo.DESCENDING),  # 최신순
                 "UPDATED_AT": ("UPDATED_AT", pymongo.ASCENDING),  # 오래된순
-                "DOWNLOADS": ("DOWNLOADS", pymongo.ASCENDING),    # 다운로드 많은 순
+                "DOWNLOADS": ("DOWNLOADS", pymongo.DESCENDING),    # 다운로드 많은 순
             }
             sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, pymongo.ASCENDING))  # 기본값 오름차순
 
