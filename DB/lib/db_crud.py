@@ -9,13 +9,17 @@ utils_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), "../../../")
 sys.path.append(utils_dir)
 from logger import *
 from constant import * # 모든 상수 임포트
-"""
-대형민 주문사항 CREATED_DATA 처럼 상수 파일 따로 만들어서 파일분리해주세요 그리고 DB 사용하는 모든 파일에 import
-logging 기능도 넣어주세요
-"""
+
 class DbCrud:
     def __init__(self, logger_name=LOGGER_NAME, log_path = None):
-        # MongoDB 싱글턴 클라이언트를 통해 데이터베이스와 컬렉션을 가져옴
+        """
+        DbCrud 클래스의 생성자
+        - MongoDB 클라이언트를 사용하여 데이터베이스와 컬렉션을 설정합니다.
+        - 로깅을 위한 기본 설정을 초기화합니다.
+
+        :param logger_name: 로거 이름 (기본값: LOGGER_NAME)
+        :param log_path: 로그 파일 경로 (기본값: None, 제공되지 않으면 기본 로그 경로 사용)
+        """
         self.db = MongoDBClient.get_db()  # 싱글턴 클라이언트를 통해 데이터베이스 가져오기
         self.asset_collection = self.db[USER_COLLECTION]  # 데이터베이스에서 컬렉션 가져오기
 
@@ -75,7 +79,7 @@ class DbCrud:
         # sort_by만 주어졌을 경우 기본값으로 DESCENDING을 설정
         if sort_by:
             default_sort_orders = {
-                "CREATED_AT": ("CREATED_AT", pymongo.DESCENDING),  # 최신순
+                "CREATED_AT": ("UPDATED_AT", pymongo.DESCENDING),  # 최신순
                 "UPDATED_AT": ("UPDATED_AT", pymongo.ASCENDING),  # 오래된순
                 "DOWNLOADS": ("DOWNLOADS", pymongo.DESCENDING),    # 다운로드 많은 순
             }
