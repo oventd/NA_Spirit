@@ -23,9 +23,18 @@ try:
     from shiboken2 import wrapInstance
 except ImportError:
     from shiboken6 import wrapInstance
+# from json_manager import DictManager
 
 ASSET_DIRECTORY = "/nas/spirit/spirit/sequences/SQ001/SH0010/MMV/work/maya"
 
+# 🔹 json_manager.py가 있는 폴더 추가
+custom_script_path = "/home/rapa/NA_Spirit/maya/"
+
+if custom_script_path not in sys.path:
+    sys.path.append(custom_script_path)
+
+# 🔹 DictManager 가져오기
+from json_manager import DictManager
 
 
 class VersionCheckUI(QMainWindow):
@@ -35,6 +44,21 @@ class VersionCheckUI(QMainWindow):
         self.setGeometry(100, 100, 800, 600)
         self.setup_ui()
         self.update_table()
+        self.load_json_data()  # JSON 데이터 로드 추가
+
+    def load_json_data(self):
+        """JSON 데이터를 테이블에 로드"""
+        data = DictManager.load_dict_from_json()
+
+        if not data:
+            print("⚠️ JSON 데이터가 없습니다.")
+            return
+
+        self.table.setRowCount(len(data))
+        for row, (asset_name, asset_info) in enumerate(data.items()):
+            self.table.setItem(row, 0, QTableWidgetItem(asset_name))
+            self.table.setItem(row, 1, QTableWidgetItem(asset_info["path"]))
+
 
     def setup_ui(self):
         """UI 요소 초기화 및 설정"""
@@ -275,26 +299,55 @@ class VersionCheckUI(QMainWindow):
 
                 except Exception as e:
                     print(f"⚠️ 업데이트 실패: {e}")
+    def onCellClicked(self, row, column):
+        """✅ 테이블에서 Asset 열 클릭 시 Maya에서 해당 에셋 선택"""
+        if column == 1:  # 🔹 Asset 열 클릭
+            asset_name = self.table.item(row, 1).text()  # 선택된 에셋 이름 가져오기
+            MayaReferenceManager.select_asset_by_name(asset_name)
 
 
 
 class AssetManager:
     """🚀 파일 및 버전 정보를 관리하는 클래스"""
 
-    ASSET_DIRECTORY =  "/nas/spirit/spirit/sequences/SQ001/SH0010/MMV/work/maya"
+    ASSET_DIRECTORY =  "/home/rapa/NA_Spirit/maya/"
+
+
+    @staticmethod
+    def update_asset_info():
+        """🔹 현재 씬에서 참조된 에셋 정보를 JSON에 저장"""
+        references = cmds.file(q=True, reference=True) or []
+        asset_data = {}
+
+        for ref in references:
+            asset_name = os.path.basename(ref)  # 파일명 추출
+            clean_asset_name = AssetManager.get_clean_asset_name(asset_name)
+            ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
+            ref_node = cmds.referenceQuery(ref, referenceNode=True)
+            object_list = cmds.referenceQuery(ref_node, nodes=True, dagPath=True) or []
+
+            asset_data[clean_asset_name] = {
+                "path": ref_path,
+                "objects": object_list
+            }
+
+        DictManager.save_dict_to_json(asset_data)
 
     @staticmethod
     def get_clean_asset_name(asset_name):
-        """파일명에서 버전 제거 (정규식 대신 os.path 사용)"""
-        base_name, _ = os.path.splitext(asset_name)
-        
-        parts = re.split(r"[_\.\-\s]+", base_name)
-        for part in parts:
-            if part and not part.isdigit():  # 공백이거나 숫자가 아니면 유효한 단어
-                return part  # 소문자로 변환하여 반환
+        """파일명에서 가장 의미 있는 단어(에셋 이름)를 추출"""
+        base_name, _ = os.path.splitext(asset_name)  # 확장자 제거 (.ma, .mb 등)
 
-        
-        return "unknown"
+        # `_`, `.`, `-`, 공백(` `)을 기준으로 분리
+        parts = re.split(r"[_\.\-\s]+", base_name)
+
+        # 의미 없는 단어 제거 (숫자, "scene" 같은 단어 제거)
+        valid_parts = [part for part in parts if part and not part.isdigit() and part.lower() != "scene"]
+
+        # 가장 긴 단어를 에셋 이름으로 선택 (일반적으로 에셋 이름은 길이가 길다)
+        clean_name = max(valid_parts, key=len) if valid_parts else "unknown"
+
+        return clean_name  # 소문자로 변환하여 반환
 
 
    
@@ -320,6 +373,7 @@ class AssetManager:
                 return os.path.dirname(ref_path)  # 참조된 파일의 경로 반환
 
         return None
+        
 
 
     
@@ -335,11 +389,49 @@ class AssetManager:
                     versions.append(int(match.group(1)))
 
         return [f".v{str(v).zfill(3)}" for v in sorted(versions)] if versions else [".v001"]
+    @staticmethod
+    def update_asset_info():
+        """🔹 현재 씬에서 참조된 에셋 정보를 JSON에 저장"""
+        references = cmds.file(q=True, reference=True) or []
+        asset_data = {}
+
+        for ref in references:
+            asset_name = os.path.basename(ref)  # 파일명 추출
+            clean_asset_name = AssetManager.get_clean_asset_name(asset_name)
+            ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
+            ref_node = cmds.referenceQuery(ref, referenceNode=True)
+            object_list = cmds.referenceQuery(ref_node, nodes=True, dagPath=True) or []
+
+            asset_data[clean_asset_name] = {
+                "path": ref_path,
+                "objects": object_list
+            }
+
+        DictManager.save_dict_to_json(asset_data)
+
 
 
 
 class MayaReferenceManager:
     """🎯 Maya 내 참조 및 오브젝트 선택 기능 관리"""
+    @staticmethod
+    def select_asset_by_name(asset_name):
+        """🔹 JSON 데이터를 기반으로 에셋을 선택"""
+        asset_dict = DictManager.load_dict_from_json()
+
+        if asset_name not in asset_dict:
+            print(f"⚠️ '{asset_name}' 에셋을 찾을 수 없습니다.")
+            return
+
+        objects_to_select = asset_dict[asset_name]["objects"]
+
+        if objects_to_select:
+            cmds.select(clear=True)
+            cmds.select(objects_to_select, replace=True)
+            print(f"✅ '{asset_name}' 선택 완료: {objects_to_select}")
+        else:
+            print(f"⚠️ '{asset_name}'에 연결된 오브젝트가 없습니다.")
+
 
     @staticmethod
     def get_referenced_assets():

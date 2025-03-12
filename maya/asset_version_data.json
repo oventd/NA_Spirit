@@ -1,0 +1,16 @@
+{
+    "character": {
+        "path": "/home/rapa/NA_Spirit/maya/character_v002.mb",
+        "objects": [
+            "character_ctrl",
+            "character_mesh"
+        ]
+    },
+    "prop": {
+        "path": "/home/rapa/NA_Spirit/maya/prop_v003.mb",
+        "objects": [
+            "prop_ctrl",
+            "prop_mesh"
+        ]
+    }
+}
