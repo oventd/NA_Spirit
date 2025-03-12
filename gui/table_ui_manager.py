@@ -74,12 +74,14 @@ class TableUiManager:
         self.search_dict={}
         
 
-        assets=AssetService.search_asset(text)
+        assets=AssetService.search_input(text)
         print("search_assets: ",assets)
         print( "search_input: ",self.search_list)
         for asset in assets:
             
             self.search_list.append(asset[OBJECT_ID])
+            self.search_list.append(asset[NAME])
+            self.search_list.append(asset[SCORE])
             self.search_dict[OBJECT_ID]=self.search_list
         
         self.ui.like_empty_notice.hide()
