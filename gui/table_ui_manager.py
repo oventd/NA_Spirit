@@ -392,15 +392,29 @@ class TableUiManager:
             like_state.like_asset_list.append(asset_object_id)
             self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에 추가했습니다\n해당 에셋 정보 : {asset}")
             DictManager().save_dict_to_json(like_state.like_asset_list)
+      
+            
             
                 
         else:  # 채워진 하트 상태일 때 (좋아요 취소)
+            print("하트 지워짐")
             self.ui.like_btn.setIcon(like_state.like_icon_empty)  # 빈 하트로 변경
             if asset_object_id in like_state.like_asset_list:
                 index = like_state.like_asset_list.index(asset_object_id)
-                like_state.like_asset_list.pop(index)  # 리스트에서 제거
-                self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에서 삭제했습니다\n해당 에셋 정보 : {asset}")
-                DictManager().save_dict_to_json(like_state.like_asset_list)
+                remove_asset=like_state.like_asset_list.pop(index)  # 리스트에서 제거
+                self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에서 삭제했습니다\n해당 에셋 정보 : {remove_asset}")
+                print(f"유저가 {asset[NAME]} 에셋을 관심리스트에서 삭제했습니다\n해당 에셋 정보 : {remove_asset}")
+                DictManager.save_dict_to_json(like_state.like_asset_list)
+            self.ui.tableWidget.clear()
+            like_asset_dict = []
+            for object_id in LikeState().like_asset_list:
+                asset_info = AssetService.get_asset_by_id(object_id)
+                like_asset_dict.append(asset_info)
+                
+            self.make_table(like_asset_dict)
+            self.ui.like_download_btn.show()
+            self.ui.like_download_btn_area.show()
+          
                 
                 
         like_state.set_like_icon(asset_object_id, self.ui.like_btn)

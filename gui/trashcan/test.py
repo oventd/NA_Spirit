@@ -1,44 +1,58 @@
-from PySide6.QtWidgets import QLabel, QApplication, QWidget, QVBoxLayout
-from PySide6.QtGui import QFont
-from PySide6.QtCore import Qt
-import sys
+import cv2
+import numpy as np
+from PySide6.QtWidgets import QWidget, QStackedWidget, QVBoxLayout, QLabel, QApplication
+from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtCore import QTimer
 
-class DynamicCircleLabel(QLabel):
-    def __init__(self, text="", parent=None):
-        super().__init__(text, parent)
-        self.setFont(QFont("Pretendard", 8, QFont.Weight.Medium))  # 글꼴 설정
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)  # 텍스트 중앙 정렬
-        self.setStyleSheet("""
-            background-color: #6E3AEF;
-            color: white;
-            border-radius: 7.5px;
+class VideoWidget(QWidget):
+    def __init__(self, video_path, parent=None):
+        super().__init__(parent)
+        self.video_path = video_path
+        self.video_capture = cv2.VideoCapture(self.video_path)
 
-        """)  
-        self.update_size()
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_frame)
+        self.timer.start(30)  # Set to 30 ms for roughly 30 FPS
 
-    def update_size(self):
-        """ 텍스트 길이에 따라 QLabel 크기 조정 """
-        text_width = self.fontMetrics().horizontalAdvance(self.text())  # 텍스트 너비 계산
-        self.setFixedWidth(max(11, text_width + 11))  # 최소 40px 유지, 텍스트 크기에 맞게 확장
-        self.setFixedHeight(16)  # 높이는 고정
+        self.label = QLabel(self)
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.label)
 
-def main():
-    app = QApplication(sys.argv)
-    window = QWidget()
-    layout = QVBoxLayout()
+    def update_frame(self):
+        ret, frame = self.video_capture.read()
+        if not ret:
+            self.video_capture.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Restart the video if it ends
+            return
 
-    # 예제 라벨 3개
-    label1 = DynamicCircleLabel("1")
-    label2 = DynamicCircleLabel("123")
-    label3 = DynamicCircleLabel("1234567")
+        # Convert the frame to RGB (OpenCV uses BGR by default)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    layout.addWidget(label1)
-    layout.addWidget(label2)
-    layout.addWidget(label3)
-    
-    window.setLayout(layout)
-    window.show()
-    sys.exit(app.exec())
+        # Convert the frame to QImage
+        h, w, c = rgb_frame.shape
+        qt_image = QImage(rgb_frame.data, w, h, 3 * w, QImage.Format_RGB888)
 
+        # Set the QImage to QLabel
+        self.label.setPixmap(QPixmap.fromImage(qt_image))
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        video_path = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4"
+        
+        self.stacked_widget = QStackedWidget(self)
+        self.video_widget = VideoWidget(video_path)
+
+        self.stacked_widget.addWidget(self.video_widget)
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.stacked_widget)
+
+        self.setWindowTitle("OpenCV Video Player with PySide6")
+        self.show()
+
+# Make sure to run the Qt Application loop
 if __name__ == "__main__":
-    main()
+    import sys
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    sys.exit(app.exec())

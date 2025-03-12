@@ -1156,8 +1156,8 @@ color:#ffffff;
      <widget class="QWidget" name="horizontalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>48</x>
-        <y>365</y>
+        <x>47</x>
+        <y>367</y>
         <width>281</width>
         <height>51</height>
        </rect>
@@ -1747,11 +1747,11 @@ resolution     |</string>
      <string/>
     </property>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_3">
+   <widget class="QWidget" name="horizontalWidget_3" native="true">
     <property name="geometry">
      <rect>
-      <x>1135</x>
-      <y>70</y>
+      <x>1128</x>
+      <y>67</y>
       <width>21</width>
       <height>20</height>
      </rect>
@@ -1759,18 +1759,18 @@ resolution     |</string>
     <layout class="QHBoxLayout" name="like_asset_number"/>
    </widget>
    <zorder>label</zorder>
+   <zorder>comboBox</zorder>
+   <zorder>like_download_btn</zorder>
+   <zorder>like_download_btn_area</zorder>
    <zorder>tableWidget</zorder>
    <zorder>user_num</zorder>
-   <zorder>comboBox</zorder>
    <zorder>treeWidget</zorder>
    <zorder>toggle_btn</zorder>
    <zorder>toggle_btn_touch_area</zorder>
    <zorder>search</zorder>
    <zorder>like_empty_notice</zorder>
-   <zorder>like_download_btn</zorder>
+   <zorder>horizontalWidget_3</zorder>
    <zorder>stackedWidget</zorder>
-   <zorder>horizontalLayoutWidget_3</zorder>
-   <zorder>like_download_btn_area</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

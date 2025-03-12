@@ -1,5 +1,6 @@
 import json
 import os
+from assetmanager import AssetService
 
 class DictManager:
     file_path = '/nas/spirit/gui/json/like_asset_data.json'  # 클래스 변수로 파일 경로 설정
@@ -37,5 +38,13 @@ class DictManager:
         except Exception as e:
             print(f"liked_asset 로드 실패: {e}")
             return {}
+    @classmethod
+    def setting_table(cls):
+        asset_id =list(DictManager.load_dict_from_json())
+        for asset in asset_id:
+            asset_info=AssetService.get_asset_by_id(asset)
+            print(asset_info)
+            
 
 
+DictManager.setting_table()
