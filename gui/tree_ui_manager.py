@@ -88,7 +88,8 @@ class TreeUiManager:
         root = ui.treeWidget.invisibleRootItem()  # 트리 위젯의 최상위 항목(root item)을 반환하는 treeWidget 객체의 메서드
 
         for i in range(root.childCount()):  # 최상위 항목의 자식 갯수를 가져오는 메서드
-            parent = root.child(i)    #이때 실제 내가 설정한 부모 항목이 변수에 담김
+            parent = root.child(i)   
+  
             # print(parent.text(0))  #열과 행이 존재하기 때문에 지정을 해줘야 출력이 가능
             for j in range(parent.childCount()):  # 부모의 자식 항목(Child)
                 child = parent.child(j)
@@ -98,8 +99,8 @@ class TreeUiManager:
 
     def toggle_checkbox(self, item, column): 
             """트리 항목 클릭 시 체크 상태 토글"""
-            self.ui.tableWidget.clear()
             if item.flags() & Qt.ItemIsUserCheckable:  # item이 체크 가능 여부 확인
+                self.ui.tableWidget.clear()
                 current_state = item.checkState(column)  #item.checkState(column)은 현재 열(column)에 있는 체크 상태를 가져오는 메서드
                 new_state = Qt.Checked if current_state == Qt.Unchecked else Qt.Unchecked #체크되어있다면 미체크로, 미체크라면 체크로 상태 변경 
 
