@@ -57,7 +57,6 @@ class DbCrud:
         """
         query_filter = {}
 
-        # 전달 받은 필터 조건을 적용
         if filter_conditions:
             for key, value in filter_conditions.items():
                 if isinstance(value, list):
@@ -84,7 +83,6 @@ class DbCrud:
 
             pipeline.append({"$sort": {sort_by: sort_order}})
 
-        # 제한 및 스킵 적용
         if limit:
             pipeline.append({"$limit": limit})
         if skip:
@@ -140,6 +138,10 @@ class DbCrud:
 
         # 결과 반환
         result = list(self.asset_collection.aggregate(pipeline))
+        
+        # result에 set_url_fields 적용 (필드값이 None인 경우 기본값 처리)
+        result = self.set_url_fields(result)
+        
         self.logger.info(f"Search executed with query: {user_query} | Found: {len(result)} documents")
         return result
 
