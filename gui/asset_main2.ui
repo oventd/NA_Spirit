@@ -1156,9 +1156,9 @@ color:#ffffff;
      <widget class="QWidget" name="horizontalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>74</x>
+        <x>48</x>
         <y>367</y>
-        <width>233</width>
+        <width>281</width>
         <height>51</height>
        </rect>
       </property>

@@ -80,14 +80,7 @@ class SubWin:
                 label.setFixedSize(380, 291)  # 500x300 해상도로 고정
                 stackedWidget_2.addWidget(label)
                 image=  VideoPlayer.save_frame()
-
-            for idx, label in enumerate(image_labels):
-                if image:  # URL이 있는 경우에만 설정
-                    pixmap = QPixmap(image)
-                    label.setPixmap(pixmap.scaled(40, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                else:
-                    label.clear()
-
+                
                 
             if ext == ".png":
             
@@ -99,12 +92,12 @@ class SubWin:
                 label.setAlignment(Qt.AlignCenter)
                 stackedWidget_2.addWidget(label)
 
-            for idx, label in enumerate(image_labels):
-                if idx < len(detail_thum_urls) and detail_thum_urls[idx]:  # URL이 있는 경우에만 설정
-                    pixmap = QPixmap(detail_thum_urls[idx])
-                    label.setPixmap(pixmap.scaled(40, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                else:
-                    label.clear()
+        for idx, label in enumerate(image_labels):
+            if idx < len(detail_thum_urls) and detail_thum_urls[idx]:  # URL이 있는 경우에만 설정
+                pixmap = QPixmap(detail_thum_urls[idx])
+                label.setPixmap(pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            else:
+                label.clear()
         
         stackedWidget_2.setCurrentIndex(0)  # 0번째의 label을 보여준다. 
 
