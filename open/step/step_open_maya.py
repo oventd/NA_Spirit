@@ -27,8 +27,10 @@ class StepOpenMaya(ABC):
 
         @classmethod
         def get_publish_settings(cls):
+            print("[DEBUG] get_publish_settings() called")
             if cls._publish_settings is None:
                 cls._publish_settings = JsonUtils.read_json("/home/rapa/NA_Spirit/open/config/publish_settings.json")
+            print(f"[DEBUG] get_publish_settings() returns: {cls._publish_settings}")  # 디버깅용 출력
             return cls._publish_settings  
 
         @classmethod     
@@ -50,33 +52,39 @@ class StepOpenMaya(ABC):
             """ 퍼블리싱을 위한 공통 export 설정 로직 """
             publish_settings = StepOpenMaya.Publish.get_publish_settings()
 
+            print(f"[DEBUG] export_setting() - publish_settings: {publish_settings}")  # 디버깅용 출력
+            
             # Step이 존재하는지 확인
-            step_settings = publish_settings.get(step)
+            step_settings = publish_settings.get(step) # "modeling"을 가져옴
             if step_settings is None:
                 print(f"Error: Step '{step}' not found in publish settings.")
                 return {}
 
-            # group_name (예: "geo")에 해당하는 설정이 있는지 확인
-            group_settings = step_settings.get(group_name)
+            group_settings = step_settings.get(group_name) # "geo"를 가져옴
             if not group_settings:
                 print(f"Warning: No settings found for group '{group_name}' in step '{step}'.")
                 return {}
+            
 
             for key, value in group_settings.items():
-                if value.get("all", False):
+                if isinstance(value, bool):
+                    value = {"all": value}
+
+                if isinstance(value, dict) and value.get("all", False):
                     children = cmds.listRelatives(group_name, children=True) or []
-                    print(f"Importing all children of {group_name} at once.")
+                    print(f"all children {group_name}")
                 else:
                     children = cmds.listRelatives(group_name, children=False) or []
-                    print(f"Importing specific children of {group_name}.")
-            
-            if value.get("isReferenced", False):
+                    print(f"specific children {group_name}")
+
+            is_referenced = group_settings.get("isReferenced", False)
+
+            if is_referenced:
                 if not file_path:
-                    print("Error: file_path is required for referenced objects.")
+                    print(f"file_path is not required")
                     return {}
                 else:
                     MayaUtils.reference_file(file_path, group_name)
-
             return group_settings
             
         @staticmethod
@@ -90,7 +98,7 @@ class StepOpenMaya(ABC):
                 print(f"Warning: No render settings found for step '{step}'. Using defaults.")
                 return {}
 
-            return step_settings.get(category, {}).get(group, {})
+            return step_settings.get(category, {}).get(group, {}) or {}
    
 
         

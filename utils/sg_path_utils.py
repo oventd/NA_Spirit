@@ -77,6 +77,7 @@ class SgPathUtils:
 
         trimmed_path = os.sep.join(dirs[:symbolic_index_added])
         return trimmed_path
+    
     @staticmethod
     def get_publish_dir(entity_path, step):
         trimed_path = SgPathUtils.trim_entity_path(entity_path)
@@ -96,3 +97,45 @@ class SgPathUtils:
     def get_maya_publish_dir(entity_path, step):
         publish_dir = SgPathUtils.get_publish_dir(entity_path=entity_path,step=step)
         return os.path.join(publish_dir,"maya")
+    
+
+    @staticmethod
+    def get_publish_from_work(work_file):
+        """work -> publish 변경"""
+        return work_file.replace("work", "publish")
+
+    @staticmethod
+    def get_work_from_publish(publish_file):
+        """publish -> work 변경"""
+        return publish_file.replace("publish", "work")
+
+    @staticmethod
+    def get_maya_dcc_from_usd_dcc(path):
+        return path.replace('usd', 'maya')
+    @staticmethod
+    def get_usd_dcc_from_usd_dcc(path):
+        return path.replace('maya', 'usd')
+    
+    @staticmethod
+    def get_maya_ext_from_usd_ext(usd_file):
+        """USD 확장자를 MB 확장자로 변경"""
+        return usd_file.replace(".usd", ".mb")
+
+    @staticmethod
+    def get_usd_ext_from_maya_ext(maya_file):
+        """MB 확장자를 USD 확장자로 변경"""
+        if maya_file.find('.ma'):
+            result = maya_file.replace(".ma", ".usd")
+        elif maya_file.find('.mb'):
+            result = maya_file.replace('.mb','.usd')
+        else:
+            raise ValueError
+        return result
+    
+
+if __name__ == "__main__":
+    session_path = "/nas/spirit/spirit/assets/Prop/apple/MDL/work/maya/scene.v002.ma"
+    session_path = SgPathUtils.get_usd_ext_from_maya_ext(session_path)
+    session_path = SgPathUtils.get_publish_from_work(session_path)
+    session_path = SgPathUtils.get_usd_dcc_from_usd_dcc(session_path)
+    print(session_path)
