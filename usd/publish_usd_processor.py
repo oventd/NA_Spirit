@@ -11,7 +11,7 @@ class PublishUsdProcessor:
 
     def __init__(self, entity_path:str):
 
-        self.entity_path = self.trim_entity_path(entity_path)
+        self.entity_path, _ = SgPathUtils.trim_entity_path(entity_path)
         self.entity_name = os.path.basename(entity_path)
 
         self.entity_type = SgPathUtils.get_entity_type(entity_path)
