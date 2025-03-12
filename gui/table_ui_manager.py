@@ -293,6 +293,8 @@ class TableUiManager:
 
     def exit_sub_win(self):
         self.ui.stackedWidget.hide()
+        
+        self.timer.stop()
 
    
 
@@ -301,6 +303,11 @@ class TableUiManager:
         ui=self.ui
         ui.stackedWidget.show()
         detail_thum_urls=[]
+        
+        try:
+            self.timer.stop()
+        except:
+            pass
         
         # for asset_id, asset_info in asset.items(): 
         LikeState().set_like_icon(str(asset[OBJECT_ID]),self.ui.like_btn)
@@ -341,7 +348,7 @@ class TableUiManager:
                 asset["presetting_url3"]
             ]
             self.make_label_list(len(detail_thum_urls))
-            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
+            self.timer = SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
 
         elif asset[ASSET_TYPE]=="3D Model":
             turnaround_urls = [
@@ -349,7 +356,7 @@ class TableUiManager:
                 asset["rig_url"]
             ]
             self.make_video_label_list(len(turnaround_urls))
-            SubWin.show_asset_detail_video(self.ui.stackedWidget_2,turnaround_urls)
+            self.timer = SubWin.show_asset_detail_video(self.ui.stackedWidget_2,turnaround_urls)
 
         elif asset[ASSET_TYPE]=="HDRI":
             detail_thum_urls = [
@@ -357,7 +364,7 @@ class TableUiManager:
                 asset["hdri_url"]
             ]
             self.make_label_list(len(detail_thum_urls))
-            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
+            self.timer = SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
 
         else:
             for url in asset["material_urls"]:
@@ -367,7 +374,7 @@ class TableUiManager:
             detail_thum_urls.append(asset["preview_url"])
           
             self.make_label_list(len(detail_thum_urls))
-            SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
+            self.timer = SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
 
 
 

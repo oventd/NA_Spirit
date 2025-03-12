@@ -12,6 +12,8 @@ from PySide6.QtMultimediaWidgets import QVideoWidget
 from functools import partial
 import sys
 import os
+import cv2
+# from #점심시간테스트 import VLCVideoPlayer
 
 # 현재 파일(ui.py)의 절대 경로
 current_file_path = os.path.abspath(__file__)
@@ -66,8 +68,10 @@ class MainUi(QMainWindow):
             self.default_ui_manager = DefaultUiManager(self.ui )
 
             self.tree_ui_manager = TreeUiManager(self.ui)
+            
 
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
+            
 
     def load_ui(self):
         ui_file_path = "/home/rapa/NA_Spirit/gui/asset_main2.ui"

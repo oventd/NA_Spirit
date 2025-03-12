@@ -37,14 +37,14 @@ class VLCVideoPlayer(QWidget):
         # self.layout.setContentsMargins(0, 0, 0, 0)
 
         # VLC가 QWidget을 비디오 출력으로 사용하도록 설정
-        if sys.platform.startswith("linux"): 
-            self.media_player.set_xwindow(self.container.winId())
-        elif sys.platform == "win32": 
-            self.media_player.set_hwnd(self.container.winId())  # ✅ 수정됨
-        elif sys.platform == "darwin": 
-            self.media_player.set_nsobject(int(self.container.winId()))  # ✅ 수정됨
+        # if sys.platform.startswith("linux"): 
+        #     self.media_player.set_xwindow(self.container.winId())
+        # elif sys.platform == "win32": 
+        #     self.media_player.set_hwnd(self.container.winId())  # ✅ 수정됨
+        # elif sys.platform == "darwin": 
+        #     self.media_player.set_nsobject(int(self.container.winId()))  # ✅ 수정됨
 
-    def set_video_source(self, file_path):
+    def set_video_source(self, file_path, ):
         """ 비디오 파일 경로를 설정하고 재생 """
         file_path = self.clean_path(file_path)  # VLC에서 사용할 경로    
         if file_path:

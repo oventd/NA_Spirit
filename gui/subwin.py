@@ -12,7 +12,9 @@ from functools import partial
 import sys
 import os
 import vlc
-
+import cv2
+from PySide6.QtGui import QImage
+from PySide6.QtCore import QTimer
 # 현재 파일(ui.py)의 절대 경로
 current_file_path = os.path.abspath(__file__)
 
@@ -36,6 +38,7 @@ from video_player_manager import VLCVideoPlayer
 from like_state import LikeState
 
 from asset import Asset
+from lunch_test import VideoPlayer
 
 
 class SubWin:
@@ -66,15 +69,22 @@ class SubWin:
       # 리뷰 순서를 정리를 
 
     def show_asset_detail_image(stackedWidget_2, detail_thum_urls , image_labels):
-
+        video_path = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4"
+        detail_thum_urls.append(video_path)
         for img_path in detail_thum_urls:
-            if img_path == None:
-                continue
-            label = QLabel()
-            pixmap = QPixmap(img_path)
-            label.setPixmap(pixmap)
-            label.setAlignment(Qt.AlignCenter)
-            stackedWidget_2.addWidget(label)
+            ext = os.path.splitext(img_path)[1]
+            if ext == ".mp4":
+                label = VideoPlayer()
+                stackedWidget_2.addWidget(label)
+                
+            if ext == ".png":
+                if img_path == None:
+                    continue
+                label = QLabel()
+                pixmap = QPixmap(img_path)
+                label.setPixmap(pixmap)
+                label.setAlignment(Qt.AlignCenter)
+                stackedWidget_2.addWidget(label)
 
         for idx, label in enumerate(image_labels):
             if idx < len(detail_thum_urls) and detail_thum_urls[idx]:  # URL이 있는 경우에만 설정
@@ -86,35 +96,60 @@ class SubWin:
         stackedWidget_2.setCurrentIndex(0)  # 0번째의 label을 보여준다. 
         print("디테일 썸네일 이미지 리스트>>>> " + str(detail_thum_urls))
         print("이미지라벨 4개 >>>>"+str(image_labels))
-    
+
+
     @staticmethod
+    def update_frame(video_capture, label):
+        ret, frame = video_capture.read()
+        if not ret:
+            video_capture.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Restart the video if it ends
+            return
 
-    def show_asset_detail_video(stackedWidget_2, turnaround_urls):
-        """QStackedWidget에 VLC 기반 동영상 플레이어 추가"""
+        # Convert the frame to RGB (OpenCV uses BGR by default)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # for video_path in turnaround_urls:
-        # if video_path is None:
-        #     continue  # 빈 값은 무시
+        # Convert the frame to QImage
+        h, w, c = rgb_frame.shape
+        qt_image = QImage(rgb_frame.data, w, h, 3 * w, QImage.Format_RGB888)
 
-        # ✅ VLC 비디오 플레이어 위젯 생성
-        # video_player = VLCVideoPlayer()
-        # video_widget = video_player.set_video_source("/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4")
-
-        # ✅ QStackedWidget에 추가
-        video_widget = QWidget()
-        import vlc
-        instance = vlc.Instance()
-        path = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4"
-
-        media = instance.media_new(path)
-        player = instance.media_player_new()
+        # Set the QImage to QLabel
+        label.setPixmap(QPixmap.fromImage(qt_image))
         
-        player.set_media(media)
+# class VideoWidget(QWidget):
+#     _instance = None  # 싱글톤 인스턴스 저장
 
-        player.set_xwindow(video_widget.winId())
+#     def __new__(cls, *args, **kwargs):
+#         if cls._instance is None:
+#             cls._instance = super().__new__(cls)
 
-        stackedWidget_2.addWidget(video_widget)
+#         return cls._instance
+#     def __init__(self, video_path, parent=None):
+#         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
+#             super().__init__(parent)
+#             self.video_path = video_path
+#             self.video_capture = cv2.VideoCapture(self.video_path)
 
-        stackedWidget_2.setCurrentIndex(0)  # 첫 번째 동영상을 표시
-        stackedWidget_2.raise_()  # ✅ `stackedWidget_2`를 UI의 가장 앞(front)으로 이동
+#             self.timer = QTimer(self)
+#             self.timer.timeout.connect(self.update_frame)
+#             self.timer.start(30)  # Set to 30 ms for roughly 30 FPS
 
+#             self.label = QLabel(self)
+#             layout = QVBoxLayout(self)
+#             layout.addWidget(self.label)
+
+#             self._initialized = True  # 인스턴스가 초기화되었음을 표시
+#     def update_frame(self):
+#         ret, frame = self.video_capture.read()
+#         if not ret:
+#             self.video_capture.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Restart the video if it ends
+#             return
+
+#         # Convert the frame to RGB (OpenCV uses BGR by default)
+#         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+#         # Convert the frame to QImage
+#         h, w, c = rgb_frame.shape
+#         qt_image = QImage(rgb_frame.data, w, h, 3 * w, QImage.Format_RGB888)
+
+#         # Set the QImage to QLabel
+#         self.label.setPixmap(QPixmap.fromImage(qt_image))
