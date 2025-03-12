@@ -32,35 +32,36 @@ class DbCrud:
     # 데이터 삽입 (Create)
     def insert_one(self, asset_data, update_data):
         """
-        새로운 자산 데이터를 컬렉션에 삽입합니다.
-        :asset_data: 삽입할 자산 데이터 (사전 형태로 전달)
+        새로운 자산 데이터를 삽입합니다. 
+        - 자산의 생성 시간을 추가하고, 업데이트 데이터에 수정 시간을 추가하여 자산을 삽입합니다.
+        
+        :param asset_data: 삽입할 자산 데이터 (사전 형태로 전달)
+        :param update_data: 업데이트할 데이터 (수정 시간 정보 포함)
         :return: 삽입된 자산의 ID (문자열 형태)
         """
-        # 자산 생성 시간과 수정 시간을 UTC로 추가 (시간대에 상관없는 시간 저장)
         asset_data[CREATED_AT] = datetime.utcnow()  # 생성 시간 추가
         update_data[UPDATED_AT] = datetime.utcnow()  # 수정 시간 추가
         result = self.asset_collection.insert_one(asset_data)  # asset_data를 MongoDB 컬렉션에 삽입
         self.logger.info(f"Inserted document ID: {result.inserted_id} | Asset Data: {asset_data}")
         return str(result.inserted_id)
 
-    """
-    find()는 필터링 된 모든 문서를 가져온 후 limit를 적용하기에 효율성 저하
-    aggregate()는 필터링 후 정렬하고, limit를 사용해서 메모리 사용을 줄인다.
-    """
-
     def construct_query_pipeline(self, filter_conditions=None, sort_by=None, sort_order=None,
                                 limit=40, skip=0, fields=None):
         """
-        MongoDB 쿼리 파이프라인을 생성하는 공통 함수.
-        - filter_conditions: 필터 조건
-        - sort_by: 정렬 기준 필드
-        - sort_order: 정렬 순서 (ASCENDING or DESCENDING)
-        - limit: 최대 조회 개수
-        - skip: 건너뛸 개수
-        - fields: 반환할 필드 목록
+        MongoDB 쿼리 파이프라인을 생성하는 공통 함수
+        - 주어진 조건에 맞춰 MongoDB 쿼리 파이프라인을 동적으로 생성합니다.
+
+        :param filter_conditions: 필터 조건 (기본값: None)
+        :param sort_by: 정렬 기준 필드 (기본값: None)
+        :param sort_order: 정렬 순서 (ASCENDING or DESCENDING) (기본값: None)
+        :param limit: 최대 조회 개수 (기본값: 40)
+        :param skip: 건너뛸 개수 (기본값: 0)
+        :param fields: 반환할 필드 목록 (기본값: None)
+        :return: 생성된 MongoDB 쿼리 파이프라인
         """
         query_filter = {}
 
+        # 필터 조건이 주어지면, 필터에 맞는 조건을 파이프라인에 추가
         if filter_conditions:
             for key, value in filter_conditions.items():
                 if isinstance(value, list):
@@ -76,7 +77,7 @@ class DbCrud:
 
         pipeline = [{"$match": query_filter}]
 
-        # sort_by만 주어졌을 경우 기본값으로 DESCENDING을 설정
+        # 정렬 기준과 순서가 주어지면, 정렬을 파이프라인에 추가
         if sort_by:
             default_sort_orders = {
                 CREATED_AT: (UPDATED_AT, pymongo.DESCENDING),  # 최신순
@@ -88,36 +89,76 @@ class DbCrud:
             pipeline.append({"$sort": {sort_by: sort_order}})
 
         if limit:
-            pipeline.append({"$limit": limit})
+            pipeline.append({"$limit": limit}) # 제한 조건
         if skip:
-            pipeline.append({"$skip": skip})
+            pipeline.append({"$skip": skip}) # 건너뛰기 조건
         if projection:
             pipeline.append({"$project": projection})  # 기본 projection
 
-        self.logger.debug(f"Generated Query Pipeline: {pipeline}")  # 디버깅을 위한 로깅
+        self.logger.debug(f"Generated Query Pipeline: {pipeline}")
         return pipeline
 
+    """
+    find()는 필터링 된 모든 문서를 가져온 후 limit를 적용하기에 효율성 저하
+    aggregate()는 필터링 후 정렬하고, limit를 사용해서 메모리 사용을 줄인다.
+    """
+    # 데이터 찾기(Find)
     def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=40, skip=0, fields=None):
+        """
+        필터 조건에 맞는 데이터를 찾고, 정렬 및 제한된 개수를 반환합니다. 
+        - 조건에 맞는 데이터를 조회하고, 정렬을 적용한 후 limit과 skip을 고려하여 반환합니다.
+        
+        :param filter_conditions: 필터 조건 (기본값: None)
+        :param sort_by: 정렬 기준 (기본값: None)
+        :param sort_order: 정렬 순서 (ASCENDING 또는 DESCENDING) (기본값: None)
+        :param limit: 최대 조회 개수 (기본값: 40)
+        :param skip: 건너뛸 개수 (기본값: 0)
+        :param fields: 반환할 필드 목록 (기본값: None)
+        :return: 조회된 자산들의 리스트
+        """        
         pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields)
         result = list(self.asset_collection.aggregate(pipeline))
         self.logger.info(f"Query executed with filter: {filter_conditions} | Found: {len(result)} documents")
         return result
-
+    # ObjectId 데이터 찾기(Find)
     def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
                     limit=40, skip=0, fields=None):
+        """
+        자산을 필터 조건에 맞게 조회하고 정렬을 적용한 후 반환합니다. 
+        - 필터 조건을 ObjectId로 변환하여 정확히 매칭된 데이터를 조회합니다.
+
+        :param filter_conditions: 필터 조건 (기본값: None)
+        :param sort_by: 정렬 기준 (기본값: None)
+        :param sort_order: 정렬 순서 (ASCENDING 또는 DESCENDING) (기본값: None)
+        :param limit: 조회할 최대 개수 (기본값: 40)
+        :param skip: 건너뛸 개수 (기본값: 0)
+        :param fields: 반환할 필드 목록 (기본값: None)
+        :return: 필터링과 정렬된 자산들의 리스트
+        """
         object_ids = []
         if filter_conditions:
             for value in filter_conditions:
                 object_ids.append(ObjectId(value))
 
-        query_filter = {"_id": {"$in": object_ids}}
+        query_filter = {"_id": {"$in": object_ids}} # ObjectId 기반 필터
         pipeline = self.construct_query_pipeline(query_filter, sort_by, sort_order, limit, skip, fields)
         result = list(self.asset_collection.aggregate(pipeline))
         return result
     
+    # 데이터 검색(search)
     def search(self, user_query=None, filter_conditions=None, limit=40, skip=0, fields=None, sort_by=None, sort_order=None):
         """
-        검색어 기반으로 데이터를 조회. 검색 점수를 기준으로 정렬됨.
+        검색어 기반으로 데이터를 조회하고, 검색 점수를 기준으로 정렬합니다.
+        - 텍스트 검색을 통해 `score`를 기준으로 결과를 정렬합니다.
+
+        :param user_query: 텍스트 검색어
+        :param filter_conditions: 필터 조건
+        :param limit: 조회할 최대 개수 (기본값: 40)
+        :param skip: 건너뛸 개수 (기본값: 0)
+        :param fields: 반환할 필드 목록 (기본값: None)
+        :param sort_by: 정렬 기준 (기본값: None)
+        :param sort_order: 정렬 순서 (ASCENDING or DESCENDING) (기본값: None)
+        :return: 검색된 자산들의 상세 정보
         """
         pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields)
 
@@ -136,24 +177,23 @@ class DbCrud:
             }
 
             if fields:
-                # fields가 주어지면 그 필드들만 반환하도록 projection 설정
                 projection = {field: 1 for field in fields}
-                projection["score"] = {"$meta": "textScore"}  # score 필드는 항상 포함
+                projection["score"] = {"$meta": "textScore"}
 
-            pipeline.append({"$project": projection})
+            pipeline.append({"$project": projection}) # 결과에서 반환할 필드
 
         # 결과 반환
         result = list(self.asset_collection.aggregate(pipeline))
         
-        # result에 set_url_fields 적용 (필드값이 None인 경우 기본값 처리)
-        # result = self.set_url_fields(result)
-        
         self.logger.info(f"Search executed with query: {user_query} | Found: {len(result)} documents")
         return result
 
+    # 하나의 데이터 찾기(Find)
     def find_one(self, object_id, fields=None):
         """
-        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환
+        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환합니다. 
+        - 주어진 `object_id`에 맞는 자산을 반환하고, 선택된 필드를 프로젝션으로 반환합니다.
+
         :param object_id: 자산의 고유 ID
         :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
         :return: 자산의 상세 정보 (object_id, asset_type, description, price 등)
@@ -178,6 +218,8 @@ class DbCrud:
     def update_one(self, object_id, update_data):
         """
         기존 자산 데이터를 수정합니다. 만약 자산이 없으면 새로 생성합니다.
+        - 자산의 `UPDATED_AT`을 현재 시간으로 설정하여 수정합니다.
+
         :param object_id: 수정할 자산의 ID
         :param update_data: 수정할 데이터 (사전 형태)
         :return: 수정 성공 여부 (True/False)
@@ -195,6 +237,8 @@ class DbCrud:
     def delete_one(self, object_id):
         """
         자산을 삭제합니다.
+        - 주어진 `object_id`에 해당하는 자산을 삭제합니다.
+
         :param object_id: 삭제할 자산의 ID
         :return: 삭제 성공 여부 (True/False)
         """
@@ -206,7 +250,10 @@ class DbCrud:
     def increment_count(self, object_id, field):
         """
         자산의 다운로드 수를 증가시킵니다.
+        - 주어진 `object_id`에 대해 다운로드 수 필드의 값을 1만큼 증가시킵니다.
+
         :param object_id: 다운로드 수를 증가시킬 자산의 ID
+        :param field: 다운로드 수를 저장하는 필드 이름
         :return: 다운로드 수 증가 여부 (True/False)
         """
         result = self.asset_collection.update_one(
@@ -224,7 +271,11 @@ class AssetDb(DbCrud):
         self.setup_indexes()
 
     def setup_indexes(self):
-            """자산 컬렉션에 대한 인덱스 설정"""
+        """
+        자산 컬렉션에 대한 인덱스를 설정합니다. 
+        - 인덱스를 설정하여 검색 성능을 향상시킵니다. (필요시 활성화 *저희 db는 현재 인덱싱 생성 되어 있어요!)
+
+        """
             # self.asset_collection.create_index([(FILE_FORMAT, pymongo.ASCENDING)])
             # self.asset_collection.create_index([(UPDATED_AT, pymongo.DESCENDING)])
             # self.asset_collection.create_index([(UPDATED_AT, pymongo.ASCENDING)])
@@ -233,11 +284,13 @@ class AssetDb(DbCrud):
             #     [(NAME, TEXT), (DESCRIPTION, TEXT)],
             #     weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
             # )
-            self.logger.info("Indexes set up for AssetDb")
+        self.logger.info("Indexes set up for AssetDb")
 
     def set_url_fields(self, data):
         """
         자산의 URL 필드를 확인하고, 없는 경우 기본값(None)으로 처리합니다.
+        - 자산 데이터의 URL 필드를 채워넣어주는 함수입니다. 기본값을 `None`으로 처리합니다.
+
         :param data: 자산 데이터 (단일 자산 또는 자산 리스트)
         :return: URL 필드가 설정된 자산 데이터
         """
@@ -256,7 +309,9 @@ class AssetDb(DbCrud):
     
     def find(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
         """
-        자산들을 조회하여 상세 정보를 반환 (필터링, 정렬, 제한, 건너뛰기 등 포함)
+        자산들을 조회하여 상세 정보를 반환합니다. 필터링, 정렬, 제한, 건너뛰기 등 포함
+        - 필터 조건에 맞는 자산들을 조회하고, 정렬 및 페이징을 적용하여 결과를 반환합니다.
+
         :param filter_conditions: 필터 조건 (기본값은 None)
         :param sort_by: 정렬 기준 (기본값은 None)
         :param limit: 조회할 데이터 수 (기본값은 40)
@@ -269,17 +324,30 @@ class AssetDb(DbCrud):
     
     def find_one(self, object_id, fields=None):
         """
-        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환 (AssetDb에서만 사용)
+        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환합니다. 
+        - 주어진 `object_id`에 맞는 자산을 반환하며, 필요한 경우 `fields`를 기준으로 반환할 필드를 제한합니다.
+
         :param object_id: 자산의 고유 ID
         :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
         :return: 자산의 상세 정보 (object_id, asset_type, description, price 등)
         """
-        # 부모 클래스의 find_one 호출
         details = super().find_one(object_id, fields)
         return self.set_url_fields(details)
     
     def search(self, user_query=None, filter_conditions=None, limit=40, skip=0, fields=None, sort_by=None, sort_order=None):
-        # 부모 클래스의 search 호출
+        """
+        검색어 기반으로 데이터를 조회하고, 검색 점수를 기준으로 정렬합니다. 
+        - 텍스트 검색을 통해 `score`를 기준으로 결과를 정렬합니다.
+
+        :param user_query: 텍스트 검색어
+        :param filter_conditions: 필터 조건
+        :param limit: 조회할 최대 개수 (기본값: 40)
+        :param skip: 건너뛸 개수 (기본값: 0)
+        :param fields: 반환할 필드 목록 (기본값은 None)
+        :param sort_by: 정렬 기준 (기본값은 None)
+        :param sort_order: 정렬 순서 (ASCENDING or DESCENDING) (기본값은 None)
+        :return: 검색된 자산들의 상세 정보
+        """
         result = super().search(user_query, filter_conditions, limit, skip, fields, sort_by, sort_order)
         return self.set_url_fields(result)
 
