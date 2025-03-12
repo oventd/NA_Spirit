@@ -392,6 +392,19 @@ class TableUiManager:
             like_state.like_asset_list.append(asset_object_id)
             self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에 추가했습니다\n해당 에셋 정보 : {asset}")
             DictManager().save_dict_to_json(like_state.like_asset_list)
+
+            if LikeState().state == True:
+                print("저 서브바가 열려있을때만 닫혀요")
+                self.ui.tableWidget.clear()
+                like_asset_dict = []
+                for object_id in LikeState().like_asset_list:
+                    asset_info = AssetService.get_asset_by_id(object_id)
+                    like_asset_dict.append(asset_info)
+                    
+                self.make_table(like_asset_dict)
+                self.ui.like_download_btn.show()
+                self.ui.like_download_btn_area.show()
+            
       
             
             
@@ -405,15 +418,18 @@ class TableUiManager:
                 self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에서 삭제했습니다\n해당 에셋 정보 : {remove_asset}")
                 print(f"유저가 {asset[NAME]} 에셋을 관심리스트에서 삭제했습니다\n해당 에셋 정보 : {remove_asset}")
                 DictManager.save_dict_to_json(like_state.like_asset_list)
-            self.ui.tableWidget.clear()
-            like_asset_dict = []
-            for object_id in LikeState().like_asset_list:
-                asset_info = AssetService.get_asset_by_id(object_id)
-                like_asset_dict.append(asset_info)
-                
-            self.make_table(like_asset_dict)
-            self.ui.like_download_btn.show()
-            self.ui.like_download_btn_area.show()
+
+            if LikeState().state == True:
+                print("저 서브바가 열려있을때만 닫혀요")
+                self.ui.tableWidget.clear()
+                like_asset_dict = []
+                for object_id in LikeState().like_asset_list:
+                    asset_info = AssetService.get_asset_by_id(object_id)
+                    like_asset_dict.append(asset_info)
+                    
+                self.make_table(like_asset_dict)
+                self.ui.like_download_btn.show()
+                self.ui.like_download_btn_area.show()
           
                 
                 
