@@ -166,15 +166,18 @@ class AssetService:
         return asset_manager.increment_count(asset_id)  # 자산 데이터 업데이트
     
     @staticmethod
-    def search_input(search_word, fields=None):
+    def search_input(search_word, fields=[OBJECT_ID, NAME, SCORE]):
         """
         데이터를 검색합니다.
         :param user_query: 검색어
-        :return: 검색 성공 여부
+        :param fields: 검색 결과에서 가져올 필드 목록
+        :return: 검색 결과
         """
         asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
         print(f"[DEBUG] Searching with query: {search_word}")  # 디버깅용 로그
+        print(f"[DEBUG] Fields passed to search_input: {fields}")  # 전달된 fields 값 확인
         return asset_manager.search(user_query=search_word, fields=fields)  # 자산 데이터 업데이트
+
 
     # @staticmethod
     # def search_input(search_word, filter_conditions, limit, skip, sort_by, fields=None):

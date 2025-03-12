@@ -98,43 +98,43 @@ class TreeUiManager:
                 child.setCheckState(0, Qt.Unchecked) #
 
     def toggle_checkbox(self, item, column): 
-            """트리 항목 클릭 시 체크 상태 토글"""
-            if item.flags() & Qt.ItemIsUserCheckable:  # item이 체크 가능 여부 확인
-                self.ui.tableWidget.clear()
-                current_state = item.checkState(column)  #item.checkState(column)은 현재 열(column)에 있는 체크 상태를 가져오는 메서드
-                new_state = Qt.Checked if current_state == Qt.Unchecked else Qt.Unchecked #체크되어있다면 미체크로, 미체크라면 체크로 상태 변경 
+        """트리 항목 클릭 시 체크 상태 토글"""
+        if item.flags() & Qt.ItemIsUserCheckable:  # item이 체크 가능 여부 확인
+            self.ui.tableWidget.clear()
+            current_state = item.checkState(column)  #item.checkState(column)은 현재 열(column)에 있는 체크 상태를 가져오는 메서드
+            new_state = Qt.Checked if current_state == Qt.Unchecked else Qt.Unchecked #체크되어있다면 미체크로, 미체크라면 체크로 상태 변경 
 
-                filter_name_convert =str(item.text(0)) 
-                
-                #체크박스의 item 문자열을 상수화 시키기
-                parent_name = item.parent()
-                parent_item_convert=parent_name.text(0)
-
-                #체크박스의 parent 문자열을 db의 key 명과 일치 시키기
-                if parent_item_convert == "Asset":
-                    parent_item_convert = "asset_type"
-                elif parent_item_convert == "Category":
-                    parent_item_convert = "category"
-                else: 
-                    parent_item_convert = "style"
-    
-                item.setCheckState(column, new_state)  # 체크박스 상태 변경
-                
-                if new_state == Qt.Checked:  #체크 상태일 경우 부모 item을 키로 item을 list에 담아 value로 추가
-                    Check().dict.setdefault(parent_item_convert, []).append(filter_name_convert)
-                else:  #체크 해제 상태일 경우 부모 item의 키에서 해당하는 value 삭제
-                    Check().dict[parent_item_convert].remove(filter_name_convert)
-                    if Check().dict[parent_item_convert] == []:
-                        del Check().dict[parent_item_convert]
+            filter_name_convert =str(item.text(0)) 
             
-                sort_by = self.ui.comboBox.currentText()
-                if sort_by == "최신 순":
-                    sort_by=CREATED_AT
-                elif sort_by == "다운로드 순":
-                    sort_by = DOWNLOADS
-                else:
-                    sort_by = UPDATED_AT
-                    
-                TableUiManager(self.ui).table_widget(filter_conditions = Check().dict, sort_by= sort_by, limit = 20, skip = 0, fields =None)
+            #체크박스의 item 문자열을 상수화 시키기
+            parent_name = item.parent()
+            parent_item_convert=parent_name.text(0)
 
-                #만들어 진 리스트를 필터로 table에 정렬해주기 + s실제 콤보박스의 정렬이랑도 섞여야함
+            #체크박스의 parent 문자열을 db의 key 명과 일치 시키기
+            if parent_item_convert == "Asset":
+                parent_item_convert = "asset_type"
+            elif parent_item_convert == "Category":
+                parent_item_convert = "category"
+            else: 
+                parent_item_convert = "style"
+
+            item.setCheckState(column, new_state)  # 체크박스 상태 변경
+            
+            if new_state == Qt.Checked:  #체크 상태일 경우 부모 item을 키로 item을 list에 담아 value로 추가
+                Check().dict.setdefault(parent_item_convert, []).append(filter_name_convert)
+            else:  #체크 해제 상태일 경우 부모 item의 키에서 해당하는 value 삭제
+                Check().dict[parent_item_convert].remove(filter_name_convert)
+                if Check().dict[parent_item_convert] == []:
+                    del Check().dict[parent_item_convert]
+        
+            sort_by = self.ui.comboBox.currentText()
+            if sort_by == "최신 순":
+                sort_by=CREATED_AT
+            elif sort_by == "다운로드 순":
+                sort_by = DOWNLOADS
+            else:
+                sort_by = UPDATED_AT
+                
+            TableUiManager(self.ui).table_widget(filter_conditions = Check().dict, sort_by= sort_by, limit = 20, skip = 0, fields =None)
+
+            #만들어 진 리스트를 필터로 table에 정렬해주기 + s실제 콤보박스의 정렬이랑도 섞여야함

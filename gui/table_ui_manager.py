@@ -80,26 +80,25 @@ class TableUiManager:
             self.asset_dict = {}
 
     def search_input(self, search_word):
-        
+    
         """서치 텍스트를 받아오고 table을 업데이트하는 함수"""
         self.search_list = []
         self.search_dict={}
+      
         
 
         assets=AssetService.search_input(search_word)
         print("search_assets: ",assets)
-        print( "search_input: ",self.search_list)
-        for asset in assets:
+        # print( "search_input: ",self.search_list)
+        # for asset in assets:
             
-            self.search_list.append(asset[OBJECT_ID])
-            self.search_list.append(asset[NAME])
-            self.search_list.append(asset[SCORE])
-            self.search_dict[OBJECT_ID]=self.search_list
+ 
+            # self.search_dict[OBJECT_ID]=self.search_list
         
-        self.ui.like_empty_notice.hide()
-        self.ui.tableWidget.clear()
-        print( "search_input: ",self.search_list)
-        self.table_widget(self.search_dict, None, 40, 0, None)
+        # self.ui.like_empty_notice.hide()
+        # self.ui.tableWidget.clear()
+        # print( "search_input: ",self.search_list)
+        self.table_widget(assets, SCORE, 40, 0, None)
 
 #라벨 초기화 함수 실행
     def remove_lable(self):
@@ -190,6 +189,8 @@ class TableUiManager:
         else:
             print("최신 순서를 정렬할게요")
             self.table_widget(Check().dict,UPDATED_AT, 40, 0, None)
+        
+        
     
     def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None, search = False):
         ui = self.ui

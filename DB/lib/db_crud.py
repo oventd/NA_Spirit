@@ -49,7 +49,7 @@ class DbCrud:
     """
 
     def construct_query_pipeline(self, filter_conditions=None, sort_by=None, sort_order=None,
-                                limit=40, skip=0, fields=None):
+                                limit=0, skip=0, fields=None):
         """
         MongoDB 쿼리 파이프라인을 생성하는 공통 함수.
         - filter_conditions: 필터 조건
@@ -97,7 +97,7 @@ class DbCrud:
         self.logger.debug(f"Generated Query Pipeline: {pipeline}")  # 디버깅을 위한 로깅
         return pipeline
 
-    def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=40, skip=0, fields=None):
+    def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=0, skip=0, fields=None):
         pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields)
         result = list(self.asset_collection.aggregate(pipeline))
         self.logger.info(f"Query executed with filter: {filter_conditions} | Found: {len(result)} documents")
@@ -115,39 +115,44 @@ class DbCrud:
         result = list(self.asset_collection.aggregate(pipeline))
         return result
     
-    def search(self, user_query=None, filter_conditions=None, limit=40, skip=0, fields=None, sort_by=None, sort_order=None):
+    def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
         """
         검색어 기반으로 데이터를 조회. 검색 점수를 기준으로 정렬됨.
         """
+        # 기본 파이프라인 생성
         pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields)
 
         if user_query:
             # 텍스트 검색을 위한 파이프라인 추가
             pipeline.insert(0, {"$match": {"$text": {"$search": user_query}}})
-            # pipeline.append({"$text": {"$search": user_query}})
             pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})  # 점수(score)로 정렬
 
-            projection = {
-                "score": {"$meta": "textScore"},
-                "_id": 1, "name": 1, "description": 1, "asset_type": 1, "category": 1, 
-                "style": 1, "resolution": 1, "file_format": 1, "size": 1, "license_type": 1,
-                "creator_id": 1, "creator_name": 1, "downloads": 1, "price": 1, "detail_url": 1,
-                "presetting_url1": 1, "presetting_url2": 1, "presetting_url3": 1, "preview_url": 1
-            }
+        # 기본 projection 설정
+        projection = {
+            "_id": 1, "name": 1, "description": 1, "asset_type": 1, "category": 1, 
+            "style": 1, "resolution": 1, "file_format": 1, "size": 1, "license_type": 1,
+            "creator_id": 1, "creator_name": 1, "downloads": 1, "price": 1, "detail_url": 1,
+            "presetting_url1": 1, "presetting_url2": 1, "presetting_url3": 1, "preview_url": 1
+        }
 
-            if fields:
-                # fields가 주어지면 그 필드들만 반환하도록 projection 설정
-                projection = {field: 1 for field in fields}
-                projection["score"] = {"$meta": "textScore"}  # score 필드는 항상 포함
+        # fields가 전달된 경우, projection을 해당 필드들로만 제한
+        if fields:
+            projection = {field: 1 for field in fields}  # fields에서 지정한 필드만 포함
+        
+        # score 필드는 항상 포함시키기
+        projection["score"] = {"$meta": "textScore"}
 
-            pipeline.append({"$project": projection})
+        # _id를 제외하려면 projection에 '_id': 0을 추가
+        if "_id" not in fields:
+            projection["_id"] = 0
+
+        # projection 추가
+        pipeline.append({"$project": projection})
 
         # 결과 반환
         result = list(self.asset_collection.aggregate(pipeline))
         
-        # result에 set_url_fields 적용 (필드값이 None인 경우 기본값 처리)
-        # result = self.set_url_fields(result)
-        
+        # 디버깅을 위한 출력
         self.logger.info(f"Search executed with query: {user_query} | Found: {len(result)} documents")
         return result
 
@@ -235,26 +240,42 @@ class AssetDb(DbCrud):
             # )
             self.logger.info("Indexes set up for AssetDb")
 
-    def set_url_fields(self, data):
+    def set_url_fields(self, data, fields=None):
         """
         자산의 URL 필드를 확인하고, 없는 경우 기본값(None)으로 처리합니다.
         :param data: 자산 데이터 (단일 자산 또는 자산 리스트)
         :return: URL 필드가 설정된 자산 데이터
         """
+        # url_fields = [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
+        #             PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]
+
+        # if isinstance(data, list):  # 결과가 리스트인 경우
+        #     for item in data:
+        #         for url_field in url_fields:
+        #             item[url_field] = item.get(url_field, None)
+        # else:  # 단일 자산인 경우
+        #     for url_field in url_fields:
+        #         data[url_field] = data.get(url_field, None)
+        
+        # return data
         url_fields = [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
                     PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]
 
         if isinstance(data, list):  # 결과가 리스트인 경우
             for item in data:
                 for url_field in url_fields:
-                    item[url_field] = item.get(url_field, None)
+                    # fields에 해당 URL 필드가 포함된 경우에만 추가
+                    if fields and url_field in fields:
+                        item[url_field] = item.get(url_field, None)
         else:  # 단일 자산인 경우
             for url_field in url_fields:
-                data[url_field] = data.get(url_field, None)
+                # fields에 해당 URL 필드가 포함된 경우에만 추가
+                if fields and url_field in fields:
+                    data[url_field] = data.get(url_field, None)
         
-        return data
-    
-    def find(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
+        return data 
+       
+    def find(self, filter_conditions=None, sort_by=None, limit=0, skip=0, fields=None):
         """
         자산들을 조회하여 상세 정보를 반환 (필터링, 정렬, 제한, 건너뛰기 등 포함)
         :param filter_conditions: 필터 조건 (기본값은 None)
@@ -278,7 +299,7 @@ class AssetDb(DbCrud):
         details = super().find_one(object_id, fields)
         return self.set_url_fields(details)
     
-    def search(self, user_query=None, filter_conditions=None, limit=40, skip=0, fields=None, sort_by=None, sort_order=None):
+    def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
         # 부모 클래스의 search 호출
         result = super().search(user_query, filter_conditions, limit, skip, fields, sort_by, sort_order)
         return self.set_url_fields(result)
