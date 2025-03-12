@@ -92,16 +92,28 @@ class SubWin:
     def show_asset_detail_video(stackedWidget_2, turnaround_urls):
         """QStackedWidget에 VLC 기반 동영상 플레이어 추가"""
 
-        for video_path in turnaround_urls:
-            if video_path is None:
-                continue  # 빈 값은 무시
+        # for video_path in turnaround_urls:
+        # if video_path is None:
+        #     continue  # 빈 값은 무시
 
-            # ✅ VLC 비디오 플레이어 위젯 생성
-            video_player = VLCVideoPlayer()
-            video_widget = video_player.set_video_source(video_path)
+        # ✅ VLC 비디오 플레이어 위젯 생성
+        # video_player = VLCVideoPlayer()
+        # video_widget = video_player.set_video_source("/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4")
 
-            # ✅ QStackedWidget에 추가
-            stackedWidget_2.addWidget(video_widget)
+        # ✅ QStackedWidget에 추가
+        video_widget = QWidget()
+        import vlc
+        instance = vlc.Instance()
+        path = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4"
+
+        media = instance.media_new(path)
+        player = instance.media_player_new()
+        
+        player.set_media(media)
+
+        player.set_xwindow(video_widget.winId())
+
+        stackedWidget_2.addWidget(video_widget)
 
         stackedWidget_2.setCurrentIndex(0)  # 첫 번째 동영상을 표시
         stackedWidget_2.raise_()  # ✅ `stackedWidget_2`를 UI의 가장 앞(front)으로 이동

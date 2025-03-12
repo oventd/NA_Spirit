@@ -40,6 +40,11 @@ from asset import Asset
 from check import Check
 from subwin import SubWin
 from dynamic_circle_label import DynamicCircleLabel
+from logger import *
+from download_manager import DownloadManager
+from json_manager import DictManager
+
+
 class TableUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -62,29 +67,38 @@ class TableUiManager:
             self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
             self.ui.search.textEdited.connect(self.search_input)
+            self.ui.like_download_btn_area.clicked.connect(DownloadManager.download_likged_assets_all)
+            self.ui.download_btn.clicked.connect(DownloadManager.download_assets_one)
+
+            self.logger = create_logger(UX_Like_ASSET_LOGGER_NAME, UX_Like_ASSET_LOGGER_DIR)
+
+
+        
             
 
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.asset_dict = {}
 
-    def search_input(self, text):
+    def search_input(self, search_word):
         
         """서치 텍스트를 받아오고 table을 업데이트하는 함수"""
         self.search_list = []
         self.search_dict={}
         
 
-        assets=AssetService.search_asset(user_query=text)
-        print("search_assets: ",assets)
-        print( "search_input: ",self.search_list)
+        assets=AssetService.search_input(search_word)
+        print("asset :",assets)
         for asset in assets:
             
             self.search_list.append(asset[OBJECT_ID])
+            self.search_list.append(asset[SCORE])
+            # self.search_list.append(asset[NAME])
+
             self.search_dict[OBJECT_ID]=self.search_list
         
         self.ui.like_empty_notice.hide()
         self.ui.tableWidget.clear()
-        print( "search_input22: ",self.search_list)
+        print( "search_input: ",self.search_list)
         self.table_widget(self.search_dict, None, 40, 0, None)
 
 #라벨 초기화 함수 실행
@@ -187,7 +201,7 @@ class TableUiManager:
 
         if search == True:
             
-            AssetService.search_asset()
+            AssetService.assetmanager()
         self.make_table(assets)
     
     def make_table(self, assets):
@@ -361,19 +375,29 @@ class TableUiManager:
     def toggle_like_icon(self):
         """하트 버튼을 누르는 시그널로 실행
         아이콘 변경 & 딕셔너리에 좋아요한 asset 정보 저장 """
+
         like_state = LikeState()
         asset = Asset().current
         asset_object_id = str(asset[OBJECT_ID])
+
+        
+    
         current_icon = self.ui.like_btn.icon()
         if current_icon.cacheKey() == like_state.like_icon_empty.cacheKey():  #빈하트 상태일때 
             self.ui.like_btn.setIcon(like_state.like_icon)
             like_state.like_asset_list.append(asset_object_id)
+            self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에 추가했습니다\n해당 에셋 정보 : {asset}")
+            DictManager().save_dict_to_json(like_state.like_asset_list)
+            
                 
         else:  # 채워진 하트 상태일 때 (좋아요 취소)
             self.ui.like_btn.setIcon(like_state.like_icon_empty)  # 빈 하트로 변경
             if asset_object_id in like_state.like_asset_list:
                 index = like_state.like_asset_list.index(asset_object_id)
                 like_state.like_asset_list.pop(index)  # 리스트에서 제거
+                self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에서 삭제했습니다\n해당 에셋 정보 : {asset}")
+                DictManager().save_dict_to_json(like_state.like_asset_list)
+                
                 
         like_state.set_like_icon(asset_object_id, self.ui.like_btn)
 
@@ -441,3 +465,6 @@ class TableUiManager:
             if widget is not None:
                 widget.setParent(None)  # ✅ 부모에서 제거
                 widget.deleteLater()  # ✅ 메모리에서 완전 삭제
+
+
+    

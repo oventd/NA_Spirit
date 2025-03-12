@@ -80,10 +80,17 @@ class DbCrud:
         if skip:
             pipeline.append({"$skip": skip})
 
-        if projection:
-            pipeline.append({"$project": projection})
+        if search_query:
+            # projection이 None일 경우 모든 필드를 반환하면서 score 추가
+            if projection:
+                pipeline.append({"$project": {**projection, "score": {"$meta": "textScore"}}})
+            else:
+                pipeline.append({"$project": {"score": {"$meta": "textScore"}}})  # 모든 필드 반환 + score 추가
 
-        self.logger.debug(f"Generated Query Pipeline: {pipeline}")
+        elif projection:
+            pipeline.append({"$project": projection})  # 기본 projection
+
+        self.logger.debug(f"Generated Query Pipeline: {pipeline}")  # 디버깅을 위한 로깅
         return pipeline
 
     def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=40, skip=0, fields=None):
@@ -110,6 +117,10 @@ class DbCrud:
         """
         pipeline = self.construct_query_pipeline(filter_conditions, None, limit=limit, skip=skip, fields=fields, search_query=user_query)
         result = list(self.asset_collection.aggregate(pipeline))
+        
+        # result에 set_url_fields 적용 (필드값이 None인 경우 기본값 처리)
+        result = self.set_url_fields(result)
+        
         self.logger.info(f"Search executed with query: {user_query} | Found: {len(result)} documents")
         return result
 
@@ -378,7 +389,7 @@ class AssetDb(DbCrud):
         details = super().find_one(object_id, fields)
         return self.set_url_fields(details)
     
-    def search(self, user_query=None, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
+    def search(self, user_query=None, filter_conditions=None, limit=40, skip=0, fields=None):
         # 부모 클래스의 search 호출
-        result = super().search(user_query, filter_conditions, sort_by, limit, skip, fields)
+        result = super().search(user_query, filter_conditions, limit, skip, fields)
         return self.set_url_fields(result)
