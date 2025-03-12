@@ -79,9 +79,9 @@ class DbCrud:
         # sort_by만 주어졌을 경우 기본값으로 DESCENDING을 설정
         if sort_by:
             default_sort_orders = {
-                "CREATED_AT": ("UPDATED_AT", pymongo.DESCENDING),  # 최신순
-                "UPDATED_AT": ("UPDATED_AT", pymongo.ASCENDING),  # 오래된순
-                "DOWNLOADS": ("DOWNLOADS", pymongo.DESCENDING),    # 다운로드 많은 순
+                CREATED_AT: (UPDATED_AT, pymongo.DESCENDING),  # 최신순
+                UPDATED_AT: (UPDATED_AT, pymongo.ASCENDING),  # 오래된순
+                DOWNLOADS: (DOWNLOADS, pymongo.DESCENDING),    # 다운로드 많은 순
             }
             sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, pymongo.ASCENDING))  # 기본값 오름차순
 
@@ -225,13 +225,14 @@ class AssetDb(DbCrud):
 
     def setup_indexes(self):
             """자산 컬렉션에 대한 인덱스 설정"""
-            self.asset_collection.create_index([(FILE_FORMAT, pymongo.ASCENDING)])
-            self.asset_collection.create_index([(UPDATED_AT, pymongo.DESCENDING)])
-            self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
-            self.asset_collection.create_index(
-                [(NAME, TEXT), (DESCRIPTION, TEXT)],
-                weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
-            )
+            # self.asset_collection.create_index([(FILE_FORMAT, pymongo.ASCENDING)])
+            # self.asset_collection.create_index([(UPDATED_AT, pymongo.DESCENDING)])
+            # self.asset_collection.create_index([(UPDATED_AT, pymongo.ASCENDING)])
+            # self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
+            # self.asset_collection.create_index(
+            #     [(NAME, TEXT), (DESCRIPTION, TEXT)],
+            #     weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
+            # )
             self.logger.info("Indexes set up for AssetDb")
 
     def set_url_fields(self, data):
