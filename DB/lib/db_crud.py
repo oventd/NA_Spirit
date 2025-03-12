@@ -119,10 +119,10 @@ class DbCrud:
 
         if user_query:
             # 텍스트 검색을 위한 파이프라인 추가
-            pipeline.append({"$text": {"$search": user_query}})
+            pipeline.insert(0, {"$match": {"$text": {"$search": user_query}}})
+            # pipeline.append({"$text": {"$search": user_query}})
             pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})  # 점수(score)로 정렬
 
-            # 프로젝션 추가 (필요한 필드 포함)
             projection = {
                 "score": {"$meta": "textScore"},
                 "_id": 1, "name": 1, "description": 1, "asset_type": 1, "category": 1, 
@@ -130,9 +130,11 @@ class DbCrud:
                 "creator_id": 1, "creator_name": 1, "downloads": 1, "price": 1, "detail_url": 1,
                 "presetting_url1": 1, "presetting_url2": 1, "presetting_url3": 1, "preview_url": 1
             }
-        # 만약 fields가 주어지면, 해당 필드들만 포함
-        if fields:
-            projection = {field: 1 for field in fields}  # fields에 있는 필드들만 1로 설정
+
+            if fields:
+                # fields가 주어지면 그 필드들만 반환하도록 projection 설정
+                projection = {field: 1 for field in fields}
+                projection["score"] = {"$meta": "textScore"}  # score 필드는 항상 포함
 
             pipeline.append({"$project": projection})
 
@@ -140,7 +142,7 @@ class DbCrud:
         result = list(self.asset_collection.aggregate(pipeline))
         
         # result에 set_url_fields 적용 (필드값이 None인 경우 기본값 처리)
-        result = self.set_url_fields(result)
+        # result = self.set_url_fields(result)
         
         self.logger.info(f"Search executed with query: {user_query} | Found: {len(result)} documents")
         return result
@@ -219,13 +221,13 @@ class AssetDb(DbCrud):
 
     def setup_indexes(self):
             """자산 컬렉션에 대한 인덱스 설정"""
-            # self.asset_collection.create_index([(FILE_FORMAT, pymongo.ASCENDING)])
-            # self.asset_collection.create_index([(UPDATED_AT, pymongo.DESCENDING)])
-            # self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
-            # self.asset_collection.create_index(
-            #     [(NAME, TEXT), (DESCRIPTION, TEXT)],
-            #     weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
-            # )
+            self.asset_collection.create_index([(FILE_FORMAT, pymongo.ASCENDING)])
+            self.asset_collection.create_index([(UPDATED_AT, pymongo.DESCENDING)])
+            self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
+            self.asset_collection.create_index(
+                [(NAME, TEXT), (DESCRIPTION, TEXT)],
+                weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
+            )
             self.logger.info("Indexes set up for AssetDb")
 
     def set_url_fields(self, data):
