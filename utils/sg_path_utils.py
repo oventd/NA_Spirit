@@ -55,6 +55,7 @@ class SgPathUtils:
         elif 'assets' in path:
             return 'assets'
         return None
+    
     @staticmethod
     def trim_entity_path(entity_path):
         dirs = os.path.normpath(entity_path).split(os.sep)  # OS에 맞게 경로 정규화
@@ -78,6 +79,7 @@ class SgPathUtils:
         trimmed_path = os.sep.join(dirs[:symbolic_index_added])
         trimmed_after = os.sep.join(dirs[symbolic_index_added:])
         return trimmed_path ,trimmed_after
+    
     @staticmethod
     def get_publish_dir(entity_path, step):
         trimed_path = SgPathUtils.trim_entity_path(entity_path)
@@ -96,6 +98,19 @@ class SgPathUtils:
         return publish_file.replace("usd", "maya")
     
     @staticmethod
+    def get_publish_from_work(work_file):
+        return work_file.replace("work", "publish")
+    @staticmethod
+    def get_work_from_publish(publish_file):
+        return publish_file.replace("publish", "work")
+    @staticmethod
+    def get_maya_ext_from_usd_ext(usd_file):
+        return usd_file.replace(".usd", ".mb")
+    @staticmethod
+    def get_usd_ext_from_maya_ext(maya_file):
+        return maya_file.replace(".mb", ".usd")
+        
+    @staticmethod
     def set_step(publish_file, step):
         entity_path, after_path= SgPathUtils.trim_entity_path(publish_file)
         step_changed = after_path.split("/")
@@ -109,4 +124,5 @@ class SgPathUtils:
 
 if __name__ == "__main__":
     path = "/nas/spirit/spirit/assets/Prop/apple/MDL/publish/usd/scene.v005.usd"
-    print(SgPathUtils.set_step(path,"LGT"))
+    entity, _ = SgPathUtils.trim_entity_path(path)
+    print(entity.split("/")[-1])

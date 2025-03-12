@@ -2,11 +2,11 @@ import maya.cmds as cmds
 import os
 import sys
 
-# 경로 설정
-utils_dir = '/home/rapa/NA_Spirit/utils'
-sys.path.append(utils_dir)
-usd_dir = '/home/rapa/NA_Spirit/usd/'
-sys.path.append(usd_dir)
+# 프로젝트 경로 설정
+UTILS_DIR = '/home/rapa/NA_Spirit/utils'
+USD_DIR = '/home/rapa/NA_Spirit/usd/'
+sys.path.append(UTILS_DIR)
+sys.path.append(USD_DIR)
 
 # 외부 모듈 임포트
 from constant import *
@@ -15,148 +15,220 @@ from sg_path_utils import SgPathUtils
 from published_version_usd_connector import PublishUsd2StepUsdConnector
 
 
-def print_references():
-    """현재 씬의 모든 Reference 정보를 출력"""
-    references = cmds.ls(type="reference")
+class UsdAssetProcessor:
+    """Maya 씬에서 데이터를 추출하고 USD를 생성 및 업데이트하는 클래스"""
 
-    if not references:
-        print("No references found in the scene.")
-        return
+    def __init__(self,step, usd_file_path,export_animated=True, export_static=True):
+        self.step = step
+        self.usd_file_path = usd_file_path
+        self.stage = None
+        self.assets_node = "Assets"
+        self.export_animated = export_animated
+        self.export_static = export_static
 
-    for ref in references:
-        ref_path = cmds.referenceQuery(ref, filename=True)
-        is_loaded = cmds.referenceQuery(ref, isLoaded=True)
-        associated_nodes = cmds.referenceQuery(ref, nodes=True) or []
+    def setup_usd(self):
+        """USD 파일을 생성하거나 기존 파일을 불러옴"""
+        if os.path.exists(self.usd_file_path):
+           os.remove(self.usd_file_path) 
 
-        print(f"Reference Node: {ref}")
-        print(f"  File Path: {ref_path}")
-        print(f"  Loaded: {is_loaded}")
-        print(f"  Associated Nodes: {associated_nodes}\n")
+        self.stage = UsdUtils.create_usd_file(self.usd_file_path)
 
-def get_anim_curve_tl_nodes():
-    """모든 애니메이션 커브의 value 연결된 트랜스폼 노드를 가져옴"""
-    anim_curves = cmds.ls(type="animCurve")
-    tl_nodes = set()
+    def print_references(self):
+        """현재 씬의 모든 Reference 정보를 출력"""
+        references = cmds.ls(type="reference")
+        if not references:
+            print("No references found in the scene.")
+            return
 
-    for anim_curve in anim_curves:
-        value_node = cmds.listConnections(f"{anim_curve}.output", source=False, destination=True)
-        if value_node:
-            tl_nodes.add(value_node[0])
+        for ref in references:
+            ref_path = cmds.referenceQuery(ref, filename=True)
+            is_loaded = cmds.referenceQuery(ref, isLoaded=True)
+            associated_nodes = cmds.referenceQuery(ref, nodes=True) or []
 
-    return list(tl_nodes)
+            print(f"Reference Node: {ref}")
+            print(f"  File Path: {ref_path}")
+            print(f"  Loaded: {is_loaded}")
+            print(f"  Associated Nodes: {associated_nodes}\n")
 
-def get_parent_hierarchy(obj):
-    """주어진 오브젝트의 부모 계층을 리스트로 반환 (최상위 Root까지)"""
-    hierarchy = []
-    current_obj = obj
+    def get_animated_transform_nodes(self):
+        """애니메이션 커브에 연결된 트랜스폼 노드를 가져옴"""
+        anim_curves = cmds.ls(type="animCurve")
+        animated_nodes = set()
 
-    while True:
-        parent = cmds.listRelatives(current_obj, parent=True)
-        if not parent:
-            break
-        hierarchy.append(parent[0])
-        current_obj = parent[0]
+        for curve in anim_curves:
+            connected_nodes = cmds.listConnections(f"{curve}.output", source=False, destination=True)
+            if connected_nodes:
+                animated_nodes.add(connected_nodes[0])
 
-    return hierarchy
+        return list(animated_nodes)
 
-def find_scene_animation_range():
-    """씬에서 애니메이션 프레임 범위를 찾음"""
-    animation_curves = cmds.ls(typ="animCurve")
+    def get_parent_hierarchy(self, node):
+        """주어진 노드의 부모 계층 구조를 반환"""
+        hierarchy = []
+        current_node = node
 
-    if not animation_curves:
-        return 1, 1
+        while True:
+            parent = cmds.listRelatives(current_node, parent=True)
+            if not parent:
+                break
+            hierarchy.append(parent[0])
+            current_node = parent[0]
 
-    start = int(cmds.playbackOptions(q=True, min=True))
-    end = int(cmds.playbackOptions(q=True, max=True))
+        return hierarchy
+    
+    def get_hierarchy_depth_to_references(root_group):
+        """루트 그룹부터 레퍼런스까지의 계층 깊이를 반환"""
+        depth = 0
+        current_group = root_group
 
-    return start, end
-
-# 실행
-print_references()
-tl_nodes = get_anim_curve_tl_nodes()
-
-print("Time, Value Nodes:", tl_nodes)
-
-# 선택된 오브젝트 확인 및 계층 관계 추출
-selected_objects = tl_nodes
-key_existing_objects = []
-if selected_objects:
-    for obj in selected_objects:
-        hierarchy = get_parent_hierarchy(obj)
-        if len(hierarchy) >= 3:
-            key_existing_objects.append(hierarchy[-3])  # 인덱스 에러 방지
-else:
-    print("No object selected.")
-
-print("Key existing:", key_existing_objects)
-
-# USD 생성 및 연결
-root_path = "/home/rapa/NA_Spirit"
-usd_test_path = os.path.join(root_path, "test2.usd")
-
-if not os.path.exists(usd_test_path):
-    UsdUtils.create_usd_file(usd_test_path)
-
-stage = UsdUtils.get_stage(usd_test_path)
-
-
-# Assets 존재 여부 확인
-assets = "Assets"
-if not cmds.objExists(assets):
-    raise ValueError("Assets node does not exist.")
-
-categorys = cmds.listRelatives(assets, children=True) or []
-assets_scope = UsdUtils.create_scope(stage, "/"+assets)
-assets_scope_path = UsdUtils.get_prim_path(assets_scope)
-for category in categorys:
-    category_scope = UsdUtils.create_scope(stage, f"{assets_scope_path}/{category}")
-    category_scope_path = UsdUtils.get_prim_path(category_scope)
-    assets = cmds.listRelatives(category, children=True) or []
-    for asset in assets:
-        print(asset)
-        asset_name = asset.split(":")[0]
-        ref_node = cmds.referenceQuery(asset, referenceNode=True)
-        ref_path = cmds.referenceQuery(ref_node, filename=True)
-
-        ref_version = SgPathUtils.get_version(ref_path)
-        usd_path = ref_path.replace("maya", "usd")
-        mod_path = SgPathUtils.set_step(usd_path, MDL)
-        mod_usd_dir = os.path.dirname(mod_path)
-        mod_usd_path = os.path.splitext(mod_path)[0].split(".")[0] + ".usd"
-
-        if not os.path.exists(mod_usd_path):
-            raise ValueError(f"USD file not found: {mod_usd_path}")
-
-        print("Checking USD directory:", mod_usd_dir)
-
-        for usd in os.listdir(mod_usd_dir):
-            if mod_usd_path in usd:
-                print(f"USD found: {usd}")
+        while True:
+            children = cmds.listRelatives(current_group, children=True)
+            if not children:
+                break
+            if cmds.referenceQuery(children[0], isNodeReferenced=True):
+                depth += 1
                 break
 
-        usd_root_dir = os.path.dirname(mod_path)
-        usd_list = os.listdir(usd_root_dir)
+            depth += 1
+            current_group = children[0]
+        return depth
+    
 
-        # 루트 트랜스폼 가져오기
-        root_curve = f"{asset.split(':')[0]}:root"
-        root_curve_transform = {attr: cmds.getAttr(f"{root_curve}.{attr}") for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']}
-        print("Root Curve Transform:", root_curve_transform)
+    def find_scene_animation_range(self):
+        """씬의 애니메이션 프레임 범위를 찾음"""
+        start_frame = int(cmds.playbackOptions(q=True, min=True))
+        end_frame = int(cmds.playbackOptions(q=True, max=True))
+        return start_frame, end_frame
 
-        print("USD Root Dir:", usd_root_dir)
+    def process_static_asset(self, category_scope_path, asset_name, usd_mod_file, root_transform):
+        """정적 오브젝트를 처리하는 메서드"""
+        print(f"{asset_name} is a static object. Creating Xform and adding reference.")
+        asset_xform = UsdUtils.create_xform(self.stage, f"{category_scope_path}/{asset_name}")
+        print(f"Created Xform: {asset_name}")
+        print(f"Adding reference to USD: {usd_mod_file}")
+        
+        UsdUtils.add_reference(asset_xform, usd_mod_file)
+        print(f"Added reference: {usd_mod_file}")
+        
+        transform_translate = (root_transform['tx'], root_transform['ty'], root_transform['tz'])
+        transform_rotate = (root_transform['rx'], root_transform['ry'], root_transform['rz'])
+        transform_scale = (root_transform['sx'], root_transform['sy'], root_transform['sz'])
 
-        if asset in key_existing_objects:
-            print(f"{asset_name} is a key existing object.")
-        else:
-            print(f"{asset_name} is not a key existing object. Creating Xform and adding reference.")
+        UsdUtils.set_transform(asset_xform, translate=transform_translate, rotate=transform_rotate, scale=transform_scale)
+        print("Transform applied.")
+
+    def create_anim_asset_dir(self, category, asset_name):
+        usd_dir = os.path.dirname(self.usd_file_path)
+        dir = f"{usd_dir}/{category}/{asset_name}"
+        os.makedirs(dir, exist_ok=True)
+        return dir
+    
+    def export_anim_asset_usd(self, asset_usd_dir, asset, asset_name, frame_range):
+        """애니메이션 오브젝트를 USD로 내보내는 메서드"""
+        
+        # 애니메이션 오브젝트 선택
+        cmds.select(asset)
+        export_path = f"{asset_usd_dir}/{asset_name}_{self.step}.usd"
+        
+        # USD Export 옵션
+        export_options = {
+            "filterTypes": "nurbsCurve",
+            "animation": 1,
+            "startTime": 1,
+            "endTime": 48,
+            "defaultUSDFormat": "usdc",
+            "rootPrim": "",
+            "rootPrimType": "scope",
+            "defaultPrim": "Assets",
+            "exportMaterials": 0,
+            "mergeTransformAndShape": 1,
+            "includeEmptyTransforms": 1
+        }
+
+        # 딕셔너리를 문자열 옵션으로 변환
+        export_options_str = ";".join(f"{key}={value}" for key, value in export_options.items())
+
+        # USD export 실행
+        cmds.file(export_path, force=True, options=export_options_str, type="USD Export", preserveReferences=True, exportSelected=True)
+        return export_path
+
+    def process_animated_asset(self, category_scope_path, asset_name, anim_usd_path, mod_usd_path):
+        """애니메이션 오브젝트를 처리하는 메서드"""
+        # create anim asset xform
+        asset_xform = UsdUtils.create_xform(self.stage, f"{category_scope_path}/{asset_name}")
+        print(f"Created Xform: {asset_name}")
+        # reference anim asset usd
+        print(f"Adding reference to USD: {asset_name}")
+        UsdUtils.add_reference(asset_xform, anim_usd_path)
+        print(f"Added reference: {anim_usd_path}")
+
+        UsdUtils.create_variants_set(asset_xform, "state")
+        UsdUtils.add_reference_to_variant_set(asset_xform, "state", {"modeling":mod_usd_path})
+        UsdUtils.add_reference_to_variant_set(asset_xform, "state", {"anim_cache": anim_usd_path}, set_default=True)
+
+    def process_assets(self):
+        """Maya 씬 내의 Assets를 USD에 적용"""
+        
+        if not cmds.objExists(self.assets_node):
+            raise ValueError("Assets node does not exist.")
+
+        category_nodes = cmds.listRelatives(self.assets_node, children=True) or []
+        assets_scope = UsdUtils.create_scope(self.stage, f"/{self.assets_node}")
+        assets_scope_path = UsdUtils.get_prim_path(assets_scope)
+
+        animated_nodes = self.get_animated_transform_nodes()
+        important_assets = [self.get_parent_hierarchy(node)[-3] for node in animated_nodes if len(self.get_parent_hierarchy(node)) >= 3]
+        
+        for category in category_nodes:
+            category_scope = UsdUtils.create_scope(self.stage, f"{assets_scope_path}/{category}")
+            category_scope_path = UsdUtils.get_prim_path(category_scope)
+            asset_nodes = cmds.listRelatives(category, children=True) or []
+
+        for asset in asset_nodes:
+            if asset in important_assets:
+                if self.export_animated == False:
+                    continue
+            if asset not in important_assets:
+                if self.export_static == False:
+                    continue
             
-            xform = UsdUtils.create_xform(stage, f"{category_scope_path}/{asset_name}")
-            print(f"Created Xform: {asset_name}")
-            print(mod_usd_path)
-            UsdUtils.add_reference(xform, mod_usd_path)
-            print(f"Added reference: {mod_usd_path}")
-            root_translate = (root_curve_transform['tx'], root_curve_transform['ty'], root_curve_transform['tz'])
-            root_rotate = (root_curve_transform['rx'], root_curve_transform['ry'], root_curve_transform['rz'])
-            root_scale = (root_curve_transform['sx'], root_curve_transform['sy'], root_curve_transform['sz'])
+            print(f"Processing animated asset: {asset}")
 
-            UsdUtils.set_transform(xform, translate=root_translate, rotate=root_rotate, scale=root_scale)
-            print("Set Transform")
+            asset_name = asset.split(":")[0]
+            ref_node = cmds.referenceQuery(asset, referenceNode=True)
+            ref_path = cmds.referenceQuery(ref_node, filename=True)
+
+            usd_path = ref_path.replace("maya", "usd")
+            usd_mod_path = SgPathUtils.set_step(usd_path, MDL)
+            usd_mod_file = os.path.splitext(usd_mod_path)[0].split(".")[0] + ".usd"
+
+            if not os.path.exists(usd_mod_file):
+                raise ValueError(f"USD file not found: {usd_mod_file}")
+
+            root_transform_node = f"{asset.split(':')[0]}:root"
+            root_transform = {attr: cmds.getAttr(f"{root_transform_node}.{attr}") for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']}
+            print(f"Root Transform: {root_transform}")
+
+            if asset in important_assets:
+                if self.export_animated == False:
+                    continue
+                asset_usd_dir = self.create_anim_asset_dir(category, asset_name)
+                anim_usd_path = self.export_anim_asset_usd(asset_usd_dir, asset, asset_name, self.find_scene_animation_range())
+                self.process_animated_asset(category_scope_path, asset_name, anim_usd_path,usd_mod_file)
+                
+            else:
+                if self.export_static == False:
+                    continue
+                self.process_static_asset(category_scope_path, asset_name, usd_mod_file, root_transform)
+
+    def run(self):
+        """USD 처리 실행"""
+        self.setup_usd()
+        self.print_references()
+        self.process_assets()
+
+
+if __name__ == "__main__":
+    # 실행 코드
+    usd_processor = UsdAssetProcessor(LAY,"/home/rapa/NA_Spirit/test3.usd", export_animated=True, export_static=False)
+    usd_processor.run()
