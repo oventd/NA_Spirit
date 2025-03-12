@@ -108,26 +108,16 @@ class SubWin:
         # Convert the frame to RGB (OpenCV uses BGR by default)
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Convert the frame to QImage
-        h, w, c = rgb_frame.shape
-        qt_image = QImage(rgb_frame.data, w, h, 3 * w, QImage.Format_RGB888)
+        for video_path in turnaround_urls:
+            if video_path is None:
+                continue  # 빈 값은 무시
 
-        # Set the QImage to QLabel
-        label.setPixmap(QPixmap.fromImage(qt_image))
-        
-# class VideoWidget(QWidget):
-#     _instance = None  # 싱글톤 인스턴스 저장
+            # ✅ VLC 비디오 플레이어 위젯 생성
+            video_player = VLCVideoPlayer()
+            video_widget = video_player.set_video_source(video_path)
 
-#     def __new__(cls, *args, **kwargs):
-#         if cls._instance is None:
-#             cls._instance = super().__new__(cls)
-
-#         return cls._instance
-#     def __init__(self, video_path, parent=None):
-#         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
-#             super().__init__(parent)
-#             self.video_path = video_path
-#             self.video_capture = cv2.VideoCapture(self.video_path)
+            # ✅ QStackedWidget에 추가
+            stackedWidget_2.addWidget(video_widget)
 
 #             self.timer = QTimer(self)
 #             self.timer.timeout.connect(self.update_frame)

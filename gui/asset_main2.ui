@@ -1638,10 +1638,10 @@ resolution     |</string>
       </property>
      </widget>
      <zorder>label_3</zorder>
-     <zorder>info_name</zorder>
      <zorder>label_2</zorder>
      <zorder>name</zorder>
      <zorder>info_list_bar_s</zorder>
+     <zorder>info_name</zorder>
      <zorder>image_l_btn</zorder>
      <zorder>image_r_btn</zorder>
      <zorder>horizontalLayoutWidget</zorder>
@@ -1654,9 +1654,9 @@ resolution     |</string>
      <zorder>comboBox_3</zorder>
      <zorder>label_4</zorder>
      <zorder>download_btn</zorder>
+     <zorder>like_btn</zorder>
      <zorder>exit_btn_3</zorder>
      <zorder>exit_btn</zorder>
-     <zorder>like_btn</zorder>
      <zorder>stackedWidget_2</zorder>
     </widget>
     <widget class="QWidget" name="page_4"/>
@@ -1767,10 +1767,10 @@ resolution     |</string>
    <zorder>toggle_btn_touch_area</zorder>
    <zorder>search</zorder>
    <zorder>like_empty_notice</zorder>
+   <zorder>like_download_btn_area</zorder>
    <zorder>like_download_btn</zorder>
    <zorder>stackedWidget</zorder>
    <zorder>horizontalLayoutWidget_3</zorder>
-   <zorder>like_download_btn_area</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

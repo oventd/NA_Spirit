@@ -166,13 +166,38 @@ class AssetService:
         return asset_manager.increment_count(asset_id)  # 자산 데이터 업데이트
     
     @staticmethod
-    def search_input(search_word):
+    def search_input(search_word, fields=None):
         """
         데이터를 검색합니다.
         :param user_query: 검색어
         :return: 검색 성공 여부
         """
         asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
+        print(f"[DEBUG] Searching with query: {search_word}")  # 디버깅용 로그
+        return asset_manager.search(user_query=search_word, fields=fields)  # 자산 데이터 업데이트
 
-        return asset_manager.search(user_query=search_word)  # 자산 데이터 업데이트
-
+    # @staticmethod
+    # def search_input(search_word, filter_conditions, limit, skip, sort_by, fields=None):
+    #     """
+    #     데이터를 검색합니다.
+    #     :param search_word: 검색어
+    #     :param filter_conditions: 필터 조건
+    #     :param limit: 조회할 최대 개수
+    #     :param skip: 건너뛸 개수
+    #     :param sort_by: 정렬 기준
+    #     :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
+    #     :return: 검색 결과
+    #     """
+    #     asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
+        
+    #     # 디버깅 로그
+    #     print(f"[DEBUG] Searching with query: {search_word}")
+        
+    #     # 필드가 주어지지 않으면 None을 기본값으로 설정하고, 
+    #     # AssetDb.search에 모든 인자를 전달
+    #     return asset_manager.search(user_query=search_word, 
+    #                                 filter_conditions=filter_conditions, 
+    #                                 sort_by=sort_by, 
+    #                                 limit=limit, 
+    #                                 skip=skip,
+    #                                 fields=fields)
