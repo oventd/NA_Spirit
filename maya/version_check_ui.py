@@ -153,8 +153,14 @@ class VersionCheckUI(QMainWindow):
     def update_table(self):
         version_data = self.get_referenced_assets()
         self.set_table_items(version_data)
-
-
+        
+    def get_clean_asset_name(self, asset_name):
+        """파일명에서 불필요한 `{}` 기호 및 숫자를 제거"""
+        asset_name = re.sub(r"\{\d+\}", "", asset_name)
+        asset_name = re.sub(r"_v\d{3}", "", asset_name)  # `_v003` 같은 버전 제거
+        asset_name = asset_name.replace(" ", "")
+        return asset_name
+    
     def get_referenced_assets(self):
         """현재 씬에서 참조된 에셋을 가져오기"""
         references = cmds.file(q=True, reference=True) or []
@@ -162,17 +168,19 @@ class VersionCheckUI(QMainWindow):
 
         for ref in references:
             asset_name = os.path.basename(ref)  # 파일 이름 추출
-            clean_asset_name = re.sub(r"_v\d{3}", "", asset_name)  # 🚀 v### 패턴 제거
+            clean_asset_name = self.get_clean_asset_name(asset_name)
+            clean_asset_name = re.sub(r"_v\d{3}", "", clean_asset_name)  # v### 패턴 제거
 
             match = re.search(r"v(\d+)", asset_name)  # 파일명에서 버전 찾기
             current_version = int(match.group(1)) if match else 1
 
             # 최신 버전 확인
-            latest_version = self.get_latest_version(USD_DIRECTORY, asset_name)
+            latest_version = self.get_latest_version(USD_DIRECTORY, clean_asset_name)
 
             asset_data.append((clean_asset_name, current_version, latest_version))  # 🚀 변경됨!
 
         return asset_data
+    
     def get_latest_version(self, asset_dir, asset_name):
         """디렉토리 내에서 최신 버전을 찾기"""
         if not os.path.exists(asset_dir):
@@ -258,7 +266,9 @@ class VersionCheckUI(QMainWindow):
             latest_item = QTableWidgetItem(f"{latest_status} v{latest_version:03d}")
             latest_item.setTextAlignment(Qt.AlignCenter)
             self.table.setItem(row, 3, latest_item)
-    
+
+            # 클릭기능
+            self.table.cellClicked.connect(self.onCellClicked)
 
     def update_table(self):
         """Maya에서 에셋 버전 정보 가져와 테이블 업데이트"""
@@ -308,19 +318,86 @@ class VersionCheckUI(QMainWindow):
 
         for i in range(self.table.rowCount()):
             self.table.cellWidget(i, 0).layout().itemAt(0).widget().setChecked(new_state)
+    # def update_version_status(self, row, combo, latest_item):
+    #     """버전 변경 후 UI 갱신"""
+    #     asset_name = self.table.item(row, 1).text()  # 에셋 이름
+    #     asset_dir = USD_DIRECTORY  # 고정된 디렉토리
+        
+    #     # 최신 버전 다시 가져오기
+    #     latest_version = self.get_latest_version(asset_dir, asset_name)
+    #     current_version = int(combo.currentText().replace("v", ""))  # 현재 선택된 버전 가져오기
+
+    #     # 🟢(최신) 또는 🟡(구버전) 상태 업데이트
+    #     latest_status = "🟢" if current_version == latest_version else "🟡"
+    #     latest_item.setText(f"{latest_status} v{latest_version:03d}")
+
+    #     print(f"✅ UI 업데이트: {asset_name} | 현재: v{current_version:03d} | 최신: v{latest_version:03d}")
 
     def update_version_status(self, row, combo, latest_item):
-        """Latest 상태 업데이트"""
-        asset_name = self.table.item(row, 1).text()  # 파일명 가져오기
-        asset_dir = USD_DIRECTORY  # 경로 설정
-
+        """최신 버전 상태 UI 업데이트"""
+        asset_name = self.table.item(row, 1).text()  # 에셋 이름
+        asset_dir = USD_DIRECTORY  # 고정된 디렉토리
+        
         # 최신 버전 다시 가져오기
         latest_version = self.get_latest_version(asset_dir, asset_name)
-        
-        current_version = int(combo.currentText().replace("v", ""))
-        
+        current_version = int(combo.currentText().replace("v", ""))  # 현재 선택된 버전 가져오기
+
+        # 최신 상태 반영 (🟢 최신 / 🟡 구버전)
         latest_status = "🟢" if current_version == latest_version else "🟡"
         latest_item.setText(f"{latest_status} v{latest_version:03d}")
+
+        print(f"UI 업데이트: {asset_name} | 현재: v{current_version:03d} | 최신: v{latest_version:03d}")
+
+    def onCellClicked(self, row, column):
+        """✅ 테이블에서 Asset 클릭 시 Maya에서 해당 오브젝트 선택"""
+        if column == 1:  # 🔹 Asset 열(파일명) 클릭 시
+            self.selectAssetInMaya(row)
+
+
+    def selectAssetInMaya(self, row):
+        """✅ 선택한 테이블 행의 에셋을 Maya에서 선택"""
+        asset_name = self.table.item(row, 1).text()  # 에셋 이름 가져오기 (예: "ground.mb")
+        clean_asset_name = self.get_clean_asset_name(asset_name) 
+
+        # 🔍 Maya에서 해당 에셋과 연결된 참조 찾기
+        refs = cmds.file(q=True, reference=True) or []
+        ref_nodes = []
+        
+        for ref in refs:
+            abs_ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
+            ref_base = os.path.basename(abs_ref_path)
+            clean_ref_name = self.get_clean_asset_name(ref_base)
+
+            print(f"참조 파일 검사중: {abs_ref_path} → 정리된 이름: {clean_ref_name}")
+
+            if clean_asset_name == clean_ref_name:  # 참조 파일명과 검사한 파일명이 같은 경우
+                try:
+                    ref_node = cmds.referenceQuery(ref, referenceNode=True)
+                    ref_nodes.append(ref_node)
+                    print (f"참조 파일 찾음 : {ref_node}")
+                except RuntimeError:
+                    print (f"{asset_name} 참조 파일을 찾을 수 없음")            
+
+        if not ref_nodes:
+            print(f"⚠️ '{asset_name}'의 참조를 찾을 수 없습니다.")
+            return
+
+        # 🔄 Maya 오브젝트 찾기
+        object_list = []
+        for ref_node in ref_nodes:
+            try: 
+                objects = cmds.referenceQuery(ref_node, nodes=True ,dagPath=True) or []
+                object_list.extend(objects)
+            except RuntimeError:
+                print (f"{ref_node}에서 참조 파일을 찾을 수 없음")
+
+        if object_list:
+            cmds.select(clear=True)
+            cmds.select(object_list, replace=True)
+            print(f"✅ '{asset_name}' 선택 완료: {object_list}")
+        else:
+            print(f"⚠️ '{asset_name}'에 연결된 오브젝트가 없습니다.")
+
 
     def update_maya_reference(self, row, combo):
         """ Maya에서 참조된 파일을 새로운 버전으로 업데이트 """
@@ -336,54 +413,63 @@ class VersionCheckUI(QMainWindow):
         new_path = os.path.normpath(os.path.join(USD_DIRECTORY, new_file)) #경로 정리 (운영체제 호환)
 
         print(f"변경할 참조 파일: {new_path}")  # 경로 확인용 로그
-        # ✅ 1. 디렉토리 내 모든 파일 검색하여 참조 가능 여부 확인
+        # 1. 디렉토리 내 모든 파일 검색하여 참조 가능 여부 확인
         matching_files = []
-        for root, _, files in os.walk(USD_DIRECTORY):  # ✅ 디렉토리 내 모든 파일 검색
+        for root, _, files in os.walk(USD_DIRECTORY):  # 디렉토리 내 모든 파일 검색
             for file in files:
-                if file.startswith(base_name) and file.endswith(ext):  # ✅ 같은 확장자 & 같은 기본 이름
+                if file.startswith(base_name) and file.endswith(ext):  # 같은 확장자 & 같은 기본 이름
                     matching_files.append(os.path.join(root, file))
 
         if not matching_files:
-            print(f"❌ 오류: {base_name} 관련 파일이 디렉토리에 존재하지 않음!")
+            print(f"오류: {base_name} 관련 파일이 디렉토리에 존재하지 않음!")
             return
 
-        print(f"📂 발견된 파일 목록: {matching_files}")  # ✅ 찾은 파일 목록 출력
+        print(f"발견된 파일 목록: {matching_files}")  # 찾은 파일 목록 출력
 
-        # ✅ 2. Maya에서 현재 참조된 파일 찾기
+        # 2. Maya에서 현재 참조된 파일 찾기
         refs = cmds.file(q=True, reference=True) or []
         ref_node = None
         ref_path = None
 
         for ref in refs:
-            abs_ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
-            print(f"🔍 참조 파일 검사중: {abs_ref_path}")
+            # abs_ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
+            abs_ref_path = cmds.referenceQuery(ref, filename=True)
+            print(f" 참조 파일 검사중: {abs_ref_path}")
 
-            if asset_name in ref or any(f in abs_ref_path for f in matching_files):  # ✅ 기존 참조 확인
+            if asset_name in ref or any(f in abs_ref_path for f in matching_files):  # 기존 참조 확인
                 try:
                     ref_node = cmds.referenceQuery(ref, referenceNode=True)
                     ref_path = abs_ref_path
-                    print(f"🔗 참조 파일 찾음! {ref_node} → {ref_path}")
+                    print(f"참조 파일 찾음! {ref_node} → {ref_path}")
                     break
                 except RuntimeError:
                     print(f"⚠️ 오류: 참조 파일을 찾을 수 없음! {ref}")
 
-        # ✅ 3. 새 버전이 있는지 확인 후 적용
+        # 3. 새 버전이 있는지 확인 후 적용
         if not os.path.exists(new_path):
-            print(f"❌ 오류: 새 버전 파일이 존재하지 않음! ({new_path})")
+            print(f" 오류: 새 버전 파일이 존재하지 않음! ({new_path})")
             return
 
-        # ✅ 기존 참조를 강제로 언로드하고 새 경로로 변경
+        # 기존 참조를 강제로 언로드하고 새 경로로 변경
         if ref_node:
             try:
-                print(f"🛠️ 참조 변경 중: {ref_node} → {new_path}")
-                cmds.file(unloadReference=ref_node)  # ✅ 기존 참조 언로드
-                cmds.file(new_path, loadReference=ref_node, force=True)  # ✅ 새로운 파일 로드
-                print(f"✅ {asset_name} → {new_file} 업데이트 완료")
+                print(f" 참조 변경 중: {ref_node} → {new_path}")
+                cmds.file(unloadReference=ref_node)  # 기존 참조 언로드
+                cmds.file(new_path, loadReference=ref_node, force=True)  # 새로운 파일 로드
+                print(f" {asset_name} → {new_file} 업데이트 완료")
+
+                latest_item = self.table.item(row, 3)
+                self.update_version_status(row, combo, latest_item)
+
+                self.update_table()
+
             except Exception as e:
                 print(f"⚠️ 업데이트 실패: {str(e)}")
         else:
-            print(f"❌ 참조 노드를 찾을 수 없음. {asset_name}의 참조를 확인하세요.")
-     
+            print(f"참조 노드를 찾을 수 없음. {asset_name}의 참조를 확인하세요.")
+    
+
+
 def launch_ui():
     """Maya에서 UI 실행"""
     global window
