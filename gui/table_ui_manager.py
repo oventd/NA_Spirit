@@ -161,7 +161,7 @@ class TableUiManager:
         # 새로운 QVideoWidget 추가
         for _ in range(list_len):  
             video_widget = QVideoWidget(ui.stackedWidget_2)  # 부모 설정
-            video_widget.setGeometry(0, 0, 380, 291)  # 📌 위치 (0, 53) 크기 (380x291) 설정
+            video_widget.setGeometry(0, 0, 380, 291)  #  위치 (0, 53) 크기 (380x291) 설정
             video_widget.show()  # 반드시 show() 호출해야 표시됨
 
             player = QMediaPlayer()
@@ -347,34 +347,31 @@ class TableUiManager:
                 asset["presetting_url2"],
                 asset["presetting_url3"]
             ]
-            self.make_label_list(len(detail_thum_urls))
-            self.timer = SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
+      
 
         elif asset[ASSET_TYPE]=="3D Model":
-            turnaround_urls = [
+            detail_thum_urls = [
                 asset["turnaround_url"],
                 asset["rig_url"]
             ]
-            self.make_video_label_list(len(turnaround_urls))
-            self.timer = SubWin.show_asset_detail_video(self.ui.stackedWidget_2,turnaround_urls)
+            print(detail_thum_urls)
+      
 
         elif asset[ASSET_TYPE]=="HDRI":
             detail_thum_urls = [
                 asset["applyhdri_url"],
                 asset["hdri_url"]
             ]
-            self.make_label_list(len(detail_thum_urls))
-            self.timer = SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
+       
 
         else:
             for url in asset["material_urls"]:
                 detail_thum_urls.append(url)
                
-
-            detail_thum_urls.append(asset["preview_url"])
+            
           
-            self.make_label_list(len(detail_thum_urls))
-            self.timer = SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
+        self.make_label_list(len(detail_thum_urls))
+        SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
 
 
 
