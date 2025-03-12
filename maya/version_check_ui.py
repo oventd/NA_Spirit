@@ -98,25 +98,33 @@ class VersionCheckUI(QMainWindow):
                 print(f"  - {f}")
             return usd_files
         except Exception as e:
-            print(f"❌ 파일 목록 조회 중 오류 발생: {str(e)}")
+            print(f"파일 목록 조회 중 오류 발생: {str(e)}")
             return []
 
-    def get_latest_version(directory, asset_dir, asset_name):
+    def get_latest_version(self, asset_dir, asset_name):
         """디렉토리에서 특정 에셋의 최신 버전 찾기"""
         if not os.path.exists(asset_dir):
-            return
+            print(f"경로 없음: {asset_dir}")
+            return 1  # 기본 버전 반환
         
-        asset_base = re.sub(r"v\d+", "", asset_name)  # 버전 번호 제거
-        versions = []
+        asset_base, ext = os.path.splitext(asset_name)  # 파일명과 확장자 분리
+        asset_base = re.sub(r"_v\d+", "", asset_base)  # 버전 번호 제거
 
-        for file in os.listdir(directory):
-            if file.startswith(asset_base) and file.endswith((".usd", ".mb", ".usdc")):
+        versions = []
+        for file in os.listdir(asset_dir):
+            if file.startswith(asset_base) and file.endswith(ext):  # 같은 확장자 확인
                 match = re.search(r"v(\d+)", file)
                 if match:
                     versions.append(int(match.group(1)))
 
-        return max(versions) if versions else 1
-    
+        if versions:
+            latest_version = max(versions)  # 가장 높은 숫자의 버전 반환
+            print(f"🔍 최신 버전 찾음: {asset_name} → v{latest_version:03d}")
+            return latest_version
+        else:
+            return 1  # 기본 버전
+
+
     def get_available_versions(self, asset_dir, asset_name):
         """디렉토리에서 해당 에셋의 모든 버전 목록을 가져오기"""
         if not os.path.exists(asset_dir):
@@ -153,35 +161,32 @@ class VersionCheckUI(QMainWindow):
         asset_data = []
 
         for ref in references:
-            asset_name = os.path.basename(ref)
+            asset_name = os.path.basename(ref)  # 파일 이름 추출
+            clean_asset_name = re.sub(r"_v\d{3}", "", asset_name)  # 🚀 v### 패턴 제거
+
             match = re.search(r"v(\d+)", asset_name)  # 파일명에서 버전 찾기
             current_version = int(match.group(1)) if match else 1
 
-            # 에셋이 위치한 디렉토리에서 최신 버전 확인
-            asset_dir = os.path.dirname(ref)
-            latest_version = self.get_latest_version(asset_dir, asset_name)
+            # 최신 버전 확인
+            latest_version = self.get_latest_version(USD_DIRECTORY, asset_name)
 
-            asset_data.append((asset_name, current_version, latest_version))
+            asset_data.append((clean_asset_name, current_version, latest_version))  # 🚀 변경됨!
 
         return asset_data
-
     def get_latest_version(self, asset_dir, asset_name):
-      
         """디렉토리 내에서 최신 버전을 찾기"""
         if not os.path.exists(asset_dir):
-            return 1  # 기본 버전 반환
-        
-        asset_base = re.sub(r"_v\d+(?:\.\d+)?", "", asset_name)  # 버전 번호 제거
-        versions = []
+            print(f"❌ 경로 없음: {asset_dir}")
+            return 1  # 기본 버전-return
+        asset_base, ext = os.path.splitext(asset_name)
+        asset_base = re.sub(r"_v\d+", "", asset_base)  # 버전 번호 제거
 
-        for file in os.listdir(asset_dir):
-            if file.startswith(asset_base):
+        versions = []
+        for file in os.listdir(asset_dir):  # ✅ asset_dir에서 파일 검색
+            if file.startswith(asset_base) and file.endswith(ext):
                 match = re.search(r"v(\d+)", file)
                 if match:
                     versions.append(int(match.group(1)))
-                    version_num = int(match.group(1))
-                    if version_num > 1:
-                        versions.append(version_num)
 
         return max(versions) if versions else 1
 
@@ -190,19 +195,33 @@ class VersionCheckUI(QMainWindow):
         self.table.setRowCount(len(version_data))
 
         for row, (asset_name, current_version, latest_version) in enumerate(version_data):
+            asset_dir = USD_DIRECTORY
+            print ("최신버전 검색: {asset_name} in {asset_dir}")
+
+            latest_version = self.get_latest_version(USD_DIRECTORY, asset_name)
+
+            latest_status = "🟢" if f"v{latest_version:03d}" == f"v{current_version:03d}" else "🟡"
+            latest_item = QTableWidgetItem(f"{latest_status} v{latest_version:03d}")
+            latest_item.setTextAlignment(Qt.AlignCenter)
+
+            self.table.setItem(row, 3, latest_item)
+            asset_item = QTableWidgetItem(asset_name)  
+            asset_item.setTextAlignment(Qt.AlignCenter)
+            self.table.setItem(row, 1, asset_item)
+
+
             # 체크박스 추가
             check_widget = QWidget()
             check_layout = QHBoxLayout()
             check_layout.setAlignment(Qt.AlignCenter)
             check_layout.setContentsMargins(0, 0, 0, 0)
             checkbox = QCheckBox()
+            checkbox.stateChanged.connect(self.update_checkbox_state)  # 체크박스 상태 변경 감지
             checkbox.setText("✔")
             checkbox.setStyleSheet(
                "QCheckBox {"
                "    color: red;"
-               "}"
-               
-               
+               "}"   
                 "QCheckBox::indicator {"
                 "    width: 15px;"
                 "    height: 15px;"
@@ -233,17 +252,29 @@ class VersionCheckUI(QMainWindow):
             combo.setCurrentText(f"v{current_version:03d}")  # 현재 버전 설정
             self.table.setCellWidget(row, 2, combo)
 
-            # 최신 버전 표시
+            # 최신 버전 상태 업데이트
             latest_status = "🟢" if f"v{latest_version:03d}" == f"v{current_version:03d}" else "🟡"
             latest_item = QTableWidgetItem(f"{latest_status} v{latest_version:03d}")
             latest_item.setTextAlignment(Qt.AlignCenter)
             self.table.setItem(row, 3, latest_item)
+            # # 최신 버전 표시
+            # latest_status = "🟢" if f"v{latest_version:03d}" == f"v{current_version:03d}" else "🟡"
+            # latest_item = QTableWidgetItem(f"{latest_status} v{latest_version:03d}")
+            # latest_item.setTextAlignment(Qt.AlignCenter)
+            # self.table.setItem(row, 3, latest_item)
 
     def update_table(self):
         """Maya에서 에셋 버전 정보 가져와 테이블 업데이트"""
         version_data = self.get_referenced_assets()
         self.set_table_items(version_data)
 
+    def update_checkbox_state(self):
+        """체크박스 상태 변경 시 Update Selected 버튼 활성화"""
+        checked = any(
+            self.table.cellWidget(row, 0).layout().itemAt(0).widget().isChecked()
+            for row in range(self.table.rowCount())
+        )
+        self.update_button.setEnabled(checked)
 
     def apply_selected_versions(self):
         """선택된 항목을 최신 버전으로 업데이트"""
@@ -282,11 +313,18 @@ class VersionCheckUI(QMainWindow):
             self.table.cellWidget(i, 0).layout().itemAt(0).widget().setChecked(new_state)
 
     def update_version_status(self, row, combo, latest_item):
-            """Latest 상태 업데이트"""
-            current_version = int(combo.currentText().replace("v", ""))
-            latest_version = int(latest_item.text().split(" ")[-1].replace("v", ""))
-            latest_status = "🟢" if current_version == latest_version else "🟡"
-            latest_item.setText(f"{latest_status} v{latest_version:03d}")
+        """Latest 상태 업데이트"""
+        asset_name = self.table.item(row, 1).text()  # 파일명 가져오기
+        asset_dir = USD_DIRECTORY  # 경로 설정
+
+        # 최신 버전 다시 가져오기
+        latest_version = self.get_latest_version(asset_dir, asset_name)
+        
+        current_version = int(combo.currentText().replace("v", ""))
+        
+        latest_status = "🟢" if current_version == latest_version else "🟡"
+        latest_item.setText(f"{latest_status} v{latest_version:03d}")
+
 def launch_ui():
     """Maya에서 UI 실행"""
     global window
