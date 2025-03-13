@@ -45,21 +45,29 @@ class DbCrud:
         self.logger.info(f"Inserted document ID: {result.inserted_id} | Asset Data: {asset_data}")
         return str(result.inserted_id)
 
+    """
+    find()는 필터링 된 모든 문서를 가져온 후 limit를 적용하기에 효율성 저하
+    aggregate()는 필터링 후 정렬하고, limit를 사용해서 메모리 사용을 줄인다.
+    """
     def construct_query_pipeline(self, filter_conditions=None, sort_by=None, sort_order=None,
-                                limit=40, skip=0, fields=None):
+                                limit=0, skip=0, fields=None,user_quaery =None):
         """
-        MongoDB 쿼리 파이프라인을 생성하는 공통 함수
-        - 주어진 조건에 맞춰 MongoDB 쿼리 파이프라인을 동적으로 생성합니다.
-
-        :param filter_conditions: 필터 조건 (기본값: None)
-        :param sort_by: 정렬 기준 필드 (기본값: None)
-        :param sort_order: 정렬 순서 (ASCENDING or DESCENDING) (기본값: None)
-        :param limit: 최대 조회 개수 (기본값: 40)
-        :param skip: 건너뛸 개수 (기본값: 0)
-        :param fields: 반환할 필드 목록 (기본값: None)
-        :return: 생성된 MongoDB 쿼리 파이프라인
+        MongoDB 쿼리 파이프라인을 생성하는 공통 함수.
+        - filter_conditions: 필터 조건 {}
+        - sort_by: 정렬 기준 필드
+        - sort_order: 정렬 순서 (ASCENDING or DESCENDING)
+        - limit: 최대 조회 개수
+        - skip: 건너뛸 개수
+        - fields: 반환할 필드 목록
         """
         query_filter = {}
+        pipeline = []
+        projection = {}
+        if limit:
+            pipeline.append({"$limit": limit})
+        if skip:
+            pipeline.append({"$skip": skip})
+
 
         # 필터 조건이 주어지면, 필터에 맞는 조건을 파이프라인에 추가
         if filter_conditions:
@@ -68,85 +76,94 @@ class DbCrud:
                     query_filter[key] = {"$in": value}
                 else:
                     query_filter[key] = value
+        if user_quaery is not None:
+            query_filter["$text"] = {"$search": user_quaery}
+            projection["score"]= {"$meta": "textScore"}
 
-        projection = None
         if fields:
-            projection = {}
             for field in fields:
+                if field.startswith("$"):  # 필드명이 `$`로 시작하면 오류 발생 가능성 있음
+                    raise ValueError(f"[ERROR] Invalid field name: {field}")
                 projection[field] = 1
+        if projection:
+            pipeline.append({"$project": projection})  # 기본 projection            
 
-        pipeline = [{"$match": query_filter}]
+            
+        print(f"[DEBUG] Query Filter before adding to pipeline: {query_filter}")
 
-        # 정렬 기준과 순서가 주어지면, 정렬을 파이프라인에 추가
-        if sort_by:
+        
+
+
+        pipeline.insert(0,{"$match": query_filter})
+
+        # sort_by만 주어졌을 경우 기본값으로 DESCENDING을 설정
+        if user_quaery is not None:
+            pipeline.append({"$sort": {"score":-1}})
+
+        elif sort_by:
             default_sort_orders = {
                 CREATED_AT: (UPDATED_AT, pymongo.DESCENDING),  # 최신순
                 UPDATED_AT: (UPDATED_AT, pymongo.ASCENDING),  # 오래된순
                 DOWNLOADS: (DOWNLOADS, pymongo.DESCENDING),    # 다운로드 많은 순
             }
             sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, pymongo.ASCENDING))  # 기본값 오름차순
+            if user_quaery is None:
+                pipeline.append({"$sort": {sort_by: sort_order}})
+                print(f"✅ 기본 정렬 기준 적용: {sort_by}, {sort_order}")
 
-            pipeline.append({"$sort": {sort_by: sort_order}})
 
-        if limit:
-            pipeline.append({"$limit": limit}) # 제한 조건
-        if skip:
-            pipeline.append({"$skip": skip}) # 건너뛰기 조건
-        if projection:
-            pipeline.append({"$project": projection})  # 기본 projection
 
-        self.logger.debug(f"Generated Query Pipeline: {pipeline}")
+
+        self.logger.debug(f"Generated Query Pipeline: {pipeline}")  # 디버깅을 위한 로깅
+        print(pipeline)
         return pipeline
 
-    """
-    find()는 필터링 된 모든 문서를 가져온 후 limit를 적용하기에 효율성 저하
-    aggregate()는 필터링 후 정렬하고, limit를 사용해서 메모리 사용을 줄인다.
-    """
-    # 데이터 찾기(Find)
-    def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=40, skip=0, fields=None):
-        """
-        필터 조건에 맞는 데이터를 찾고, 정렬 및 제한된 개수를 반환합니다. 
-        - 조건에 맞는 데이터를 조회하고, 정렬을 적용한 후 limit과 skip을 고려하여 반환합니다.
-        
-        :param filter_conditions: 필터 조건 (기본값: None)
-        :param sort_by: 정렬 기준 (기본값: None)
-        :param sort_order: 정렬 순서 (ASCENDING 또는 DESCENDING) (기본값: None)
-        :param limit: 최대 조회 개수 (기본값: 40)
-        :param skip: 건너뛸 개수 (기본값: 0)
-        :param fields: 반환할 필드 목록 (기본값: None)
-        :return: 조회된 자산들의 리스트
-        """        
+    def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=0, skip=0, fields=None):
         pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields)
         result = list(self.asset_collection.aggregate(pipeline))
         self.logger.info(f"Query executed with filter: {filter_conditions} | Found: {len(result)} documents")
         return result
     # ObjectId 데이터 찾기(Find)
     def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
-                    limit=40, skip=0, fields=None):
-        """
-        자산을 필터 조건에 맞게 조회하고 정렬을 적용한 후 반환합니다. 
-        - 필터 조건을 ObjectId로 변환하여 정확히 매칭된 데이터를 조회합니다.
-
-        :param filter_conditions: 필터 조건 (기본값: None)
-        :param sort_by: 정렬 기준 (기본값: None)
-        :param sort_order: 정렬 순서 (ASCENDING 또는 DESCENDING) (기본값: None)
-        :param limit: 조회할 최대 개수 (기본값: 40)
-        :param skip: 건너뛸 개수 (기본값: 0)
-        :param fields: 반환할 필드 목록 (기본값: None)
-        :return: 필터링과 정렬된 자산들의 리스트
-        """
+                    limit=0, skip=0, fields=None):
         object_ids = []
-        if filter_conditions:
-            for value in filter_conditions:
-                object_ids.append(ObjectId(value))
 
-        query_filter = {"_id": {"$in": object_ids}} # ObjectId 기반 필터
+        # ✅ filter_conditions 값이 올바른 ObjectId 리스트인지 검증
+        if filter_conditions:
+            if not isinstance(filter_conditions, list):
+                raise TypeError("filter_conditions must be a list of ObjectId strings")
+
+            for value in filter_conditions:
+                if isinstance(value, str):  # 문자열이면 ObjectId로 변환
+                    try:
+                        object_ids.append(ObjectId(value))
+                    except Exception:
+                        raise ValueError(f"Invalid ObjectId format: {value}")
+                elif isinstance(value, ObjectId):  # 이미 ObjectId이면 그대로 사용
+                    object_ids.append(value)
+                else:
+                    raise TypeError(f"Expected string or ObjectId, got {type(value)}")
+
+        # ✅ 최종적으로 object_ids에 올바른 값이 들어갔는지 확인
+                print(f"[DEBUG] Final ObjectId List: {object_ids}")
+
+        # ✅ 쿼리 필터를 올바른 형식으로 설정
+        if object_ids:
+            query_filter = {"_id": {"$in": object_ids}}
+        else:
+            query_filter = {}  # 빈 필터를 사용하여 모든 데이터를 가져올 수 있도록 처리
+
+        # ✅ 디버깅용 로그 추가
+        print(f"[DEBUG] Query Filter: {query_filter}")
+
+        # ✅ 파이프라인 생성 후 실행
         pipeline = self.construct_query_pipeline(query_filter, sort_by, sort_order, limit, skip, fields)
         result = list(self.asset_collection.aggregate(pipeline))
+
         return result
+
     
-    # 데이터 검색(search)
-    def search(self, user_query=None, filter_conditions=None, limit=40, skip=0, fields=None, sort_by=None, sort_order=None):
+    def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
         """
         검색어 기반으로 데이터를 조회하고, 검색 점수를 기준으로 정렬합니다.
         - 텍스트 검색을 통해 `score`를 기준으로 결과를 정렬합니다.
@@ -160,31 +177,48 @@ class DbCrud:
         :param sort_order: 정렬 순서 (ASCENDING or DESCENDING) (기본값: None)
         :return: 검색된 자산들의 상세 정보
         """
-        pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields)
+        # projection = {
+        #     "_id": 1, "name": 1, "description": 1, "asset_type": 1, "category": 1, 
+        #     "style": 1, "resolution": 1, "file_format": 1, "size": 1, "license_type": 1,
+        #     "creator_id": 1, "creator_name": 1, "downloads": 1, "price": 1, "detail_url": 1,
+        #     "presetting_url1": 1, "presetting_url2": 1, "presetting_url3": 1, "preview_url": 1
+        # }
+        if fields == None:
+            fields = [
+                "_id", "name", "description", "asset_type", "category", 
+                "style", "resolution", "file_format", "size", "license_type",
+                "creator_id", "creator_name", "downloads", "price", "detail_url",
+                "presetting_url1", "presetting_url2", "presetting_url3", "preview_url",CREATED_AT,UPDATED_AT,TURNAROUND_URL,RIG_URL,
+                "material_urls",'applyhdri_url','hdri_url'
+            ]
+        # 기본 파이프라인 생성
+        pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields,user_quaery=user_query)
 
-        if user_query:
-            # 텍스트 검색을 위한 파이프라인 추가
-            pipeline.insert(0, {"$match": {"$text": {"$search": user_query}}})
-            # pipeline.append({"$text": {"$search": user_query}})
-            pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})  # 점수(score)로 정렬
+        # if user_query:
+        #     # 텍스트 검색을 위한 파이프라인 추가
+        #     # pipeline.insert(0, {"$match": {"$text": {"$search": user_query}}})
+        #     pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})  # 점수(score)로 정렬
 
-            projection = {
-                "score": {"$meta": "textScore"},
-                "_id": 1, "name": 1, "description": 1, "asset_type": 1, "category": 1, 
-                "style": 1, "resolution": 1, "file_format": 1, "size": 1, "license_type": 1,
-                "creator_id": 1, "creator_name": 1, "downloads": 1, "price": 1, "detail_url": 1,
-                "presetting_url1": 1, "presetting_url2": 1, "presetting_url3": 1, "preview_url": 1
-            }
+        # 기본 projection 설정
 
-            if fields:
-                projection = {field: 1 for field in fields}
-                projection["score"] = {"$meta": "textScore"}
 
-            pipeline.append({"$project": projection}) # 결과에서 반환할 필드
+        # fields가 전달된 경우, projection을 해당 필드들로만 제한
+        # if fields:
+        #     projection = {field: 1 for field in fields}  # fields에서 지정한 필드만 포함
+        
+        # score 필드는 항상 포함시키기
+            # projection["score"] = {"$meta": "textScore"}
+
+        # _id를 제외하려면 projection에 '_id': 0을 추가
+        # if "_id" not in fields:
+        #     projection["_id"] = 1
+
+        # projection 추가
 
         # 결과 반환
         result = list(self.asset_collection.aggregate(pipeline))
         
+        # 디버깅을 위한 출력
         self.logger.info(f"Search executed with query: {user_query} | Found: {len(result)} documents")
         return result
 
@@ -281,12 +315,12 @@ class AssetDb(DbCrud):
             # self.asset_collection.create_index([(UPDATED_AT, pymongo.ASCENDING)])
             # self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
             # self.asset_collection.create_index(
-            #     [(NAME, TEXT), (DESCRIPTION, TEXT)],
-            #     weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
+            #     [(NAME, "text")]
+            #     # weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
             # )
         self.logger.info("Indexes set up for AssetDb")
 
-    def set_url_fields(self, data):
+    def set_url_fields(self, data, fields=None):
         """
         자산의 URL 필드를 확인하고, 없는 경우 기본값(None)으로 처리합니다.
         - 자산 데이터의 URL 필드를 채워넣어주는 함수입니다. 기본값을 `None`으로 처리합니다.
@@ -294,20 +328,36 @@ class AssetDb(DbCrud):
         :param data: 자산 데이터 (단일 자산 또는 자산 리스트)
         :return: URL 필드가 설정된 자산 데이터
         """
+        # url_fields = [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
+        #             PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]
+
+        # if isinstance(data, list):  # 결과가 리스트인 경우
+        #     for item in data:
+        #         for url_field in url_fields:
+        #             item[url_field] = item.get(url_field, None)
+        # else:  # 단일 자산인 경우
+        #     for url_field in url_fields:
+        #         data[url_field] = data.get(url_field, None)
+        
+        # return data
         url_fields = [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
-                    PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]
+                    PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS, MATERIAL_URLS]
 
         if isinstance(data, list):  # 결과가 리스트인 경우
             for item in data:
                 for url_field in url_fields:
-                    item[url_field] = item.get(url_field, None)
+                    # fields에 해당 URL 필드가 포함된 경우에만 추가
+                    if fields and url_field in fields:
+                        item[url_field] = item.get(url_field, None)
         else:  # 단일 자산인 경우
             for url_field in url_fields:
-                data[url_field] = data.get(url_field, None)
+                # fields에 해당 URL 필드가 포함된 경우에만 추가
+                if fields and url_field in fields:
+                    data[url_field] = data.get(url_field, None)
         
-        return data
-    
-    def find(self, filter_conditions=None, sort_by=None, limit=40, skip=0, fields=None):
+        return data 
+       
+    def find(self, filter_conditions=None, sort_by=None, limit=0, skip=0, fields=None):
         """
         자산들을 조회하여 상세 정보를 반환합니다. 필터링, 정렬, 제한, 건너뛰기 등 포함
         - 필터 조건에 맞는 자산들을 조회하고, 정렬 및 페이징을 적용하여 결과를 반환합니다.
@@ -334,20 +384,13 @@ class AssetDb(DbCrud):
         details = super().find_one(object_id, fields)
         return self.set_url_fields(details)
     
-    def search(self, user_query=None, filter_conditions=None, limit=40, skip=0, fields=None, sort_by=None, sort_order=None):
-        """
-        검색어 기반으로 데이터를 조회하고, 검색 점수를 기준으로 정렬합니다. 
-        - 텍스트 검색을 통해 `score`를 기준으로 결과를 정렬합니다.
-
-        :param user_query: 텍스트 검색어
-        :param filter_conditions: 필터 조건
-        :param limit: 조회할 최대 개수 (기본값: 40)
-        :param skip: 건너뛸 개수 (기본값: 0)
-        :param fields: 반환할 필드 목록 (기본값은 None)
-        :param sort_by: 정렬 기준 (기본값은 None)
-        :param sort_order: 정렬 순서 (ASCENDING or DESCENDING) (기본값은 None)
-        :return: 검색된 자산들의 상세 정보
-        """
+    def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
+        # 부모 클래스의 search 호출
         result = super().search(user_query, filter_conditions, limit, skip, fields, sort_by, sort_order)
+        return self.set_url_fields(result)
+    
+    def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
+                    limit=0, skip=0, fields=None):
+        result = super().find_and_sort(filter_conditions, sort_by, sort_order, limit, skip, fields)
         return self.set_url_fields(result)
 
