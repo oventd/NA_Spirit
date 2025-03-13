@@ -72,48 +72,12 @@ class TableUiManager:
 
             self.logger = create_logger(UX_Like_ASSET_LOGGER_NAME, UX_Like_ASSET_LOGGER_DIR)
 
-
-        
-            
-
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.asset_dict = {}
 
     def search_input(self, search_word):
         self.search_word = search_word
-        """서치 텍스트를 받아오고 table을 업데이트하는 함수"""
-        self.search_list = []
-        self.search_dict = {}
-    
-        if self.search_word is not None:
-            if len(self.search_word) < 3:
-                search_word =None
-        else:
-            search_word = self.search_word
-
-        if LikeState().state:
-            filter_conditions = LikeState().like_filter_condition
-
-        else:
-            filter_conditions = Check().dict
-
-        assets=AssetService.search_input(search_word, filter_conditions)
-       
-        # print(f"👉[DEBUG] asset_ids: {asset_ids}")  # 👉 검색 결과 확인
-        # # id_list = [(original['_id']) for original in asset_list]
-
-        # # asset_ids에서 '_id' 필드를 추출하고 ObjectId로 변환
-        # id_list = [ObjectId(asset['_id']) for asset in asset_ids]
-        # print(f"👉[DEBUG] Converted id_list: {id_list}")
-
-        # # 필터 조건으로 ObjectId 리스트 전달
-        # asset_list = AssetService.get_asset_by_id_all(filter_conditions=id_list)
-        # print(f"👉[DEBUG] asset_list id_list: {asset_list}")
-
-        # UI 업데이트
-        self.ui.like_empty_notice.hide()
-        self.ui.tableWidget.clear()
-        self.make_table(assets)
+        self.table_widget()
 
 #라벨 초기화 함수 실행
     def remove_lable(self):
@@ -195,40 +159,43 @@ class TableUiManager:
         #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
         if option == "오래된 순":
             print(f"오래된 순의 필터임 :{Check().dict}")
-            self.table_widget(Check().dict,CREATED_AT, 40, 0,None)
+            self.table_widget(CREATED_AT, 40, 0,None)
 
         elif option =="다운로드 순":
             print("다운로드된 순서를 정렬할게요")
-            self.table_widget(Check().dict,DOWNLOADS, 40, 0,None)
+            self.table_widget(DOWNLOADS, 40, 0,None)
 
         else:
             print("최신 순서를 정렬할게요")
-            self.table_widget(Check().dict,UPDATED_AT, 40, 0, None)
+            self.table_widget(UPDATED_AT, 40, 0, None)
         
         
     
-    def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None, search = False):
+    def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
         ui = self.ui
-        # 리뷰 이거 셀프로 init에 구현 이거 근데 저장하는 변수명이 쫌...... 
-        # 리뷰 static밖에 없는데 왜 객체 생성????
+
         ui.like_empty_notice.hide()
         search_word = self.search_word
         if self.search_word is not None:
             if len(self.search_word) < 3:
                 search_word =None
-
+        filter_conditions = {}
         if LikeState().state:
-            filter_conditions = LikeState().like_filter_condition
+            filter_conditions[OBJECT_ID] = LikeState().like_filter_condition[OBJECT_ID]
+        if Check().dict:
+            for key, value in Check().dict.items():
+                filter_conditions[key] = value
 
-        if filter_conditions == list:
-            AssetService.get_asset_by_id_all(filter_conditions, sort_by, limit, skip, search_word)
+        # if filter_conditions == list:
+        #     AssetService.get_asset_by_id_all(filter_conditions, sort_by, limit, skip, search_word)
             
         assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip,search_word)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
         print(f"여기에 테이블위젯 구정하는 assets 들어있어요 <<>>>>>>{assets}")
-        if search == True:
-            
-            AssetService.assetmanager()
+
+        self.ui.tableWidget.clear()
         self.make_table(assets)
+
+        filter_conditions = None
     
     def make_table(self, assets):
         ui = self.ui
@@ -319,10 +286,6 @@ class TableUiManager:
 
     def exit_sub_win(self):
         self.ui.stackedWidget.hide()
-        
-        self.timer.stop()
-
-   
 
     def set_detail_info(self, asset):
         Asset().current = asset
@@ -423,11 +386,7 @@ class TableUiManager:
                 print("저 서브바가 열려있을때만 닫혀요")
                 self.ui.tableWidget.clear()
                 like_asset_dict = []
-                for object_id in LikeState().like_asset_list:
-                    asset_info = AssetService.get_asset_by_id(object_id)
-                    like_asset_dict.append(asset_info)
-                    
-                self.make_table(like_asset_dict)
+                self.table_widget(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
                 self.ui.like_download_btn.show()
                 self.ui.like_download_btn_area.show()
             
@@ -449,9 +408,8 @@ class TableUiManager:
                 print("저 서브바가 열려있을때만 닫혀요")
                 self.ui.tableWidget.clear()
                 like_asset_dict = []
-                for object_id in LikeState().like_asset_list:
-                    asset_info = AssetService.get_asset_by_id(object_id)
-                    like_asset_dict.append(asset_info)
+
+                self.table_widget(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
                     
                 self.make_table(like_asset_dict)
                 self.ui.like_download_btn.show()
@@ -478,11 +436,7 @@ class TableUiManager:
             else:
                 self.ui.tableWidget.clear()
                 like_asset_dict = []
-                for object_id in LikeState().like_asset_list:
-                    asset_info = AssetService.get_asset_by_id(object_id)
-                    like_asset_dict.append(asset_info)
-
-                self.make_table(like_asset_dict)
+                self.table_widget(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
                 self.ui.like_download_btn.show()
                 self.ui.like_download_btn_area.show()
 
@@ -501,7 +455,7 @@ class TableUiManager:
                 LikeState().state = False
                 self.ui.like_empty_notice.hide()
                 self.ui.tableWidget.clear()
-                self.table_widget(Check().dict,UPDATED_AT, 40, 0,None)
+                self.table_widget(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
                 #사용자 pc에 저장해두고 라이크 받을때 마다 오브젝트 id를 json에 저장해두고 
 
     def remove_widget_with_children(self,widget):

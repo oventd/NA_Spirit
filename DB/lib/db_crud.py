@@ -166,7 +166,8 @@ class DbCrud:
                 "_id", "name", "description", "asset_type", "category", 
                 "style", "resolution", "file_format", "size", "license_type",
                 "creator_id", "creator_name", "downloads", "price", "detail_url",
-                "presetting_url1", "presetting_url2", "presetting_url3", "preview_url"
+                "presetting_url1", "presetting_url2", "presetting_url3", "preview_url",CREATED_AT,UPDATED_AT,TURNAROUND_URL,RIG_URL,
+                "material_urls"
             ]
         # 기본 파이프라인 생성
         pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields,user_quaery=user_query)
@@ -302,7 +303,7 @@ class AssetDb(DbCrud):
         
         # return data
         url_fields = [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
-                    PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]
+                    PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS, MATERIAL_URLS]
 
         if isinstance(data, list):  # 결과가 리스트인 경우
             for item in data:

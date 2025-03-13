@@ -135,6 +135,6 @@ class TreeUiManager:
             else:
                 sort_by = UPDATED_AT
                 
-            TableUiManager(self.ui).table_widget(filter_conditions = Check().dict, sort_by= sort_by, limit = 20, skip = 0, fields =None)
+            TableUiManager(self.ui).table_widget( sort_by= sort_by, limit = 20, skip = 0, fields =None)
 
             #만들어 진 리스트를 필터로 table에 정렬해주기 + s실제 콤보박스의 정렬이랑도 섞여야함
