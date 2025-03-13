@@ -2,7 +2,6 @@ from db_client import MongoDBClient
 from bson import ObjectId  # MongoDB에서 사용하는 ObjectId를 처리하는 데 사용
 from datetime import datetime  # 현재 날짜와 시간을 다룰 때 사용
 import pymongo  # MongoDB 작업을 위한 라이브러리
-
 import os
 import sys
 utils_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), "../../../"))+'/utils'
@@ -123,6 +122,7 @@ class DbCrud:
         result = list(self.asset_collection.aggregate(pipeline))
         self.logger.info(f"Query executed with filter: {filter_conditions} | Found: {len(result)} documents")
         return result
+    
     # ObjectId 데이터 찾기(Find)
     def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
                     limit=0, skip=0, fields=None):
