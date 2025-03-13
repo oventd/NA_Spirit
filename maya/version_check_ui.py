@@ -23,41 +23,27 @@ try:
     from shiboken2 import wrapInstance
 except ImportError:
     from shiboken6 import wrapInstance
-# from json_manager import DictManager
+
 
 ASSET_DIRECTORY = "/nas/spirit/spirit/sequences/SQ001/SH0010/MMV/work/maya"
 
-# 🔹 json_manager.py가 있는 폴더 추가
+
 custom_script_path = "/home/rapa/NA_Spirit/maya/"
 
 if custom_script_path not in sys.path:
     sys.path.append(custom_script_path)
 
-# 🔹 DictManager 가져오기
-from json_manager import DictManager
-
 
 class VersionCheckUI(QMainWindow):
+    asset_paths_dict = {} 
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ASSET & Maya Version Matching Check")
         self.setGeometry(100, 100, 800, 600)
         self.setup_ui()
         self.update_table()
-        self.load_json_data()  # JSON 데이터 로드 추가
 
-    def load_json_data(self):
-        """JSON 데이터를 테이블에 로드"""
-        data = DictManager.load_dict_from_json()
 
-        if not data:
-            print("⚠️ JSON 데이터가 없습니다.")
-            return
-
-        self.table.setRowCount(len(data))
-        for row, (asset_name, asset_info) in enumerate(data.items()):
-            self.table.setItem(row, 0, QTableWidgetItem(asset_name))
-            self.table.setItem(row, 1, QTableWidgetItem(asset_info["path"]))
 
 
     def setup_ui(self):
@@ -268,42 +254,95 @@ class VersionCheckUI(QMainWindow):
                 MayaReferenceManager.select_asset(self, row)
 
 
-    def update_maya_reference(self, row, combo):
-        """Maya에서 참조된 파일을 새로운 버전으로 업데이트"""
-        asset_name = self.table.item(row, 1).text()
-        new_version = combo.currentText().replace("v", "")
+    # def update_maya_reference(self, row, combo):
+    #     """Maya에서 참조된 파일을 새로운 버전으로 업데이트"""
+    #     asset_name = self.table.item(row, 1).text()
+    #     new_version = combo.currentText().replace("v", "")
         
-        base_name, ext = os.path.splitext(asset_name)
-        base_name = re.sub(r".v\d{3}", "", base_name)
+    #     base_name, ext = os.path.splitext(asset_name)
+    #     base_name = re.sub(r".v\d{3}", "", base_name)
 
-        new_file = f"{base_name}.v{new_version}{ext}"
-        new_path = os.path.join(ASSET_DIRECTORY, new_file)
+    #     new_file = f"{base_name}.v{new_version}{ext}"
+    #     new_path = os.path.join(ASSET_DIRECTORY, new_file)
 
-        refs = cmds.file(q=True, reference=True) or []
-        for ref in refs:
-            ref_node = cmds.referenceQuery(ref, referenceNode=True)
-            ref_path = cmds.referenceQuery(ref, filename=True)
+    #     refs = cmds.file(q=True, reference=True) or []
+    #     for ref in refs:
+    #         ref_node = cmds.referenceQuery(ref, referenceNode=True)
+    #         ref_path = cmds.referenceQuery(ref, filename=True)
 
-            if asset_name in ref_path:
-                if not os.path.exists(new_path):
-                    print(f"⚠️ 새 버전 파일이 존재하지 않습니다: {new_path}")
-                    return
+    #         if asset_name in ref_path:
+    #             if not os.path.exists(new_path):
+    #                 print(f"⚠️ 새 버전 파일이 존재하지 않습니다: {new_path}")
+    #                 return
 
-                try:
-                    cmds.file(unloadReference=ref_node)
-                    cmds.file(new_path, loadReference=ref_node, force=True)
-                    print(f"✅ 참조 업데이트 완료: {asset_name} → {new_file}")
+    #             try:
+    #                 cmds.file(unloadReference=ref_node)
+    #                 cmds.file(new_path, loadReference=ref_node, force=True)
+    #                 print(f"✅ 참조 업데이트 완료: {asset_name} → {new_file}")
 
-                    latest_item = self.table.item(row, 3)
-                    self.update_version_status(row, combo, latest_item)
+    #                 latest_item = self.table.item(row, 3)
+    #                 self.update_version_status(row, combo, latest_item)
 
-                except Exception as e:
-                    print(f"⚠️ 업데이트 실패: {e}")
-    def onCellClicked(self, row, column):
-        """✅ 테이블에서 Asset 열 클릭 시 Maya에서 해당 에셋 선택"""
-        if column == 1:  # 🔹 Asset 열 클릭
-            asset_name = self.table.item(row, 1).text()  # 선택된 에셋 이름 가져오기
-            MayaReferenceManager.select_asset_by_name(asset_name)
+    #             except Exception as e:
+    #                 print(f"⚠️ 업데이트 실패: {e}")
+    # def onCellClicked(self, row, column):
+    #     """✅ 테이블에서 Asset 열 클릭 시 Maya에서 해당 에셋 선택"""
+    #     if column == 1:  # 🔹 Asset 열 클릭
+    #         asset_name = self.table.item(row, 1).text()  # 선택된 에셋 이름 가져오기
+    #         MayaReferenceManager.select_asset_by_name(asset_name)
+import os
+import re
+import maya.cmds as cmds
+
+def update_maya_reference(self, row, combo):
+    """Maya에서 참조된 파일을 새로운 버전으로 업데이트 (디렉토리 순회 방식)"""
+    
+    # 🔹 현재 참조된 파일 경로 가져오기
+    ref_path = cmds.referenceQuery(cmds.file(q=True, reference=True)[row], filename=True, withoutCopyNumber=True)
+    
+    if not ref_path or not os.path.exists(ref_path):
+        print(f"⚠️ 참조 경로를 찾을 수 없습니다: {ref_path}")
+        return
+
+    # 🔹 참조된 파일이 존재하는 디렉토리 가져오기
+    asset_dir = os.path.dirname(ref_path)
+    
+    # 🔹 파일 이름에서 버전 정보 제거
+    base_name, ext = os.path.splitext(os.path.basename(ref_path))
+    base_name_no_version = re.sub(r"\.v\d{3}", "", base_name)  # `v001` 같은 버전 제거
+
+    # 🔹 해당 디렉토리 내에서 최신 버전 찾기
+    latest_version = 0
+    latest_file = None
+
+    for file in os.listdir(asset_dir):
+        if file.startswith(base_name_no_version) and file.endswith(ext):
+            match = re.search(r"\.v(\d{3})", file)
+            if match:
+                version = int(match.group(1))
+                if version > latest_version:
+                    latest_version = version
+                    latest_file = file
+
+    if not latest_file:
+        print(f"⚠️ 최신 버전을 찾을 수 없습니다: {base_name_no_version}")
+        return
+
+    latest_path = os.path.join(asset_dir, latest_file)
+
+    # 🔹 Maya 참조 업데이트
+    try:
+        ref_node = cmds.referenceQuery(ref_path, referenceNode=True)
+        cmds.file(unloadReference=ref_node)
+        cmds.file(latest_path, loadReference=ref_node, force=True)
+        print(f"✅ 참조 업데이트 완료: {ref_path} → {latest_file}")
+
+        # 🔹 UI 최신 상태 업데이트
+        latest_item = self.table.item(row, 3)
+        self.update_version_status(row, combo, latest_item)
+
+    except Exception as e:
+        print(f"⚠️ 업데이트 실패: {e}")
 
 
 
@@ -331,23 +370,25 @@ class AssetManager:
                 "objects": object_list
             }
 
-        DictManager.save_dict_to_json(asset_data)
+
+
+    # @staticmethod
+    # def get_clean_asset_name(asset_path):
+    #     """✅ 파일 경로에서 Prop/ 다음에 오는 폴더명을 에셋 이름으로 가져오기"""
+    #     match = re.search(r"/Prop/([^/]+)/RIG/", asset_path)
+    #     if match:
+    #         return match.group(1)  # `Prop/` 다음의 폴더명(에셋 이름) 반환
+        
+    #     return "unknown"  # 경로가 예상과 다르면 기본값 반환
 
     @staticmethod
-    def get_clean_asset_name(asset_name):
-        """파일명에서 가장 의미 있는 단어(에셋 이름)를 추출"""
-        base_name, _ = os.path.splitext(asset_name)  # 확장자 제거 (.ma, .mb 등)
-
-        # `_`, `.`, `-`, 공백(` `)을 기준으로 분리
-        parts = re.split(r"[_\.\-\s]+", base_name)
-
-        # 의미 없는 단어 제거 (숫자, "scene" 같은 단어 제거)
-        valid_parts = [part for part in parts if part and not part.isdigit() and part.lower() != "scene"]
-
-        # 가장 긴 단어를 에셋 이름으로 선택 (일반적으로 에셋 이름은 길이가 길다)
-        clean_name = max(valid_parts, key=len) if valid_parts else "unknown"
-
-        return clean_name  # 소문자로 변환하여 반환
+    def get_clean_asset_name(asset_path):
+        """✅ 파일 경로에서 'Prop/' 다음에 오는 폴더명을 에셋 이름으로 가져오기"""
+        match = re.search(r"/Prop/([^/]+)/RIG/", asset_path)
+        if match:
+            return match.group(1)  # `Prop/` 다음 폴더명(에셋 이름) 반환
+        
+        return "unknown"  # 경로가 예상과 다르면 기본값 반환
 
 
    
@@ -374,7 +415,6 @@ class AssetManager:
 
         return None
         
-
 
     
 
@@ -407,8 +447,7 @@ class AssetManager:
                 "objects": object_list
             }
 
-        DictManager.save_dict_to_json(asset_data)
-
+        return asset_data
 
 
 
@@ -417,8 +456,7 @@ class MayaReferenceManager:
     @staticmethod
     def select_asset_by_name(asset_name):
         """🔹 JSON 데이터를 기반으로 에셋을 선택"""
-        asset_dict = DictManager.load_dict_from_json()
-
+        asset_dict = {}
         if asset_name not in asset_dict:
             print(f"⚠️ '{asset_name}' 에셋을 찾을 수 없습니다.")
             return
@@ -435,30 +473,25 @@ class MayaReferenceManager:
 
     @staticmethod
     def get_referenced_assets():
-        """✅ 현재 씬에서 참조된 에셋을 가져오기"""
-        """현재 씬에서 참조된 에셋을 가져오기"""
+        """✅ 현재 씬에서 참조된 에셋을 가져오기 (파일 경로에서 에셋명 추출)"""
         references = cmds.file(q=True, reference=True) or []
         asset_data = []
-    
+
         for ref in references:
-            asset_name = os.path.basename(ref)  # 파일 이름 추출
-            clean_asset_name = AssetManager.get_clean_asset_name(asset_name)  # ✅ 수정됨
+            ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
+            asset_name = AssetManager.get_clean_asset_name(ref_path)  # ✅ 경로 기반 에셋 이름 추출
 
-            # `.` 및 `_`을 기준으로 분리하여 버전 정보 추출
-            parts = re.split(r"[_\.\-\s]+", asset_name)
-            current_version = 1  # 기본 버전 설정
+            # 🔹 현재 버전 추출 (파일명에서 버전 번호 가져오기)
+            current_version_match = re.search(r"\.v(\d{3})", os.path.basename(ref_path))
+            current_version = f"v{int(current_version_match.group(1)):03d}" if current_version_match else "v001"
 
-            for part in parts:
-                if part.startswith("v") and part[1:].isdigit():  # 'v###' 형식인지 확인
-                    current_version = int(part[1:])  # 'v###'에서 숫자만 추출
-                    break  # 첫 번째로 찾은 버전만 사용
+            # 🔹 최신 버전 찾기
+            latest_version = AssetManager.get_latest_version(asset_name)
 
-            # 최신 버전 확인
-            latest_version = AssetManager.get_latest_version(clean_asset_name)
-
-            asset_data.append((clean_asset_name, current_version, latest_version))  # 🚀 변경됨!
+            asset_data.append((asset_name, current_version, latest_version))  # ✅ (3개 값) 반환
 
         return asset_data
+
 
     @staticmethod
     def select_asset(row):
