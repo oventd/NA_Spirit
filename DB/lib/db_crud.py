@@ -76,7 +76,7 @@ class DbCrud:
         if user_quaery is not None:
             query_filter["$text"] = {"$search": user_quaery}
             projection["score"]= {"$meta": "textScore"}
-            
+
         if fields:
             for field in fields:
                 if field.startswith("$"):  # 필드명이 `$`로 시작하면 오류 발생 가능성 있음
@@ -176,7 +176,7 @@ class DbCrud:
                 "style", "resolution", "file_format", "size", "license_type",
                 "creator_id", "creator_name", "downloads", "price", "detail_url",
                 "presetting_url1", "presetting_url2", "presetting_url3", "preview_url",CREATED_AT,UPDATED_AT,TURNAROUND_URL,RIG_URL,
-                "material_urls"
+                "material_urls",'applyhdri_url','hdri_url'
             ]
         # 기본 파이프라인 생성
         pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields,user_quaery=user_query)
