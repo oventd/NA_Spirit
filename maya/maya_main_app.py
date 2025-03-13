@@ -1,5 +1,5 @@
-import maya.mel as mel
-import maya.cmds as cmds
+# import maya.mel as mel
+# import maya.cmds as cmds
 import sys
 import os
 import re
@@ -19,9 +19,9 @@ except ImportError:
     from PySide2.QtGui import QColor
 
 sys.path.append('/home/rapa/NA_Spirit/maya')
-from maya.maya_ui_manager import MainUiManager
-from maya.maya_asset_manager import AssetManager
-from maya.maya_reference_manager import MayaReferenceManager
+from maya_ui_manager import MainUiManager
+from maya_asset_manager import AssetManager
+from maya_reference_manager import MayaReferenceManager
 
 class MainUiManager(QMainWindow):
     _instance = None  # 싱글톤 인스턴스 저장
