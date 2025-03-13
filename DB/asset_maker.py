@@ -310,6 +310,31 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 #     print("3D Model 타입 자산의 preview_url, presetting_url, detail_url을 업데이트했습니다.")
 # generate_asset_data()
 
+# def update_3d_model_urls():
+#     # '3D Model'인 자산을 업데이트
+#     for asset in asset_collection.find({"asset_type": "3D Model"}):
+#         # 새로운 turnaround_url과 rig_url 설정
+#         # turnaround_url = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround_video.mp4"
+#         rig_url = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_pool_table_asset_turnaround.mp4"
+        
+#         # 업데이트할 데이터 준비
+#         update_data = {
+#             "$set": {
+#                 # "turnaround_url": turnaround_url,  # turnaround_url 업데이트
+#                 "rig_url": rig_url  # rig_url 업데이트
+#             }
+#         }
+
+#         # 자산 데이터를 업데이트
+#         asset_collection.update_one(
+#             {"_id": asset["_id"]},  # 자산의 _id로 해당 자산을 찾아서
+#             update_data  # turnaround_url과 rig_url을 업데이트
+#         )
+
+#     print("3D Model 타입 자산의 turnaround_url과 rig_url을 업데이트했습니다.")
+
+# # 함수 호출
+# update_3d_model_urls()
 
 
 """모든 인덱스 삭제"""
