@@ -29,6 +29,7 @@ class VersionCheckUI(QMainWindow):
         self.setGeometry(100, 100, 800, 600)
         self.setup_ui()
         self.update_table()
+     
         self.table.cellClicked.connect(self.onCellClicked)
 
 
@@ -69,7 +70,8 @@ class VersionCheckUI(QMainWindow):
         main_layout.addLayout(button_layout)
 
         self.setCentralWidget(main_widget)
-
+    
+    #정리필요
     def update_table(self):
         self.set_table_items(MayaReferenceManager.get_referenced_assets())
 
@@ -116,22 +118,31 @@ class VersionCheckUI(QMainWindow):
             check_layout.setContentsMargins(0, 0, 0, 0)
             checkbox = QCheckBox()
             checkbox.stateChanged.connect(self.update_checkbox_state)  # 체크박스 상태 변경 감지
+           
             checkbox.setText("✔")
             checkbox.setStyleSheet(
-               "QCheckBox {"
-               "    color: red;"
-               "}"   
+                "QCheckBox {"
+                "    color: white;"
+                "}"
                 "QCheckBox::indicator {"
-                "    width: 15px;"
-                "    height: 15px;"
-                "   border: 0.5px solid white;"  # 흰색 테두리 추가
-                "   background-color: white;" 
+                "    width: 10px;"
+                "    height: 10px;"
+                "    border: 1px solid rgb(184, 184, 184);"  # 흰색 테두리
+                "    border-radius: 5px;"  # 동그라미 형태로 만들기
+                "    background-color: rgb(39, 39, 39);"  # 배경 색상
                 "}"
                 "QCheckBox::indicator:checked {"
-                "   background-color: red;"
-                "   border: 2px solid red;"
+                "    background-color:rgb(184, 184, 184);"  # 체크 시 배경 색상
+                "    border: 1px solid rgb(184, 184, 184);"  # 흰색 테두리
                 "}"
-            )
+                "QCheckBox::indicator:checked::after {"
+                "    content: '✔';"  # 체크 표시
+                "    color: white;"  # 체크 표시 색상 (흰색)
+                "    font-size: 2px;"  # 체크 표시 크기
+                "    position: absolute;"
+              
+                "}"
+)
 
 
             checkbox.setFixedSize(15, 15)
@@ -216,6 +227,7 @@ class VersionCheckUI(QMainWindow):
             # 현재 버전과 최신 버전을 숫자 비교 가능하도록 정수로 변환
             current_version = int(current_version_str)  # 현재 버전 (숫자)
             latest_version_int = int(latest_version_str)  # 최신 버전 (숫자)
+            print ( current_version)
         except ValueError as e:
             print(f"⚠️ 버전 값 변환 오류: {e}")
             return
@@ -248,7 +260,8 @@ class VersionCheckUI(QMainWindow):
 
         if reply == QMessageBox.Yes:
             # 버전 업데이트 진행
-            self.update_maya_reference(row, f".v{new_version:03d}")  # 선택된 버전으로 참조 업데이트
+            version = f".v{new_version:03d}"
+            self.update_maya_reference(row, version)  # 선택된 버전으로 참조 업데이트
 
             # 콤보박스와 최신 버전 상태 업데이트
             combo.setCurrentText(f".v{new_version:03d}")  # 콤보박스를 .v001 형식으로 갱신
@@ -264,6 +277,7 @@ class VersionCheckUI(QMainWindow):
     def update_maya_reference(self, row, new_version):
         """Maya에서 참조된 파일을 새로운 버전으로 업데이트"""
         references = cmds.file(q=True, reference=True) or []
+        print (f"안녕나는 레퍼런스 {references}" )
         
         if row >= len(references):
             print(f"⚠️ 참조 파일을 찾을 수 없음: {row}")
@@ -271,6 +285,7 @@ class VersionCheckUI(QMainWindow):
 
         # 🔹 현재 참조된 파일 경로 가져오기
         ref_path = cmds.referenceQuery(references[row], filename=True, withoutCopyNumber=True)
+        print(f"안녕 난느 {ref_path}")
         
         if not ref_path or not os.path.exists(ref_path):
             print(f"⚠️ 참조 경로를 찾을 수 없습니다: {ref_path}")
@@ -279,10 +294,23 @@ class VersionCheckUI(QMainWindow):
         # 참조된 파일이 존재하는 디렉토리 가져오기
         asset_dir = os.path.dirname(ref_path)
         
+
         # 파일 이름에서 버전 정보 제거
         base_name, ext = os.path.splitext(os.path.basename(ref_path))
         base_name_no_version = re.sub(r"\.v\d{3}", "", base_name)  # `v001` 같은 버전 제거
-        file_extension = '.ma' if ref_path.endswith('.ma') else ('.mb')
+
+
+        # file_extension = '.ma'  if ref_path.endswith('.ma') else ('.mb')
+        # 파일 확장자를 확실하게 설정하기
+      
+        try :
+            file_extension = '.ma'
+        except:
+            file_extension = '.mb'
+    
+
+
+
 
         # 선택된 버전으로 파일명 갱신
         new_filename = f"{base_name_no_version}{new_version}{file_extension}"  # 새 파일명 생성
@@ -290,14 +318,14 @@ class VersionCheckUI(QMainWindow):
         #  해당 디렉토리 내에서 선택된 버전 찾기
         latest_path = os.path.join(asset_dir, new_filename)
 
-        print(f"Updating Maya reference to {latest_path}")  # Debugging line to check if correct version is being used
+        print(f" 자 업뎃 드가자{latest_path}")  # Debugging line to check if correct version is being used
 
         if not os.path.exists(latest_path):
             print(f"⚠️ {new_filename} 파일이 존재하지 않습니다.")
             return
 
 
-        # 참조 파일을 언로드하고, 새 버전으로 로드ㅂ
+        # 참조 파일을 언로드하고, 새 버전으로 로드
         try:
             # 참조 노드 가져오기
             ref_node = cmds.referenceQuery(references[row], referenceNode=True)
@@ -307,7 +335,6 @@ class VersionCheckUI(QMainWindow):
 
             # 새 버전 파일 로드
             cmds.file(latest_path, loadReference=ref_node, force=True)
-
             print(f"✅ 참조 업데이트 완료: {ref_path} → {latest_path}")
         except Exception as e:
             print(f"⚠️ 참조 업데이트 실패: {e}")
@@ -419,24 +446,20 @@ class AssetManager:
 
 
     @staticmethod
-    def update_asset_info():
-        """🔹 현재 씬에서 참조된 에셋 정보를 JSON에 저장"""
+    def get_referenced_asset_paths():
+        """현재 씬에서 참조된 에셋들의 경로를 딕셔너리 형태로 반환"""
         references = cmds.file(q=True, reference=True) or []
-        asset_data = {}
+        asset_paths = {}
 
         for ref in references:
             asset_name = os.path.basename(ref)  # 파일명 추출
             clean_asset_name = AssetManager.get_clean_asset_name(asset_name)
             ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
-            ref_node = cmds.referenceQuery(ref, referenceNode=True)
-            object_list = cmds.referenceQuery(ref_node, nodes=True, dagPath=True) or []
 
-            asset_data[clean_asset_name] = {
-                "path": ref_path,
-                "objects": object_list
-            }
+            # 에셋 경로를 딕셔너리에 저장
+            asset_paths[clean_asset_name] = ref_path
 
-        return asset_data
+        return asset_paths
 
 class MayaReferenceManager:
     """🎯 Maya 내 참조 및 오브젝트 선택 기능 관리"""
@@ -534,12 +557,6 @@ class MayaReferenceManager:
             print(f" '{asset_name}' 선택 완료: {object_list}")
         else:
             print(f"⚠️ '{asset_name}'에 연결된 오브젝트가 없습니다.")
-
-
-    @staticmethod
-    def update_reference(asset_name, new_version):
-        """✅ Maya에서 참조된 파일을 새로운 버전으로 업데이트"""
-        pass
 
 
 def launch_ui():
