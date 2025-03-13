@@ -17,20 +17,33 @@ except ImportError:
     from PySide2.QtCore import QFile, Qt
     from PySide2.QtGui import QColor
 
-import maya.cmds as cmds
+# import maya.cmds as cmds
+
+
+# from maya_ui_manager import MainUiManager
+# from maya_ui_manager import MayaReferenceManager
+# from maya_asset_manager import AssetManager
 
 ASSET_DIRECTORY = "/nas/spirit/spirit/assets/Prop"
 
 
-class VersionCheckUI(QMainWindow):
+class MainUiManager(QMainWindow):
+    _instance = None  # 싱글톤 인스턴스 저장
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(MainUiManager, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self):
-        super().__init__()
-        self.setWindowTitle("ASSET & Maya Version Matching Check")
-        self.setGeometry(100, 100, 800, 600)
-        self.setup_ui()
-        self.update_table()
-     
-        self.table.cellClicked.connect(self.onCellClicked)
+        if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
+            super().__init__()
+            self.setWindowTitle("ASSET & Maya Version Matching Check")
+            self.setGeometry(100, 100, 800, 600)
+            self.setup_ui()
+            self.update_table()
+        
+            self.table.cellClicked.connect(self.onCellClicked)
 
 
 
@@ -83,8 +96,7 @@ class VersionCheckUI(QMainWindow):
 
         for row, (asset_name, current_version, latest_version) in enumerate(version_data):
             current_version = current_version or "v001"
-            latest_version = AssetManager.get_latest_version(asset_name)
-
+    
             try:
                 current_version_int = int(re.sub(r"\D", "", current_version))
                 latest_version_int = int(re.sub(r"\D", "", latest_version))
@@ -166,7 +178,7 @@ class VersionCheckUI(QMainWindow):
         checked = False
         for row in range(self.table.rowCount()):
             widget = self.table.cellWidget(row, 0)
-            if widget and widget.layout():  # 🔹 체크박스가 존재하는지 확인
+            if widget and widget.layout():  # 체크박스가 존재하는지 확인
                 checkbox = widget.layout().itemAt(0).widget()
                 if checkbox and checkbox.isChecked():
                     checked = True
@@ -192,16 +204,6 @@ class VersionCheckUI(QMainWindow):
                 self.update_version_status(row, combo, latest_item)  # UI 갱신
                 self.table.setItem(row, 3, latest_item)  # 'Latest' 열을 갱신
 
-    def refresh_maya_reference(self):
-        references = cmds.file(q=True, reference=True) or []
-        for ref in references:
-            try:
-                ref_node = cmds.referenceQuery(ref, referenceNode=True)
-                cmds.file(unloadReference=ref_node)  # 참조 파일 언로드
-                cmds.file(ref, loadReference=ref_node, force=True)  # 최신 버전으로 참조 파일 로드
-                print(f"✅ 참조 업데이트 완료: {ref}")
-            except Exception as e:
-                print(f"⚠️ 참조 업데이트 실패: {e}")
 
     def toggle_all_checkboxes(self):
         """모든 체크박스를 선택/해제하는 기능"""
@@ -277,16 +279,14 @@ class VersionCheckUI(QMainWindow):
     def update_maya_reference(self, row, new_version):
         """Maya에서 참조된 파일을 새로운 버전으로 업데이트"""
         references = cmds.file(q=True, reference=True) or []
-        print (f"안녕나는 레퍼런스 {references}" )
-        
+
         if row >= len(references):
             print(f"⚠️ 참조 파일을 찾을 수 없음: {row}")
             return
 
         # 🔹 현재 참조된 파일 경로 가져오기
         ref_path = cmds.referenceQuery(references[row], filename=True, withoutCopyNumber=True)
-        print(f"안녕 난느 {ref_path}")
-        
+
         if not ref_path or not os.path.exists(ref_path):
             print(f"⚠️ 참조 경로를 찾을 수 없습니다: {ref_path}")
             return
@@ -299,8 +299,6 @@ class VersionCheckUI(QMainWindow):
         base_name, ext = os.path.splitext(os.path.basename(ref_path))
         base_name_no_version = re.sub(r"\.v\d{3}", "", base_name)  # `v001` 같은 버전 제거
 
-
-        # file_extension = '.ma'  if ref_path.endswith('.ma') else ('.mb')
         # 파일 확장자를 확실하게 설정하기
       
         try :
@@ -308,17 +306,12 @@ class VersionCheckUI(QMainWindow):
         except:
             file_extension = '.mb'
     
-
-
-
-
         # 선택된 버전으로 파일명 갱신
         new_filename = f"{base_name_no_version}{new_version}{file_extension}"  # 새 파일명 생성
 
         #  해당 디렉토리 내에서 선택된 버전 찾기
         latest_path = os.path.join(asset_dir, new_filename)
 
-        print(f" 자 업뎃 드가자{latest_path}")  # Debugging line to check if correct version is being used
 
         if not os.path.exists(latest_path):
             print(f"⚠️ {new_filename} 파일이 존재하지 않습니다.")
@@ -339,127 +332,127 @@ class VersionCheckUI(QMainWindow):
         except Exception as e:
             print(f"⚠️ 참조 업데이트 실패: {e}")
 
-class AssetManager:
-    """🚀 파일 및 버전 정보를 관리하는 클래스"""
-    ASSET_DIRECTORY = "/nas/spirit/spirit/assets/Prop"
+# class AssetManager:
+#     """🚀 파일 및 버전 정보를 관리하는 클래스"""
+#     ASSET_DIRECTORY = "/nas/spirit/spirit/assets/Prop"
 
-    @staticmethod
-    def update_asset_info():
-        """🔹 현재 씬에서 참조된 에셋 정보를 JSON에 저장"""
-        references = cmds.file(q=True, reference=True) or []
-        asset_data = {}
+#     @staticmethod
+#     def update_asset_info():
+#         """🔹 현재 씬에서 참조된 에셋 정보를 JSON에 저장"""
+#         references = cmds.file(q=True, reference=True) or []
+#         asset_data = {}
 
-        for ref in references:
-            asset_name = os.path.basename(ref)  # 파일명 추출
-            clean_asset_name = AssetManager.get_clean_asset_name(asset_name)
-            ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
-            ref_node = cmds.referenceQuery(ref, referenceNode=True)
-            object_list = cmds.referenceQuery(ref_node, nodes=True, dagPath=True) or []
+#         for ref in references:
+#             asset_name = os.path.basename(ref)  # 파일명 추출
+#             clean_asset_name = AssetManager.get_clean_asset_name(asset_name)
+#             ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
+#             ref_node = cmds.referenceQuery(ref, referenceNode=True)
+#             object_list = cmds.referenceQuery(ref_node, nodes=True, dagPath=True) or []
 
-            asset_data[clean_asset_name] = {
-                "path": ref_path,
-                "objects": object_list
-            }
+#             asset_data[clean_asset_name] = {
+#                 "path": ref_path,
+#                 "objects": object_list
+#             }
 
-    @staticmethod
-    def get_clean_asset_name(asset_path):
-        """✅ 파일 경로에서 'Prop/' 다음에 오는 폴더명을 에셋 이름으로 가져오기"""
-        match = re.search(r"/Prop/([^/]+)/RIG/", asset_path)
-        if match:
-            return match.group(1)  # `Prop/` 다음 폴더명(에셋 이름) 반환
+#     @staticmethod
+#     def get_clean_asset_name(asset_path):
+#         """✅ 파일 경로에서 'Prop/' 다음에 오는 폴더명을 에셋 이름으로 가져오기"""
+#         match = re.search(r"/Prop/([^/]+)/RIG/", asset_path)
+#         if match:
+#             return match.group(1)  # `Prop/` 다음 폴더명(에셋 이름) 반환
         
-        return "unknown"  # 경로가 예상과 다르면 기본값 반환
-
-    @staticmethod
-    def get_latest_version(asset_name):
-        """최신 버전 찾기"""
-        asset_dir = AssetManager.get_asset_directory(asset_name)
-        if not asset_dir or not os.path.exists(asset_dir):
-            print(f"⚠️ '{asset_name}'의 디렉토리를 찾을 수 없음.")
-            return "v001"  # 기본값 v001 반환
-
-        versions = []
-        for file in os.listdir(asset_dir):
-            match = re.search(r"\.v(\d{3})\.mb", file)
-            if match:
-                versions.append(int(match.group(1)))
-        
-        print(f"Versions found: {versions}")  # 디버깅 출력
-        
-        if versions:
-            latest_version = max(versions)  # 가장 큰 버전 번호 선택
-            return f"v{latest_version:03d}"
-        else:
-            return "v001"  # 최신 버전이 없으면 v001 반환
-        
-
-
-    @staticmethod
-    def get_asset_directory(asset_name):
-        """해당 에셋이 존재하는 디렉토리 경로 가져오기"""
-        asset_path = os.path.join(ASSET_DIRECTORY, asset_name, "RIG", "publish", "maya")
-        
-        if os.path.exists(asset_path):
-            return asset_path
-        return None
+#         return "unknown"  # 경로가 예상과 다르면 기본값 반환
     
-    @staticmethod
-    def get_asset_paths():
-        """디렉토리 내 모든 에셋 경로를 딕셔너리로 반환"""
-        asset_paths = {}
-        asset_dirs = os.listdir(ASSET_DIRECTORY)  # ASSET_DIRECTORY에서 모든 파일 리스트 가져오기
+#     @staticmethod
+#     def get_latest_version(asset_name):
+#         """최신 버전 찾기"""
+#         asset_dir = AssetManager.get_asset_directory(asset_name)
+#         if not asset_dir or not os.path.exists(asset_dir):
+#             print(f"⚠️ '{asset_name}'의 디렉토리를 찾을 수 없음.")
+#             return "v001"  # 기본값 v001 반환
 
-        for asset_name in asset_dirs:
-            asset_paths[asset_name] = AssetManager.get_asset_directory(asset_name)
+#         versions = []
+#         for file in os.listdir(asset_dir):
+#             match = re.search(r"\.v(\d{3})\.mb", file)
+#             if match:
+#                 versions.append(int(match.group(1)))
+        
+#         print(f"Versions found: {versions}")  # 디버깅 출력
+        
+#         if versions:
+#             latest_version = max(versions)  # 가장 큰 버전 번호 선택
+#             return f"v{latest_version:03d}"
+#         else:
+#             return "v001"  # 최신 버전이 없으면 v001 반환
+        
 
-        return asset_paths
+
+#     @staticmethod
+#     def get_asset_directory(asset_name):
+#         """해당 에셋이 존재하는 디렉토리 경로 가져오기"""
+#         asset_path = os.path.join(ASSET_DIRECTORY, asset_name, "RIG", "publish", "maya")
+        
+#         if os.path.exists(asset_path):
+#             return asset_path
+#         return None
+    
+#     @staticmethod
+#     def get_asset_paths():
+#         """디렉토리 내 모든 에셋 경로를 딕셔너리로 반환"""
+#         asset_paths = {}
+#         asset_dirs = os.listdir(ASSET_DIRECTORY)  # ASSET_DIRECTORY에서 모든 파일 리스트 가져오기
+
+#         for asset_name in asset_dirs:
+#             asset_paths[asset_name] = AssetManager.get_asset_directory(asset_name)
+
+#         return asset_paths
 
 
-    @staticmethod
-    def get_all_asset_versions():
-        """디렉토리 내 모든 에셋과 그에 해당하는 버전들을 딕셔너리로 반환"""
-        asset_versions = {}
-        asset_dirs = os.listdir(ASSET_DIRECTORY)  # ASSET_DIRECTORY에서 모든 파일 리스트 가져오기
+#     @staticmethod
+#     def get_all_asset_versions():
+#         """디렉토리 내 모든 에셋과 그에 해당하는 버전들을 딕셔너리로 반환"""
+#         asset_versions = {}
+#         asset_dirs = os.listdir(ASSET_DIRECTORY)  # ASSET_DIRECTORY에서 모든 파일 리스트 가져오기
 
-        for asset_name in asset_dirs:
-            asset_versions[asset_name] = AssetManager.get_available_versions(asset_name)
+#         for asset_name in asset_dirs:
+#             asset_versions[asset_name] = AssetManager.get_available_versions(asset_name)
 
-        return asset_versions
+#         return asset_versions
     
 
-    @staticmethod
-    def get_available_versions(asset_name):
-        """특정 에셋의 모든 버전 가져오기"""
-        asset_dir = AssetManager.get_asset_directory(asset_name)
-        if not asset_dir or not os.path.exists(asset_dir):
-            print(f"⚠️ '{asset_name}'의 디렉토리를 찾을 수 없음.")
-            return "v001"  # 기본값 v001 반환
+#     @staticmethod
+#     def get_available_versions(asset_name):
+#         """특정 에셋의 모든 버전 가져오기"""
+#         asset_dir = AssetManager.get_asset_directory(asset_name)
+#         if not asset_dir or not os.path.exists(asset_dir):
+#             print(f"⚠️ '{asset_name}'의 디렉토리를 찾을 수 없음.")
+#             return "v001"  # 기본값 v001 반환
 
-        versions = []
-        for file in os.listdir(asset_dir):
-            match = re.search(r"\.v(\d{3})\.(ma|mb)", file)
-            if match:
-                versions.append(int(match.group(1)))
+#         versions = []
+#         for file in os.listdir(asset_dir):
+#             match = re.search(r"\.v(\d{3})\.(ma|mb)", file)
+#             if match:
+#                 versions.append(int(match.group(1)))
         
-        print(f"Versions found: {versions}")  # 디버깅 출력  
-        return [f".v{v:03d}" for v in versions] if versions else [".v001"]
+#         print(f"Versions found: {versions}")  # 디버깅 출력  
+#         return [f".v{v:03d}" for v in versions] if versions else [".v001"]
 
 
-    @staticmethod
-    def get_referenced_asset_paths():
-        """현재 씬에서 참조된 에셋들의 경로를 딕셔너리 형태로 반환"""
-        references = cmds.file(q=True, reference=True) or []
-        asset_paths = {}
+#     @staticmethod
+#     def get_referenced_asset_paths():
+#         """현재 씬에서 참조된 에셋들의 경로를 딕셔너리 형태로 반환"""
+#         references = cmds.file(q=True, reference=True) or []
+#         asset_paths = {}
 
-        for ref in references:
-            asset_name = os.path.basename(ref)  # 파일명 추출
-            clean_asset_name = AssetManager.get_clean_asset_name(asset_name)
-            ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
+#         for ref in references:
+#             asset_name = os.path.basename(ref)  # 파일명 추출
+#             clean_asset_name = AssetManager.get_clean_asset_name(asset_name)
+#             ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
 
-            # 에셋 경로를 딕셔너리에 저장
-            asset_paths[clean_asset_name] = ref_path
+#             # 에셋 경로를 딕셔너리에 저장
+#             asset_paths[clean_asset_name] = ref_path
 
-        return asset_paths
+#         return asset_paths
 
 class MayaReferenceManager:
     """🎯 Maya 내 참조 및 오브젝트 선택 기능 관리"""
@@ -559,14 +552,7 @@ class MayaReferenceManager:
             print(f"⚠️ '{asset_name}'에 연결된 오브젝트가 없습니다.")
 
 
-def launch_ui():
-    """Maya에서 UI 실행"""
-    try:
-        window.close()
-    except:
-        pass
-    window = VersionCheckUI()
-    window.show()
+if __name__ == "__main__":
 
-if not cmds.about(batch=True):
-    cmds.evalDeferred(launch_ui)
+    window = MainUiManager()
+    window.show()
