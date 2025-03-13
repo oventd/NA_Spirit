@@ -13,7 +13,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
 from db_crud import AssetDb  # 수정된 db_crud에서 Asset 클래스를 import
 from constant import *
-
+from bson import ObjectId
 
 from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import Signal, Qt
@@ -99,7 +99,7 @@ class AssetService:
     """
 
     @staticmethod
-    def get_all_assets(filter_conditions, sort_by, limit, skip): # 리뷰 메서드 이상함 all과 limit가 공존하는 이름 
+    def get_all_assets(filter_conditions, sort_by, limit, skip,user_query): # 리뷰 메서드 이상함 all과 limit가 공존하는 이름 
         """
         모든 자산 데이터를 MongoDB에서 가져옴. 무한 스크롤을 지원.
         - db_crud.py의 find() 호출
@@ -111,7 +111,8 @@ class AssetService:
         :return: 조회된 자산 리스트
         """
         # asset_manager =   # Asset 클래스의 인스턴스를 생성
-        return AssetDb().find(filter_conditions=filter_conditions, sort_by=sort_by, limit=limit, skip=skip)
+        
+        return AssetDb().search(filter_conditions=filter_conditions, sort_by=sort_by, limit=limit, skip=skip,user_query = user_query)
             
     @staticmethod
     def get_asset_by_id(asset_id):
@@ -166,19 +167,21 @@ class AssetService:
         return asset_manager.increment_count(asset_id)  # 자산 데이터 업데이트
     
     @staticmethod
-    def search_input(search_word, fields=[OBJECT_ID, NAME, SCORE]):
+    def search_input(search_word, filter_conditions):
         """
         데이터를 검색합니다.
         :param user_query: 검색어
         :param fields: 검색 결과에서 가져올 필드 목록
         :return: 검색 결과
         """
-        asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        print(f"[DEBUG] Searching with query: {search_word}")  # 디버깅용 로그
-        print(f"[DEBUG] Fields passed to search_input: {fields}")  # 전달된 fields 값 확인
-        return asset_manager.search(user_query=search_word, fields=fields)  # 자산 데이터 업데이트
-
-
+        # asset_manager =   # AssetDb 클래스의 인스턴스를 생성
+   
+        return AssetDb().search(user_query=search_word, filter_conditions = filter_conditions)  # 자산 데이터 업데이트
+    @staticmethod
+    def get_asset_by_id_all(filter_conditions, sort_by=None, limit=None, skip=None, user_quaery = None):
+        # asset_manager = AssetDb()
+        return AssetDb().search(user_quaery ,filter_conditions=filter_conditions, sort_by=sort_by, limit=limit, skip=skip)
+    
     # @staticmethod
     # def search_input(search_word, filter_conditions, limit, skip, sort_by, fields=None):
     #     """

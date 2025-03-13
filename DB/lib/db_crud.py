@@ -49,10 +49,10 @@ class DbCrud:
     """
 
     def construct_query_pipeline(self, filter_conditions=None, sort_by=None, sort_order=None,
-                                limit=0, skip=0, fields=None):
+                                limit=0, skip=0, fields=None,user_quaery =None):
         """
         MongoDB 쿼리 파이프라인을 생성하는 공통 함수.
-        - filter_conditions: 필터 조건
+        - filter_conditions: 필터 조건 {}
         - sort_by: 정렬 기준 필드
         - sort_order: 정렬 순서 (ASCENDING or DESCENDING)
         - limit: 최대 조회 개수
@@ -67,11 +67,18 @@ class DbCrud:
                     query_filter[key] = {"$in": value}
                 else:
                     query_filter[key] = value
+        if user_quaery is not None:
+            query_filter["$text"] = {"$search": user_quaery}
+            
 
+            
+        print(f"[DEBUG] Query Filter before adding to pipeline: {query_filter}")
         projection = None
         if fields:
             projection = {}
             for field in fields:
+                if field.startswith("$"):  # 필드명이 `$`로 시작하면 오류 발생 가능성 있음
+                    raise ValueError(f"[ERROR] Invalid field name: {field}")
                 projection[field] = 1
 
         pipeline = [{"$match": query_filter}]
@@ -84,8 +91,10 @@ class DbCrud:
                 DOWNLOADS: (DOWNLOADS, pymongo.DESCENDING),    # 다운로드 많은 순
             }
             sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, pymongo.ASCENDING))  # 기본값 오름차순
-
-            pipeline.append({"$sort": {sort_by: sort_order}})
+            if user_quaery is None:
+                pipeline.append({"$sort": {sort_by: sort_order}})
+            elif user_quaery is not None:
+                pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})
 
         if limit:
             pipeline.append({"$limit": limit})
@@ -104,50 +113,84 @@ class DbCrud:
         return result
 
     def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
-                    limit=40, skip=0, fields=None):
+                    limit=0, skip=0, fields=None):
         object_ids = []
-        if filter_conditions:
-            for value in filter_conditions:
-                object_ids.append(ObjectId(value))
 
-        query_filter = {"_id": {"$in": object_ids}}
+        # ✅ filter_conditions 값이 올바른 ObjectId 리스트인지 검증
+        if filter_conditions:
+            if not isinstance(filter_conditions, list):
+                raise TypeError("filter_conditions must be a list of ObjectId strings")
+
+            for value in filter_conditions:
+                if isinstance(value, str):  # 문자열이면 ObjectId로 변환
+                    try:
+                        object_ids.append(ObjectId(value))
+                    except Exception:
+                        raise ValueError(f"Invalid ObjectId format: {value}")
+                elif isinstance(value, ObjectId):  # 이미 ObjectId이면 그대로 사용
+                    object_ids.append(value)
+                else:
+                    raise TypeError(f"Expected string or ObjectId, got {type(value)}")
+
+        # ✅ 최종적으로 object_ids에 올바른 값이 들어갔는지 확인
+                print(f"[DEBUG] Final ObjectId List: {object_ids}")
+
+        # ✅ 쿼리 필터를 올바른 형식으로 설정
+        if object_ids:
+            query_filter = {"_id": {"$in": object_ids}}
+        else:
+            query_filter = {}  # 빈 필터를 사용하여 모든 데이터를 가져올 수 있도록 처리
+
+        # ✅ 디버깅용 로그 추가
+        print(f"[DEBUG] Query Filter: {query_filter}")
+
+        # ✅ 파이프라인 생성 후 실행
         pipeline = self.construct_query_pipeline(query_filter, sort_by, sort_order, limit, skip, fields)
         result = list(self.asset_collection.aggregate(pipeline))
+
         return result
+
     
     def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
         """
         검색어 기반으로 데이터를 조회. 검색 점수를 기준으로 정렬됨.
         """
+        # projection = {
+        #     "_id": 1, "name": 1, "description": 1, "asset_type": 1, "category": 1, 
+        #     "style": 1, "resolution": 1, "file_format": 1, "size": 1, "license_type": 1,
+        #     "creator_id": 1, "creator_name": 1, "downloads": 1, "price": 1, "detail_url": 1,
+        #     "presetting_url1": 1, "presetting_url2": 1, "presetting_url3": 1, "preview_url": 1
+        # }
+        if fields == None:
+            fields = [
+                "_id", "name", "description", "asset_type", "category", 
+                "style", "resolution", "file_format", "size", "license_type",
+                "creator_id", "creator_name", "downloads", "price", "detail_url",
+                "presetting_url1", "presetting_url2", "presetting_url3", "preview_url"
+            ]
         # 기본 파이프라인 생성
-        pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields)
+        pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields,user_quaery=user_query)
 
-        if user_query:
-            # 텍스트 검색을 위한 파이프라인 추가
-            pipeline.insert(0, {"$match": {"$text": {"$search": user_query}}})
-            pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})  # 점수(score)로 정렬
+        # if user_query:
+        #     # 텍스트 검색을 위한 파이프라인 추가
+        #     # pipeline.insert(0, {"$match": {"$text": {"$search": user_query}}})
+        #     pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})  # 점수(score)로 정렬
 
         # 기본 projection 설정
-        projection = {
-            "_id": 1, "name": 1, "description": 1, "asset_type": 1, "category": 1, 
-            "style": 1, "resolution": 1, "file_format": 1, "size": 1, "license_type": 1,
-            "creator_id": 1, "creator_name": 1, "downloads": 1, "price": 1, "detail_url": 1,
-            "presetting_url1": 1, "presetting_url2": 1, "presetting_url3": 1, "preview_url": 1
-        }
+
 
         # fields가 전달된 경우, projection을 해당 필드들로만 제한
-        if fields:
-            projection = {field: 1 for field in fields}  # fields에서 지정한 필드만 포함
+        # if fields:
+        #     projection = {field: 1 for field in fields}  # fields에서 지정한 필드만 포함
         
         # score 필드는 항상 포함시키기
-        projection["score"] = {"$meta": "textScore"}
+            # projection["score"] = {"$meta": "textScore"}
 
         # _id를 제외하려면 projection에 '_id': 0을 추가
-        if "_id" not in fields:
-            projection["_id"] = 0
+        # if "_id" not in fields:
+        #     projection["_id"] = 1
 
         # projection 추가
-        pipeline.append({"$project": projection})
 
         # 결과 반환
         result = list(self.asset_collection.aggregate(pipeline))
@@ -302,5 +345,10 @@ class AssetDb(DbCrud):
     def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
         # 부모 클래스의 search 호출
         result = super().search(user_query, filter_conditions, limit, skip, fields, sort_by, sort_order)
+        return self.set_url_fields(result)
+    
+    def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
+                    limit=0, skip=0, fields=None):
+        result = super().find_and_sort(filter_conditions, sort_by, sort_order, limit, skip, fields)
         return self.set_url_fields(result)
 

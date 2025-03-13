@@ -43,7 +43,7 @@ from dynamic_circle_label import DynamicCircleLabel
 from logger import *
 from download_manager import DownloadManager
 from json_manager import DictManager
-
+from bson import ObjectId
 
 class TableUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
@@ -60,7 +60,7 @@ class TableUiManager:
             self.ui = ui
             self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
-
+            self.search_word =None
             self.ui.exit_btn.clicked.connect(self.exit_sub_win)
             self.ui.image_l_btn.clicked.connect(partial (SubWin.prev_slide, self.ui.stackedWidget_2))
             self.ui.image_r_btn.clicked.connect(partial (SubWin.next_slide, self.ui.stackedWidget_2))
@@ -80,25 +80,40 @@ class TableUiManager:
             self.asset_dict = {}
 
     def search_input(self, search_word):
-    
+        self.search_word = search_word
         """서치 텍스트를 받아오고 table을 업데이트하는 함수"""
         self.search_list = []
-        self.search_dict={}
-      
-        
+        self.search_dict = {}
+    
+        if self.search_word is not None:
+            if len(self.search_word) < 3:
+                search_word =None
+        else:
+            search_word = self.search_word
 
-        assets=AssetService.search_input(search_word)
-        print("search_assets: ",assets)
-        # print( "search_input: ",self.search_list)
-        # for asset in assets:
-            
- 
-            # self.search_dict[OBJECT_ID]=self.search_list
-        
-        # self.ui.like_empty_notice.hide()
-        # self.ui.tableWidget.clear()
-        # print( "search_input: ",self.search_list)
-        self.table_widget(assets, SCORE, 40, 0, None)
+        if LikeState().state:
+            filter_conditions = LikeState().like_filter_condition
+
+        else:
+            filter_conditions = Check().dict
+
+        assets=AssetService.search_input(search_word, filter_conditions)
+       
+        # print(f"👉[DEBUG] asset_ids: {asset_ids}")  # 👉 검색 결과 확인
+        # # id_list = [(original['_id']) for original in asset_list]
+
+        # # asset_ids에서 '_id' 필드를 추출하고 ObjectId로 변환
+        # id_list = [ObjectId(asset['_id']) for asset in asset_ids]
+        # print(f"👉[DEBUG] Converted id_list: {id_list}")
+
+        # # 필터 조건으로 ObjectId 리스트 전달
+        # asset_list = AssetService.get_asset_by_id_all(filter_conditions=id_list)
+        # print(f"👉[DEBUG] asset_list id_list: {asset_list}")
+
+        # UI 업데이트
+        self.ui.like_empty_notice.hide()
+        self.ui.tableWidget.clear()
+        self.make_table(assets)
 
 #라벨 초기화 함수 실행
     def remove_lable(self):
@@ -197,9 +212,19 @@ class TableUiManager:
         # 리뷰 이거 셀프로 init에 구현 이거 근데 저장하는 변수명이 쫌...... 
         # 리뷰 static밖에 없는데 왜 객체 생성????
         ui.like_empty_notice.hide()
-    
-        assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+        search_word = self.search_word
+        if self.search_word is not None:
+            if len(self.search_word) < 3:
+                search_word =None
 
+        if LikeState().state:
+            filter_conditions = LikeState().like_filter_condition
+
+        if filter_conditions == list:
+            AssetService.get_asset_by_id_all(filter_conditions, sort_by, limit, skip, search_word)
+            
+        assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip,search_word)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+        print(f"여기에 테이블위젯 구정하는 assets 들어있어요 <<>>>>>>{assets}")
         if search == True:
             
             AssetService.assetmanager()

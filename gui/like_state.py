@@ -1,5 +1,6 @@
 from PySide6.QtGui import QPixmap, QIcon
 from json_manager import DictManager
+from bson import ObjectId
 
 class LikeState:
     _instance = None  # 싱글톤 인스턴스 저장
@@ -21,7 +22,7 @@ class LikeState:
         self._like_icon = QIcon("/nas/spirit/asset_project/source/like_icon_on.png")
         self._initialized = True
         self._like_asset_list = DictManager().load_dict_from_json()
-        
+
     @property
     def state(self):
         return self._state  # _state 값을 반환
@@ -56,6 +57,13 @@ class LikeState:
     @property
     def like_download_image(self):
         return self._like_download_image
+    
+    @property
+    def like_filter_condition(self):
+        result = {'_id':[]}
+        for obj_id in self._like_asset_list:
+            result['_id'].append(ObjectId(obj_id))
+        return result
     
 
     
