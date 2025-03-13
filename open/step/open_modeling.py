@@ -38,40 +38,27 @@ class ModelingStep(StepOpenMaya):
             return True
 
         @staticmethod
-        def publish(group_name="geo", entity_path=None, step=None, category=None, group="geo"):
+        def publish(group_name="geo", session_path=None, step=None, category=None, group="geo"):
             """ 특정 그룹을 USD와 MB 파일로 export """
 
             if not ModelingStep.Publish.validate(group_name):  # validate 호출 시 geo_group_name 전달
                 print("Publish aborted: Validation failed.")
                 return False  # 검증 실패 시 퍼블리싱 중단
             
-            if not entity_path or not step:
+            if not session_path or not step:
                 print("Error: No export path or step provided.")
                 return False
             
             # 퍼블리쉬 경로 변경
-            publish_path = SgPathUtils.get_publish_from_work(os.path.dirname(entity_path)) # work-> "publish" 
+            publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish" 
 
-            # 퍼블리쉬 디렉토리 설정
-            maya_export_dir = SgPathUtils.get_maya_publish_dir(publish_path, step)
-            usd_export_dir = SgPathUtils.get_usd_publish_dir(publish_path, step)
+            # 파일 확장자명 변경
+            usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
+            mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb  
 
-            # 기존의 파일명에서 확장자 변경
-            original_filename = os.path.splitext(os.path.basename(entity_path))[0]  # scene.v002
-            mb_filename = original_filename + ".mb" # .mb
-            usd_filename = original_filename + ".usd" # .usd
-
-            # 최종 저장 경로
-            mb_export_path = os.path.join(maya_export_dir, mb_filename) # /publish/maya/scene.v002.mb
-            usd_export_path = os.path.join(usd_export_dir, usd_filename) # /publish/usd/scene.v002.usd
-
-            # ✅ 디버깅용 출력
-            print(f"[DEBUG] entity_path: {entity_path}")
-            print(f"[DEBUG] publish_path: {publish_path}")
-            print(f"[DEBUG] maya_export_dir: {maya_export_dir}")
-            print(f"[DEBUG] usd_export_dir: {usd_export_dir}")
-            print(f"[DEBUG] mb_export_path: {mb_export_path}")
-            print(f"[DEBUG] usd_export_path: {usd_export_path}")
+            # 파일 최종 저장 경로
+            maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # maya dir
+            usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir                     
             
             # 디렉토리 존재 여부 확인 후 생성
             for export_dir in [maya_export_dir, usd_export_dir]:
@@ -84,7 +71,7 @@ class ModelingStep(StepOpenMaya):
 
             """ maya 파일 내보내는 파트 """
             # MB 파일 내보내기
-            if not MayaUtils.file_export(mb_export_path, file_format="mb"):
+            if not MayaUtils.file_export(maya_export_dir, file_format="mb"):
                 return False
             
             """ USD 파일 내보내는 파트 """
@@ -96,7 +83,7 @@ class ModelingStep(StepOpenMaya):
                 usd_export_options = ""  # 값이 없다면 빈 문자열로 대체
 
             # USD 파일 내보내기
-            if not MayaUtils.file_export(usd_export_path, file_format="usd", export_options=usd_export_options):
+            if not MayaUtils.file_export(usd_export_dir, file_format="usd", export_options=usd_export_options):
                 return False
 
             print(f"Modeling publish completed for {group_name}.")
@@ -110,7 +97,7 @@ if __name__ == "__main__":
 
     ModelingStep.Publish.publish(
         group_name="geo",
-        entity_path="/nas/spirit/spirit/assets/Prop/apple/MDL/work/maya/scene.v002.ma",
+        session_path="/nas/spirit/spirit/assets/Prop/apple/MDL/work/maya/scene.v002.ma",
         step="modeling",
         category="modeling",
         group="geo"

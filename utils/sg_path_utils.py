@@ -55,12 +55,20 @@ class SgPathUtils:
         elif 'assets' in path:
             return 'assets'
         return None
+    
     @staticmethod
     def trim_entity_path(entity_path):
-        dirs = os.path.normpath(entity_path).split(os.sep)  # OS에 맞게 경로 정규화
+        """
+        주어진 entity_path에서 "assets" 또는 "sequences" 폴더가 처음 나타나는 지점을 기준으로
+        하위 2단계 폴더까지만 유지하고 나머지 뒷부분은 제거하여 경로를 간략화합니다.
+        
+        예: '/project/show/assets/character/main/model/v001'
+            -> '/project/show/assets/character/main'
+        """
+        dirs = os.path.normpath(entity_path).split(os.sep)
         symbolic_index = -1
 
-        # "assets" 또는 "sequences"가 포함된 첫 번째 위치 찾기
+        # 경로에서 "assets" 또는 "sequences"의 첫 번째 위치를 찾음
         for i, dir_name in enumerate(dirs):
             if dir_name in ("assets", "sequences"):
                 symbolic_index = i
@@ -69,73 +77,138 @@ class SgPathUtils:
         if symbolic_index == -1:
             raise ValueError(f"Invalid entity path (no 'assets' or 'sequences' found): {entity_path}")
 
-        # "assets" 또는 "sequences" 이후 2개 더 포함 (총 3개 유지)
         symbolic_index_added = symbolic_index + 3
 
-        if symbolic_index_added > len(dirs):  # num보다 커야 정상
+        if symbolic_index_added > len(dirs):
             raise ValueError(f"Invalid entity path (too short): {entity_path}")
 
         trimmed_path = os.sep.join(dirs[:symbolic_index_added])
         return trimmed_path
-    
+
     @staticmethod
     def get_publish_dir(entity_path, step):
-        trimed_path = SgPathUtils.trim_entity_path(entity_path)
-        return os.path.join(trimed_path, step, "publish" )
-        
+        """
+        entity_path에서 trim_entity_path로 경로를 간략화한 후,
+        특정 작업(step)의 publish 디렉터리 경로를 반환합니다.
+
+        예: '/project/show/assets/character/main', 'model'
+            -> '/project/show/assets/character/main/model/publish'
+        """
+        trimmed_path = SgPathUtils.trim_entity_path(entity_path)
+        return os.path.join(trimmed_path, step, "publish")
 
     @staticmethod
     def get_type(publish_file):
+        """
+        주어진 publish_file 경로에서 바로 상위 디렉터리의 이름을 반환합니다.
+
+        예: '/project/show/assets/character/main/model/publish/usd/file.usd'
+            -> 'usd'
+        """
         SgPathUtils.trim_entity_path(publish_file)
         return os.path.basename(os.path.dirname(publish_file))
-    
+
     @staticmethod
     def get_usd_publish_dir(entity_path, step):
-        publish_dir = SgPathUtils.get_publish_dir(entity_path=entity_path,step=step)
-        return os.path.join(publish_dir,"usd")
+        """
+        특정 작업(step)의 USD publish 디렉터리 경로를 반환합니다.
+
+        예: '/project/show/assets/character/main', 'model'
+            -> '/project/show/assets/character/main/model/publish/usd'
+        """
+        publish_dir = SgPathUtils.get_publish_dir(entity_path=entity_path, step=step)
+        return os.path.join(publish_dir, "usd")
+
     @staticmethod
     def get_maya_publish_dir(entity_path, step):
-        publish_dir = SgPathUtils.get_publish_dir(entity_path=entity_path,step=step)
-        return os.path.join(publish_dir,"maya")
-    
+        """
+        특정 작업(step)의 Maya publish 디렉터리 경로를 반환합니다.
+
+        예: '/project/show/assets/character/main', 'model'
+            -> '/project/show/assets/character/main/model/publish/maya'
+        """
+        publish_dir = SgPathUtils.get_publish_dir(entity_path=entity_path, step=step)
+        return os.path.join(publish_dir, "maya")
 
     @staticmethod
     def get_publish_from_work(work_file):
-        """work -> publish 변경"""
+        """
+        work 경로를 publish 경로로 변환하여 반환합니다.
+        """
         return work_file.replace("work", "publish")
 
     @staticmethod
     def get_work_from_publish(publish_file):
-        """publish -> work 변경"""
+        """
+        publish 경로를 work 경로로 변환하여 반환합니다.
+        """
         return publish_file.replace("publish", "work")
 
     @staticmethod
     def get_maya_dcc_from_usd_dcc(path):
+        """
+        USD DCC 경로를 Maya DCC 경로로 변경합니다.
+        """
         return path.replace('usd', 'maya')
+
     @staticmethod
     def get_usd_dcc_from_usd_dcc(path):
+        """
+        Maya DCC 경로를 USD DCC 경로로 변경합니다.
+        """
         return path.replace('maya', 'usd')
-    
+
     @staticmethod
     def get_maya_ext_from_usd_ext(usd_file):
-        """USD 확장자를 MB 확장자로 변경"""
+        """
+        USD 파일 확장자를 Maya 바이너리(.mb) 확장자로 변경합니다.
+        """
         return usd_file.replace(".usd", ".mb")
 
     @staticmethod
     def get_usd_ext_from_maya_ext(maya_file):
-        """MB 확장자를 USD 확장자로 변경"""
-        if maya_file.find('.ma'):
+        """
+        Maya 파일 확장자(.ma, .mb)를 USD 확장자(.usd)로 변경합니다.
+        지원되지 않는 확장자는 ValueError를 발생시킵니다.
+        """
+        if maya_file.endswith('.ma'):
             result = maya_file.replace(".ma", ".usd")
-        elif maya_file.find('.mb'):
-            result = maya_file.replace('.mb','.usd')
+        elif maya_file.endswith('.mb'):
+            result = maya_file.replace('.mb', '.usd')
         else:
-            raise ValueError
+            raise ValueError(f"Unsupported Maya file extension in {maya_file}")
         return result
     
+    @staticmethod
+    def get_maya_ext_from_mb(maya_file):
+        """
+        Maya 파일 확장자(.ma)를 (.mb)로 변경합니다.
+        지원되지 않는 확장자는 ValueError를 발생시킵니다.
+        """
+        if maya_file.endswith('.ma'):
+            result = maya_file.replace(".ma", ".mb")
+        else:
+            raise ValueError(f"Unsupported Maya file extension in {maya_file}")
+        return result
+
 
 if __name__ == "__main__":
     session_path = "/nas/spirit/spirit/assets/Prop/apple/MDL/work/maya/scene.v002.ma"
-    session_path = SgPathUtils.get_usd_ext_from_maya_ext(session_path)
-    session_path = SgPathUtils.get_publish_from_work(session_path)
-    session_path = SgPathUtils.get_usd_dcc_from_usd_dcc(session_path)
-    print(session_path)
+    # session_path = SgPathUtils.get_usd_ext_from_maya_ext(session_path)
+    # session_path = SgPathUtils.get_publish_from_work(session_path)
+    # session_path = SgPathUtils.get_maya_dcc_from_usd_dcc(session_path)
+
+# testtttt
+    publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish"
+    
+    usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
+    mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb
+
+    
+    maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # usd dir
+    usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir
+
+
+    print(publish_path)
+    print(usd_filename)
+    print(f"{usd_export_dir} + {maya_export_dir}")
