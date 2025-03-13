@@ -47,7 +47,6 @@ class DbCrud:
     find()는 필터링 된 모든 문서를 가져온 후 limit를 적용하기에 효율성 저하
     aggregate()는 필터링 후 정렬하고, limit를 사용해서 메모리 사용을 줄인다.
     """
-
     def construct_query_pipeline(self, filter_conditions=None, sort_by=None, sort_order=None,
                                 limit=0, skip=0, fields=None,user_quaery =None):
         """
@@ -60,6 +59,13 @@ class DbCrud:
         - fields: 반환할 필드 목록
         """
         query_filter = {}
+        pipeline = []
+        projection = {}
+        if limit:
+            pipeline.append({"$limit": limit})
+        if skip:
+            pipeline.append({"$skip": skip})
+
 
         if filter_conditions:
             for key, value in filter_conditions.items():
@@ -69,22 +75,29 @@ class DbCrud:
                     query_filter[key] = value
         if user_quaery is not None:
             query_filter["$text"] = {"$search": user_quaery}
+            projection["score"]= {"$meta": "textScore"}
             
-
-            
-        print(f"[DEBUG] Query Filter before adding to pipeline: {query_filter}")
-        projection = None
         if fields:
-            projection = {}
             for field in fields:
                 if field.startswith("$"):  # 필드명이 `$`로 시작하면 오류 발생 가능성 있음
                     raise ValueError(f"[ERROR] Invalid field name: {field}")
                 projection[field] = 1
+        if projection:
+            pipeline.append({"$project": projection})  # 기본 projection            
 
-        pipeline = [{"$match": query_filter}]
+            
+        print(f"[DEBUG] Query Filter before adding to pipeline: {query_filter}")
+
+        
+
+
+        pipeline.insert(0,{"$match": query_filter})
 
         # sort_by만 주어졌을 경우 기본값으로 DESCENDING을 설정
-        if sort_by:
+        if user_quaery is not None:
+            pipeline.append({"$sort": {"score":-1}})
+
+        elif sort_by:
             default_sort_orders = {
                 CREATED_AT: (UPDATED_AT, pymongo.DESCENDING),  # 최신순
                 UPDATED_AT: (UPDATED_AT, pymongo.ASCENDING),  # 오래된순
@@ -93,17 +106,13 @@ class DbCrud:
             sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, pymongo.ASCENDING))  # 기본값 오름차순
             if user_quaery is None:
                 pipeline.append({"$sort": {sort_by: sort_order}})
-            elif user_quaery is not None:
-                pipeline.append({"$sort": {"score": {"$meta": "textScore"}}})
+                print(f"✅ 기본 정렬 기준 적용: {sort_by}, {sort_order}")
 
-        if limit:
-            pipeline.append({"$limit": limit})
-        if skip:
-            pipeline.append({"$skip": skip})
-        if projection:
-            pipeline.append({"$project": projection})  # 기본 projection
+
+
 
         self.logger.debug(f"Generated Query Pipeline: {pipeline}")  # 디버깅을 위한 로깅
+        print(pipeline)
         return pipeline
 
     def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=0, skip=0, fields=None):
@@ -279,8 +288,8 @@ class AssetDb(DbCrud):
             # self.asset_collection.create_index([(UPDATED_AT, pymongo.ASCENDING)])
             # self.asset_collection.create_index([(DOWNLOADS, pymongo.DESCENDING)])
             # self.asset_collection.create_index(
-            #     [(NAME, TEXT), (DESCRIPTION, TEXT)],
-            #     weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
+            #     [(NAME, "text")]
+            #     # weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
             # )
             self.logger.info("Indexes set up for AssetDb")
 

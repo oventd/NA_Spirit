@@ -190,7 +190,7 @@ class TableUiManager:
         #     AssetService.get_asset_by_id_all(filter_conditions, sort_by, limit, skip, search_word)
             
         assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip,search_word)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
-        print(f"여기에 테이블위젯 구정하는 assets 들어있어요 <<>>>>>>{assets}")
+        # print(f"여기에 테이블위젯 구정하는 assets 들어있어요 <<>>>>>>{assets}")
 
         self.ui.tableWidget.clear()
         self.make_table(assets)
