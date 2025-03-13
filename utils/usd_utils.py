@@ -151,31 +151,35 @@ class UsdUtils:
             old_xform = UsdGeom.Xform(old_prim)
             new_xform = UsdGeom.Xform(new_prim)
 
-            for op in old_xform.GetOrderedXformOps():
-                new_xform.AddXformOp(op.GetOpType()).Set(op.Get())
+    scope_a = UsdUtils.create_scope(stage, "/Root/Geometry")
+    scope_b = UsdUtils.create_scope(stage, "/Root/Shader")
+    
+    UsdUtils.add_reference(scope_a, "geo_anim.usd")
+    UsdUtils.add_reference(scope_b, "tex.usd")
 
-        # ✅ 기존 Prim의 References 복사
-        new_prim.GetReferences().ClearReferences()
-        print(dir(old_prim.GetReferences()))
-        for reference in old_prim.GetReferences():
-            new_prim.GetReferences().AddReference(reference.assetPath)
+    usd_hierarchy = UsdUtils.usd_to_dict(stage.GetPseudoRoot())
+    import pprint
+    pprint.pprint(usd_hierarchy)
+    mats = UsdUtils.find_prim_paths_by_type(usd_hierarchy, "Material")
+    meshs = UsdUtils.find_prim_paths_by_type(usd_hierarchy, "Mesh")
 
-        # # ✅ 기존 Prim의 Variant Set 복사
-        # old_variant_sets = old_prim.GetVariantSets()
-        # new_variant_sets = new_prim.GetVariantSets()
+    print(mats)
+    print(meshs)
 
-        # for variant_set_name in old_variant_sets.GetNames():
-        #     variant_set = new_variant_sets.AddVariantSet(variant_set_name)
-        #     old_variant_set = old_variant_sets.GetVariantSet(variant_set_name)
-            
-        #     # Variant 이름 복사
-        #     for variant_name in old_variant_set.GetVariantNames():
-        #         variant_set.AddVariant(variant_name)
+    path = "/geo"
+    # stage_geo = UsdUtils.get_stage("geo_anim.usd")
+    # usd_hierarchy1 = UsdUtils.usd_to_dict(stage_geo.GetPseudoRoot())
+    # mesh1 = UsdUtils.find_prim_paths_by_type(usd_hierarchy1, "Mesh")
+    # print(usd_hierarchy1)
+    # print(mesh1)
 
-        #     # 현재 선택된 Variant 복사
-        #     selected_variant = old_variant_set.GetVariantSelection()
-        #     if selected_variant:
-        #         variant_set.SetVariantSelection(selected_variant)
+    mesh1 = stage.GetPrimAtPath(meshs[0])
+    mesh2 = stage.GetPrimAtPath(meshs[1])
+    if not mesh1 or not mesh1.IsValid():
+        raise RuntimeError(f"Invalid Mesh Prim: {path}")
+
+    material = UsdShade.Material.Get(stage, mats[0])
+    material1 = UsdShade.Material.Get(stage, mats[1])
 
         # # ✅ 기존 Prim의 하위 Prim 재귀 복사
         # for child in old_prim.GetChildren():
@@ -185,17 +189,19 @@ class UsdUtils:
     def get_prim_path(prim):
         return prim.GetPath()
 
-
-if __name__ == "__main__":
-    stage = UsdUtils.create_usd_file("output.usd")
-    stage1 = UsdUtils.create_usd_file("output1.usd")
-    xform_a = UsdUtils.create_xform(stage, "/Sphere")
-    UsdGeom.Sphere.Define(stage, "/Sphere/Shape")
+    # 올바르게 로드되었으면 Material을 Mesh에 바인딩
+    UsdShade.MaterialBindingAPI(mesh1).Bind(material1)
+    UsdShade.MaterialBindingAPI(mesh2).Bind(material)
     stage.GetRootLayer().Save()
 
     xform_b = UsdUtils.create_xform(stage1, "/ref")
     UsdUtils.add_reference(xform_b, "/home/rapa/NA_Spirit/test_maya_export.usd")
     
+# mesh export
+#file -force -options ";exportUVs=1;exportSkels=none;exportSkin=none;exportBlendShapes=0;exportDisplayColor=0;filterTypes=nurbsCurve;exportColorSets=0;exportComponentTags=0;defaultMeshScheme=catmullClark;animation=0;eulerFilter=0;staticSingleSample=0;startTime=1;endTime=48;frameStride=1;frameSample=0.0;defaultUSDFormat=usda;rootPrim=;rootPrimType=xform;defaultPrim=geo;exportMaterials=0;shadingMode=useRegistry;convertMaterialsTo=[UsdPreviewSurface];exportAssignedMaterials=1;exportRelativeTextures=automatic;exportInstances=1;exportVisibility=1;mergeTransformAndShape=1;includeEmptyTransforms=1;stripNamespaces=0;worldspace=0;exportStagesAsRefs=1;excludeExportTypes=[];legacyMaterialScope=0" -typ "USD Export" -pr -es "/home/rapa/NA_Spirit/geo.usd";
+    
+# material export
+#file -force -options ";exportUVs=1;exportSkels=none;exportSkin=none;exportBlendShapes=0;exportDisplayColor=0;filterTypes=nurbsCurve;exportColorSets=0;exportComponentTags=0;defaultMeshScheme=catmullClark;animation=0;eulerFilter=0;staticSingleSample=0;startTime=1;endTime=48;frameStride=1;frameSample=0.0;defaultUSDFormat=usda;rootPrim=;rootPrimType=xform;defaultPrim=geo;exportMaterials=1;shadingMode=useRegistry;convertMaterialsTo=[UsdPreviewSurface];exportAssignedMaterials=0;exportRelativeTextures=automatic;exportInstances=1;exportVisibility=1;mergeTransformAndShape=1;includeEmptyTransforms=1;stripNamespaces=0;worldspace=1;exportStagesAsRefs=1;jobContext=[Arnold];excludeExportTypes=[Meshes];legacyMaterialScope=0" -typ "USD Export" -pr -es "/home/rapa/NA_Spirit/tex.usd";
 
 
 
