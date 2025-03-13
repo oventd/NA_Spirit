@@ -19,7 +19,7 @@ except ImportError:
 
 import maya.cmds as cmds
 
-ASSET_DIRECTORY = "/nas/spirit/spirit/sequences/SQ001/SH0010/MMV/work/maya"
+ASSET_DIRECTORY = "/nas/spirit/spirit/assets/Prop"
 
 
 class VersionCheckUI(QMainWindow):
@@ -101,7 +101,6 @@ class VersionCheckUI(QMainWindow):
             combo.wheelEvent = lambda event: None  # 마우스 휠 비활성화
             combo.setEditable(True)
             combo.lineEdit().setAlignment(Qt.AlignCenter)  # 중앙 정렬 
-  
             for i in range(combo.count()):
                 combo.setItemData(i, Qt.AlignCenter, Qt.TextAlignmentRole)
 
@@ -109,7 +108,6 @@ class VersionCheckUI(QMainWindow):
             combo.setCurrentText(f".v{current_version_int:03d}")    # 현재 버전 설정
             combo.currentIndexChanged.connect(lambda _, r=row, c=combo: self.confirm_version_change(r, c))
             self.table.setCellWidget(row, 2, combo)
-
 
             # 체크박스 추가
             check_widget = QWidget()
@@ -164,6 +162,8 @@ class VersionCheckUI(QMainWindow):
                     break
         self.update_button.setEnabled(checked)
 
+        # 추가만 해주면됨
+
     def apply_selected_versions(self):
         """선택된 항목을 최신 버전으로 업데이트"""
         for row in range(self.table.rowCount()):
@@ -171,14 +171,27 @@ class VersionCheckUI(QMainWindow):
             if checkbox.isChecked():
                 combo = self.table.cellWidget(row, 2)
                 latest_item = self.table.item(row, 3)
+                selected_version = combo.currentText()  # 콤보박스에서 선택된 버전
+
+                # Maya에서 참조를 실제로 갱신
+                self.update_maya_reference(row, selected_version)  # 선택된 버전의 텍스트를 전달
+
+                # UI 갱신 (최신 버전 확인 후 상태 갱신)
                 latest_version = AssetManager.get_latest_version(self.table.item(row, 1).text())
+                self.update_version_status(row, combo, latest_item)  # UI 갱신
+                self.table.setItem(row, 3, latest_item)  # 'Latest' 열을 갱신
 
-                if combo.currentText() != latest_version:
-                    combo.setCurrentText(latest_version)
-                    self.update_version_status(row, combo, latest_item)  # 🔄 UI 갱신
-                    self.table.setItem(row, 3, latest_item)
+    def refresh_maya_reference(self):
+        references = cmds.file(q=True, reference=True) or []
+        for ref in references:
+            try:
+                ref_node = cmds.referenceQuery(ref, referenceNode=True)
+                cmds.file(unloadReference=ref_node)  # 참조 파일 언로드
+                cmds.file(ref, loadReference=ref_node, force=True)  # 최신 버전으로 참조 파일 로드
+                print(f"✅ 참조 업데이트 완료: {ref}")
+            except Exception as e:
+                print(f"⚠️ 참조 업데이트 실패: {e}")
 
-                        
     def toggle_all_checkboxes(self):
         """모든 체크박스를 선택/해제하는 기능"""
         checkboxes = [
@@ -190,56 +203,72 @@ class VersionCheckUI(QMainWindow):
         for cb in checkboxes:
             cb.setChecked(new_state)
 
-
     def update_version_status(self, row, combo, latest_item):
         """최신 버전 상태 UI 업데이트"""
         asset_name = self.table.item(row, 1).text()
         latest_version = AssetManager.get_latest_version(asset_name)  # 🔹 최신 버전 다시 가져오기
-        current_version = int(combo.currentText().replace("v", ""))  # 현재 선택된 버전 가져오기
+
+        # 버전 비교 전에 .v를 제거하고 숫자만 남기기
+        current_version_str = combo.currentText().replace("v", "").replace(".", "")  # .v와 .을 모두 제거
+        latest_version_str = latest_version.replace("v", "").replace(".", "")  # 최신 버전에서 .v와 .을 제거
+
+        try:
+            # 현재 버전과 최신 버전을 숫자 비교 가능하도록 정수로 변환
+            current_version = int(current_version_str)  # 현재 버전 (숫자)
+            latest_version_int = int(latest_version_str)  # 최신 버전 (숫자)
+        except ValueError as e:
+            print(f"⚠️ 버전 값 변환 오류: {e}")
+            return
 
         # 최신 상태 반영 (🟢 최신 / 🟡 구버전)
-        latest_status = "🟢" if current_version == int(latest_version.replace("v", "")) else "🟡"
-        latest_item.setText(f"{latest_status} {latest_version}")
+        latest_status = "🟢" if current_version == latest_version_int else "🟡"
+        latest_item.setText(f"{latest_status} v{latest_version_int:03d}")
 
-        # 🔹 UI 갱신 적용
+        # UI 갱신 적용
         self.table.setItem(row, 3, latest_item)
 
-        print(f" 최신 버전 갱신됨: {asset_name} | 현재: v{current_version:03d} | 최신: {latest_version}")
+        print(f"최신 버전 갱신됨: {asset_name} | 현재: v{current_version} | 최신: v{latest_version_int}")
+
 
     def confirm_version_change(self, row, combo):
         """버전 변경 시 메시지 박스를 UI 클래스에서 처리"""
-        new_version = combo.currentText()
-        current_version = self.get_current_version(row)
+        new_version = combo.currentText().replace(".", "").strip()  # 선택된 버전 텍스트 가져오기
 
+        # 사용자에게 확인 메시지 표시
         msg = QMessageBox.warning(
             self, "Confirm Change",
-            f"Change version to {new_version}?",
+            f"Do you really want to change the version to .v{new_version:03d}?",  # 버전 형식 맞춰서 표시
             QMessageBox.Yes | QMessageBox.No
         )
         msg.setIcon(QMessageBox.Warning)
-        msg.setWindowTitle("Confirm Change")
-        msg.setText(f"Change version to {new_version}?")
-        
-        reply = msg.exec()
+        msg.setWindowTitle("Confirm Version Change")
+        msg.setText(f"Change version to .v{new_version:03d}?")  # .v{new_version:03d} 형태로 정확한 버전 표시
 
-        if reply == QMessageBox.No:
-            combo.blockSignals(True)
-            combo.setCurrentText(current_version)
-            combo.blockSignals(False)
+        reply = msg.exec()  # exec()로 대기하여 메시지 박스가 닫히기를 기다림
 
+        if reply == QMessageBox.Yes:
+            # 버전 업데이트 진행
+            self.update_maya_reference(row, f".v{new_version:03d}")  # 선택된 버전으로 참조 업데이트
+
+            # 콤보박스와 최신 버전 상태 업데이트
+            combo.setCurrentText(f".v{new_version:03d}")  # 콤보박스를 .v001 형식으로 갱신
+            self.update_version_status(row, combo, self.table.item(row, 3))  # UI 갱신
+            self.table.item(row, 3).setText(f"🟢 .v{new_version:03d}")  # 최신 버전 컬럼 갱신
 
     def onCellClicked(self, row, column):
         """ 테이블에서 Asset 클릭 시 Maya에서 해당 오브젝트 선택"""
         if column == 1:  # "Asset" 열을 클릭했을 때
             asset_name = self.table.item(row, 1).text()  # 해당 에셋 이름 가져오기
             MayaReferenceManager.select_asset_by_name(asset_name)  # 해당 이름으로 Maya에서 오브젝트 선택
-    def update_maya_reference(self, row, combo):
-        """Maya에서 참조된 파일을 새로운 버전으로 업데이트 (디렉토리 순회 방식)"""
+            
+    def update_maya_reference(self, row, new_version):
+        """Maya에서 참조된 파일을 새로운 버전으로 업데이트"""
         references = cmds.file(q=True, reference=True) or []
+        
         if row >= len(references):
             print(f"⚠️ 참조 파일을 찾을 수 없음: {row}")
             return
-        
+
         # 🔹 현재 참조된 파일 경로 가져오기
         ref_path = cmds.referenceQuery(references[row], filename=True, withoutCopyNumber=True)
         
@@ -247,53 +276,45 @@ class VersionCheckUI(QMainWindow):
             print(f"⚠️ 참조 경로를 찾을 수 없습니다: {ref_path}")
             return
 
-        # 🔹 참조된 파일이 존재하는 디렉토리 가져오기
+        # 참조된 파일이 존재하는 디렉토리 가져오기
         asset_dir = os.path.dirname(ref_path)
         
-        # 🔹 파일 이름에서 버전 정보 제거
+        # 파일 이름에서 버전 정보 제거
         base_name, ext = os.path.splitext(os.path.basename(ref_path))
         base_name_no_version = re.sub(r"\.v\d{3}", "", base_name)  # `v001` 같은 버전 제거
+        file_extension = '.ma' if ref_path.endswith('.ma') else ('.mb')
 
-        # 🔹 해당 디렉토리 내에서 최신 버전 찾기
-        latest_version = 0
-        latest_file = None
+        # 선택된 버전으로 파일명 갱신
+        new_filename = f"{base_name_no_version}{new_version}{file_extension}"  # 새 파일명 생성
 
-        for file in os.listdir(asset_dir):
-            if file.startswith(base_name_no_version) and file.endswith(ext):
-                match = re.search(r"\.v(\d{3})", file) 
-                if match:
-                    version = int(match.group(1))
-                    if version > latest_version:
-                        latest_version = version
-                        latest_file = file
+        #  해당 디렉토리 내에서 선택된 버전 찾기
+        latest_path = os.path.join(asset_dir, new_filename)
 
-        if not latest_file:
-            print(f"⚠️ 최신 버전을 찾을 수 없습니다: {base_name_no_version}")
+        print(f"Updating Maya reference to {latest_path}")  # Debugging line to check if correct version is being used
+
+        if not os.path.exists(latest_path):
+            print(f"⚠️ {new_filename} 파일이 존재하지 않습니다.")
             return
 
-        latest_path = os.path.join(asset_dir, latest_file)
 
-        # 🔹 Maya 참조 업데이트
+        # 참조 파일을 언로드하고, 새 버전으로 로드ㅂ
         try:
-            ref_node = cmds.referenceQuery(ref_path, referenceNode=True)
+            # 참조 노드 가져오기
+            ref_node = cmds.referenceQuery(references[row], referenceNode=True)
+
+            # 기존 참조를 언로드
             cmds.file(unloadReference=ref_node)
+
+            # 새 버전 파일 로드
             cmds.file(latest_path, loadReference=ref_node, force=True)
-            print(f"✅ 참조 업데이트 완료: {ref_path} → {latest_file}")
 
-            # 🔹 UI 최신 상태 업데이트
-            latest_item = self.table.item(row, 3)
-            self.update_version_status(row, combo, latest_item)
-
+            print(f"✅ 참조 업데이트 완료: {ref_path} → {latest_path}")
         except Exception as e:
-            print(f"⚠️ 업데이트 실패: {e}")
-
-
+            print(f"⚠️ 참조 업데이트 실패: {e}")
 
 class AssetManager:
     """🚀 파일 및 버전 정보를 관리하는 클래스"""
-
-    ASSET_DIRECTORY =  "/home/rapa/NA_Spirit/maya/"
-
+    ASSET_DIRECTORY = "/nas/spirit/spirit/assets/Prop"
 
     @staticmethod
     def update_asset_info():
@@ -332,7 +353,7 @@ class AssetManager:
 
         versions = []
         for file in os.listdir(asset_dir):
-            match = re.search(r"\.v(\d{3})\.mb$", file)
+            match = re.search(r"\.v(\d{3})\.mb", file)
             if match:
                 versions.append(int(match.group(1)))
         
@@ -344,31 +365,61 @@ class AssetManager:
         else:
             return "v001"  # 최신 버전이 없으면 v001 반환
         
+
+
     @staticmethod
     def get_asset_directory(asset_name):
         """해당 에셋이 존재하는 디렉토리 경로 가져오기"""
-        refs = cmds.file(q=True, reference=True) or []
-        for ref in refs:
-            ref_path = cmds.referenceQuery(ref, filename=True, withoutCopyNumber=True)
-            if asset_name in ref_path:
-                return os.path.dirname(ref_path)  # 참조된 파일의 경로 반환
-
-        return None
+        asset_path = os.path.join(ASSET_DIRECTORY, asset_name, "RIG", "publish", "maya")
         
+        if os.path.exists(asset_path):
+            return asset_path
+        return None
+    
+    @staticmethod
+    def get_asset_paths():
+        """디렉토리 내 모든 에셋 경로를 딕셔너리로 반환"""
+        asset_paths = {}
+        asset_dirs = os.listdir(ASSET_DIRECTORY)  # ASSET_DIRECTORY에서 모든 파일 리스트 가져오기
 
+        for asset_name in asset_dirs:
+            asset_paths[asset_name] = AssetManager.get_asset_directory(asset_name)
+
+        return asset_paths
+
+
+    @staticmethod
+    def get_all_asset_versions():
+        """디렉토리 내 모든 에셋과 그에 해당하는 버전들을 딕셔너리로 반환"""
+        asset_versions = {}
+        asset_dirs = os.listdir(ASSET_DIRECTORY)  # ASSET_DIRECTORY에서 모든 파일 리스트 가져오기
+
+        for asset_name in asset_dirs:
+            asset_versions[asset_name] = AssetManager.get_available_versions(asset_name)
+
+        return asset_versions
     
 
     @staticmethod
     def get_available_versions(asset_name):
         """특정 에셋의 모든 버전 가져오기"""
-        versions = []
-        for file in os.listdir(ASSET_DIRECTORY):
-            if file.startswith(asset_name) and file.endswith(".mb"):
-                match = re.search(r"\.v(\d{3})\.mb", file)
-                if match:
-                    versions.append(int(match.group(1)))
+        asset_dir = AssetManager.get_asset_directory(asset_name)
+        if not asset_dir or not os.path.exists(asset_dir):
+            print(f"⚠️ '{asset_name}'의 디렉토리를 찾을 수 없음.")
+            return "v001"  # 기본값 v001 반환
 
-        return [f".v{str(v).zfill(3)}" for v in sorted(versions)] if versions else [".v001"]
+        versions = []
+        for file in os.listdir(asset_dir):
+            match = re.search(r"\.v(\d{3})\.mb", file)
+            if match:
+                versions.append(int(match.group(1)))
+        
+        print(f"Versions found: {versions}")  # 디버깅 출력  
+        return [f".v{v:03d}" for v in versions] if versions else [".v001"]
+
+
+   
+
     @staticmethod
     def update_asset_info():
         """🔹 현재 씬에서 참조된 에셋 정보를 JSON에 저장"""
@@ -388,8 +439,6 @@ class AssetManager:
             }
 
         return asset_data
-
-
 
 class MayaReferenceManager:
     """🎯 Maya 내 참조 및 오브젝트 선택 기능 관리"""
