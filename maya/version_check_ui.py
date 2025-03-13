@@ -410,15 +410,13 @@ class AssetManager:
 
         versions = []
         for file in os.listdir(asset_dir):
-            match = re.search(r"\.v(\d{3})\.mb", file)
+            match = re.search(r"\.v(\d{3})\.(ma|mb)", file)
             if match:
                 versions.append(int(match.group(1)))
         
         print(f"Versions found: {versions}")  # 디버깅 출력  
         return [f".v{v:03d}" for v in versions] if versions else [".v001"]
 
-
-   
 
     @staticmethod
     def update_asset_info():
@@ -506,9 +504,9 @@ class MayaReferenceManager:
         asset_dir = os.path.dirname(selected_path)   # 디렉토리 경로 추출
         clean_asset_name = AssetManager.get_clean_asset_name(asset_name)
 
-        print(f"🔍 선택된 에셋: {clean_asset_name} (경로: {selected_path})")
+        print(f"선택된 에셋: {clean_asset_name} (경로: {selected_path})")
 
-        # 3️⃣ Maya에서 해당 참조를 기반으로 객체 찾기
+        # 3️Maya에서 해당 참조를 기반으로 객체 찾기
         ref_nodes = []
         for ref in references:
             try:
@@ -521,7 +519,7 @@ class MayaReferenceManager:
             print(f"⚠️ '{asset_name}'의 참조를 찾을 수 없습니다.")
             return
 
-        # 4️⃣ 오브젝트 찾고 선택
+        # 4️오브젝트 찾고 선택
         object_list = []
         for ref_node in ref_nodes:
             try:
@@ -533,7 +531,7 @@ class MayaReferenceManager:
         if object_list:
             cmds.select(clear=True)
             cmds.select(object_list, replace=True)
-            print(f"✅ '{asset_name}' 선택 완료: {object_list}")
+            print(f" '{asset_name}' 선택 완료: {object_list}")
         else:
             print(f"⚠️ '{asset_name}'에 연결된 오브젝트가 없습니다.")
 
