@@ -168,26 +168,29 @@ if __name__ == "__main__":
     scope_a = UsdUtils.create_scope(stage, "/Root/Geometry")
     scope_b = UsdUtils.create_scope(stage, "/Root/Shader")
     
-    UsdUtils.add_reference(scope_a, "geo.usd")
+    UsdUtils.add_reference(scope_a, "geo_anim.usd")
     UsdUtils.add_reference(scope_b, "tex.usd")
 
     usd_hierarchy = UsdUtils.usd_to_dict(stage.GetPseudoRoot())
+    import pprint
+    pprint.pprint(usd_hierarchy)
     mats = UsdUtils.find_prim_paths_by_type(usd_hierarchy, "Material")
     meshs = UsdUtils.find_prim_paths_by_type(usd_hierarchy, "Mesh")
+
     print(mats)
     print(meshs)
+
     path = "/geo"
-    stage_geo = UsdUtils.get_stage("geo.usd")
-    usd_hierarchy1 = UsdUtils.usd_to_dict(stage_geo.GetPseudoRoot())
-    mesh1 = UsdUtils.find_prim_paths_by_type(usd_hierarchy1, "Xform")
-    print(mesh1)
+    # stage_geo = UsdUtils.get_stage("geo_anim.usd")
+    # usd_hierarchy1 = UsdUtils.usd_to_dict(stage_geo.GetPseudoRoot())
+    # mesh1 = UsdUtils.find_prim_paths_by_type(usd_hierarchy1, "Mesh")
+    # print(usd_hierarchy1)
+    # print(mesh1)
 
     mesh1 = stage.GetPrimAtPath(meshs[0])
     mesh2 = stage.GetPrimAtPath(meshs[1])
     if not mesh1 or not mesh1.IsValid():
         raise RuntimeError(f"Invalid Mesh Prim: {path}")
-    
-
 
     material = UsdShade.Material.Get(stage, mats[0])
     material1 = UsdShade.Material.Get(stage, mats[1])
@@ -199,8 +202,8 @@ if __name__ == "__main__":
         raise RuntimeError("Mesh and Material belong to different USD Stages.")
 
     # 올바르게 로드되었으면 Material을 Mesh에 바인딩
-    UsdShade.MaterialBindingAPI(mesh1).Bind(material)
-    UsdShade.MaterialBindingAPI(mesh2).Bind(material1)
+    UsdShade.MaterialBindingAPI(mesh1).Bind(material1)
+    UsdShade.MaterialBindingAPI(mesh2).Bind(material)
     stage.GetRootLayer().Save()
     print(f"Successfully bound material {mats[0]} to {meshs[0]}")
 
@@ -210,9 +213,7 @@ if __name__ == "__main__":
 #file -force -options ";exportUVs=1;exportSkels=none;exportSkin=none;exportBlendShapes=0;exportDisplayColor=0;filterTypes=nurbsCurve;exportColorSets=0;exportComponentTags=0;defaultMeshScheme=catmullClark;animation=0;eulerFilter=0;staticSingleSample=0;startTime=1;endTime=48;frameStride=1;frameSample=0.0;defaultUSDFormat=usda;rootPrim=;rootPrimType=xform;defaultPrim=geo;exportMaterials=0;shadingMode=useRegistry;convertMaterialsTo=[UsdPreviewSurface];exportAssignedMaterials=1;exportRelativeTextures=automatic;exportInstances=1;exportVisibility=1;mergeTransformAndShape=1;includeEmptyTransforms=1;stripNamespaces=0;worldspace=0;exportStagesAsRefs=1;excludeExportTypes=[];legacyMaterialScope=0" -typ "USD Export" -pr -es "/home/rapa/NA_Spirit/geo.usd";
     
 # material export
-# file -force -options ";exportUVs=1;exportSkels=none;exportSkin=none;exportBlendShapes=0;exportDisplayColor=0;filterTypes=nurbsCurve;exportColorSets=0;exportComponentTags=0;defaultMeshScheme=catmullClark;animation=0;eulerFilter=0;staticSingleSample=0;startTime=1;endTime=48;frameStride=1;frameSample=0.0;defaultUSDFormat=usda;rootPrim=;rootPrimType=xform;defaultPrim=geo;exportMaterials=1;shadingMode=useRegistry;convertMaterialsTo=[MaterialX];exportAssignedMaterials=1;exportRelativeTextures=automatic;exportInstances=1;exportVisibility=1;mergeTransformAndShape=1;includeEmptyTransforms=1;stripNamespaces=1;worldspace=0;exportStagesAsRefs=1;excludeExportTypes=[Meshes];legacyMaterialScope=0" -typ "USD Export" -pr -es "/home/rapa/NA_Spirit/tex.usd";
-
-
+#file -force -options ";exportUVs=1;exportSkels=none;exportSkin=none;exportBlendShapes=0;exportDisplayColor=0;filterTypes=nurbsCurve;exportColorSets=0;exportComponentTags=0;defaultMeshScheme=catmullClark;animation=0;eulerFilter=0;staticSingleSample=0;startTime=1;endTime=48;frameStride=1;frameSample=0.0;defaultUSDFormat=usda;rootPrim=;rootPrimType=xform;defaultPrim=geo;exportMaterials=1;shadingMode=useRegistry;convertMaterialsTo=[UsdPreviewSurface];exportAssignedMaterials=0;exportRelativeTextures=automatic;exportInstances=1;exportVisibility=1;mergeTransformAndShape=1;includeEmptyTransforms=1;stripNamespaces=0;worldspace=1;exportStagesAsRefs=1;jobContext=[Arnold];excludeExportTypes=[Meshes];legacyMaterialScope=0" -typ "USD Export" -pr -es "/home/rapa/NA_Spirit/tex.usd";
 
 
 
