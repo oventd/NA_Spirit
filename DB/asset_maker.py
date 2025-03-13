@@ -310,31 +310,37 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 #     print("3D Model 타입 자산의 preview_url, presetting_url, detail_url을 업데이트했습니다.")
 # generate_asset_data()
 
-# def update_3d_model_urls():
-#     # '3D Model'인 자산을 업데이트
-#     for asset in asset_collection.find({"asset_type": "3D Model"}):
-#         # 새로운 turnaround_url과 rig_url 설정
-#         # turnaround_url = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround_video.mp4"
-#         rig_url = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_pool_table_asset_turnaround.mp4"
-        
-#         # 업데이트할 데이터 준비
-#         update_data = {
-#             "$set": {
-#                 # "turnaround_url": turnaround_url,  # turnaround_url 업데이트
-#                 "rig_url": rig_url  # rig_url 업데이트
-#             }
-#         }
+# 업데이트할 .mp4 파일 목록
+mp4_files = [
+    "Bowl_of_Cereal.mp4", "Dish_Rack.mp4", "Salt_Shaker.mp4",
+    "Ceramic_Jar_with_Lid.mp4", "Glue_Bottle.mp4", "Sauce_Bottle.mp4",
+    "Clay_Flower_Pot.mp4", "Kettle.mp4", "Stand_Mixer.mp4",
+    "Crumpled_Paper_Bag.mp4", "Retro_Dining_Chair.mp4", "Wooden_Chair.mp4"
+]
 
-#         # 자산 데이터를 업데이트
-#         asset_collection.update_one(
-#             {"_id": asset["_id"]},  # 자산의 _id로 해당 자산을 찾아서
-#             update_data  # turnaround_url과 rig_url을 업데이트
-#         )
+# .mp4 확장자를 제거한 이름 매핑 (언더바를 공백으로 변환)
+mp4_mapping = {file_name.replace("_", " ").replace(".mp4", ""): file_name for file_name in mp4_files}
 
-#     print("3D Model 타입 자산의 turnaround_url과 rig_url을 업데이트했습니다.")
+def update_3d_model_urls():
+    # "3D Model" 타입의 자산 조회
+    for asset in asset_collection.find({"asset_type": "3D Model"}):
+        asset_name = asset.get("name", "")
+        if asset_name in mp4_mapping:  # 이름이 매핑에 존재하면 업데이트
+            turnaround_url = f"/nas/spirit/DB/turnaround/{mp4_mapping[asset_name]}"
+            
+            update_data = {
+                "$set": {
+                    "turnaround_url": turnaround_url  # URL 업데이트
+                }
+            }
 
-# # 함수 호출
-# update_3d_model_urls()
+            asset_collection.update_one({"_id": asset["_id"]}, update_data)
+            print(f"Updated '{asset_name}' with turnaround_url: {turnaround_url}")
+
+    print("3D Model 타입 자산의 turnaround_url 업데이트 완료.")
+
+# 함수 실행
+update_3d_model_urls()
 
 
 """모든 인덱스 삭제"""

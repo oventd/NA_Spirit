@@ -5,6 +5,7 @@ import sys
 sys.path.append('/home/rapa/NA_Spirit/utils')
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
+from sg_path_utils import SgPathUtils
 
 class StepOpenMaya(ABC):
     def __init__(self):
@@ -48,10 +49,11 @@ class StepOpenMaya(ABC):
             pass
 
         @staticmethod
-        def export_setting(group_name, step, file_path=""):
+        def export_cache(group_name, step, file_path=""):
             """ 퍼블리싱을 위한 공통 export 설정 로직 """
-            publish_settings = StepOpenMaya.Publish.get_publish_settings()
 
+            # 퍼블리쉬 설정 가져오기
+            publish_settings = StepOpenMaya.Publish.get_publish_settings()
             print(f"[DEBUG] export_setting() - publish_settings: {publish_settings}")  # 디버깅용 출력
             
             # Step이 존재하는지 확인
@@ -63,9 +65,13 @@ class StepOpenMaya(ABC):
             group_settings = step_settings.get(group_name) # "geo"를 가져옴
             if not group_settings:
                 print(f"Warning: No settings found for group '{group_name}' in step '{step}'.")
-                return {}
+                return False
             
+            if not StepOpenMaya.Publish.validate(group_name):  
+                print("Publish aborted: Validation failed.")
+                return False
 
+            
             for key, value in group_settings.items():
                 if isinstance(value, bool):
                     value = {"all": value}
@@ -86,7 +92,7 @@ class StepOpenMaya(ABC):
                 else:
                     MayaUtils.reference_file(file_path, group_name)
             return group_settings
-            
+ 
         @staticmethod
         def render_setting(step, category, group):
             """ 렌더링 설정을 가져오는 메서드 """
@@ -99,6 +105,38 @@ class StepOpenMaya(ABC):
                 return {}
 
             return step_settings.get(category, {}).get(group, {}) or {}
+        
+        @staticmethod
+        def export_dir(session_path):
+            """ 퍼블리쉬 경로 관련 메서드"""
+            # 퍼블리쉬 경로 변경
+            publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish" 
+
+            # 파일 확장자명 변경
+            usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
+            mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb  
+
+            # 파일 최종 저장 경로
+            maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # maya dir
+            usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir                     
+            
+            # 디렉토리 존재 여부 확인 후 생성
+            for export_dir in [maya_export_dir, usd_export_dir]:
+                if not os.path.exists(export_dir):
+                    os.makedirs(export_dir)
+            return maya_export_dir, usd_export_dir
+            
+        @staticmethod
+        def maya_export(maya_export_dir):
+            """ maya 파일 내보내는 파트 """
+            # MB 파일 내보내기
+            if not MayaUtils.file_export(maya_export_dir, file_format="mb"):
+                return False
+            return True
+
+            
+
+
    
 
         

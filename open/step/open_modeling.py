@@ -48,31 +48,10 @@ class ModelingStep(StepOpenMaya):
             if not session_path or not step:
                 print("Error: No export path or step provided.")
                 return False
-            
-            # 퍼블리쉬 경로 변경
-            publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish" 
-
-            # 파일 확장자명 변경
-            usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
-            mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb  
-
-            # 파일 최종 저장 경로
-            maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # maya dir
-            usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir                     
-            
-            # 디렉토리 존재 여부 확인 후 생성
-            for export_dir in [maya_export_dir, usd_export_dir]:
-                if not os.path.exists(export_dir):
-                    os.makedirs(export_dir)
 
             # 퍼블리시 설정 및 렌더 설정 가져오기
             StepOpenMaya.Publish.export_setting(group_name, step)
             render_settings = StepOpenMaya.Publish.render_setting(step, category, group)
-
-            """ maya 파일 내보내는 파트 """
-            # MB 파일 내보내기
-            if not MayaUtils.file_export(maya_export_dir, file_format="mb"):
-                return False
             
             """ USD 파일 내보내는 파트 """
             # USD 내보내기 옵션 가공
