@@ -100,6 +100,10 @@ class SgPathUtils:
         """
         SgPathUtils.trim_entity_path(publish_file)
         return os.path.basename(os.path.dirname(publish_file))
+    @staticmethod
+    def get_version(publish_file):
+        return os.path.splitext(publish_file)[0].split(".")[1]
+    
 
     @staticmethod
     def get_usd_publish_dir(entity_path, step):
@@ -213,12 +217,3 @@ if __name__ == "__main__":
     # print(publish_path)
     # print(usd_filename)
     # print(f"{usd_export_dir} + {maya_export_dir}")
-
-    print(SgPathUtils.get_category_from_path(session_path))
-        trimed_path = SgPathUtils.trim_entity_path(entity_path)
-        return os.path.join(trimed_path, "publish", step)
-        
-    @staticmethod
-    def get_version(publish_file):
-        return os.path.splitext(publish_file)[0].split(".")[1]
-    
