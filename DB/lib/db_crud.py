@@ -293,11 +293,11 @@ class AssetDb(DbCrud):
             self.logger.info("Indexes set up for AssetDb")
 
     # def set_url_fields(self, data, fields=None):
-        """
-        자산의 URL 필드를 확인하고, 없는 경우 기본값(None)으로 처리합니다.
-        :param data: 자산 데이터 (단일 자산 또는 자산 리스트)
-        :return: URL 필드가 설정된 자산 데이터
-        """
+        # """
+        # 자산의 URL 필드를 확인하고, 없는 경우 기본값(None)으로 처리합니다.
+        # :param data: 자산 데이터 (단일 자산 또는 자산 리스트)
+        # :return: URL 필드가 설정된 자산 데이터
+        # """
         # url_fields = [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
         #             PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS]
 
@@ -338,7 +338,7 @@ class AssetDb(DbCrud):
         :return: 자산들의 상세 정보 리스트
         """
         details = super().find(filter_conditions, sort_by, limit, skip, fields)
-        return # self.set_url_fields(details)
+        return details
     
     def find_one(self, object_id, fields=None):
         """
@@ -349,15 +349,15 @@ class AssetDb(DbCrud):
         """
         # 부모 클래스의 find_one 호출
         details = super().find_one(object_id, fields)
-        return # self.set_url_fields(details)
+        return details
     
     def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
         # 부모 클래스의 search 호출
         result = super().search(user_query, filter_conditions, limit, skip, fields, sort_by, sort_order)
-        return # self.set_url_fields(result)
+        return result
     
     def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
                     limit=0, skip=0, fields=None):
         result = super().find_and_sort(filter_conditions, sort_by, sort_order, limit, skip, fields)
-        return # self.set_url_fields(result)
+        return result
 
