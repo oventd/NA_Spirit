@@ -215,3 +215,10 @@ if __name__ == "__main__":
     # print(f"{usd_export_dir} + {maya_export_dir}")
 
     print(SgPathUtils.get_category_from_path(session_path))
+        trimed_path = SgPathUtils.trim_entity_path(entity_path)
+        return os.path.join(trimed_path, "publish", step)
+        
+    @staticmethod
+    def get_version(publish_file):
+        return os.path.splitext(publish_file)[0].split(".")[1]
+    
