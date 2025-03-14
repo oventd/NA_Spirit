@@ -1,0 +1,32 @@
+{
+  "modeling": {
+    "module": "open_modeling",
+    "class": "ModelingStep",
+    "path": "/home/rapa/NA_Spirit/open/step/open_modeling.py"
+  },
+  "rigging": {
+    "module": "open_rigging",
+    "class": "RiggingStep",
+    "path": "/home/rapa/NA_Spirit/open/step/open_rigging.py"
+  }  ,
+  "matchmove": {
+    "module": "open_matchmove",
+    "class": "MatchMoveStep",
+    "path": "/home/rapa/NA_Spirit/open/step/open_matchmove.py"
+  },
+  "layout": {
+    "module": "open_layout",
+    "class": "LayoutStep",
+    "path": "/home/rapa/NA_Spirit/open/step/open_layout.py"
+  },
+  "animating": {
+    "module": "open_animating",
+    "class": "AnimatingStep",
+    "path": "/home/rapa/NA_Spirit/open/step/open_animating.py"
+  },
+  "lighting": {
+    "module": "open_lighting",
+    "class": "LightingStep",
+    "path": "/home/rapa/NA_Spirit/open/step/open_lighting.py"
+  }  
+}

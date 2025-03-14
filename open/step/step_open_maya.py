@@ -3,10 +3,11 @@ import maya.cmds as cmds
 import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/utils')
+sys.path.append('/home/rapa/NA_Spirit/open/step')
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-
+from 
 class StepOpenMaya(ABC):
     def __init__(self):
         pass
@@ -42,11 +43,47 @@ class StepOpenMaya(ABC):
         
         @abstractmethod
         def validate(self):
+            
             pass
         
         @abstractmethod
-        def publish(self):
-            pass
+        def publish(session_path: str, step: str):
+            step = SgPathUtils.get_step_from_path(session_path)
+            category = SgPathUtils.get_category_from_path(session_path)
+            
+            usd_export_dir = StepOpenMaya.Publish.get_usd_export_dir(session_path)
+
+            # 퍼블리시 설정 및 렌더 설정 가져오기
+            publish_settings = StepOpenMaya.Publish.get_publish_settings()
+            render_settings = StepOpenMaya.Publish.render_setting(step, category)
+
+            for item, options in publish_settings[step].items():
+                all = options.get("all", False)
+                is_referenced = options.get("isReferenced", False)
+                if is_referenced is True:
+                    if 
+                if all is True:
+                    
+
+                
+                cmds.select(item)
+
+
+            """ USD 파일 내보내는 파트 """
+            # USD 내보내기 옵션 가공
+            usd_export_options = render_settings.get("usd_export_options", [])
+            if usd_export_options:
+                usd_export_options = ";".join(usd_export_options)
+            else:
+                usd_export_options = ""  # 값이 없다면 빈 문자열로 대체
+
+            # USD 파일 내보내기
+            if not MayaUtils.file_export(usd_export_dir, file_format="usd", export_options=usd_export_options):
+                return False
+
+            print(f"Modeling publish completed for {group}.")
+
+            
 
         @staticmethod
         def export_cache(group_name, step, file_path=""):
@@ -107,30 +144,52 @@ class StepOpenMaya(ABC):
             return step_settings.get(category, {}).get(group, {}) or {}
         
         @staticmethod
-        def export_dir(session_path):
+        def get_maya_export_dir(session_path):
+            """ 퍼블리쉬 경로 관련 메서드"""
+            # 퍼블리쉬 경로 변경
+            publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish" 
+
+            # 파일 확장자명 변경
+
+            maya_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb  
+
+            # 파일 최종 저장 경로
+            maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(maya_filename) # maya dir
+           
+            # # 디렉토리 존재 여부 확인 후 생성
+            # for export_dir in [maya_export_dir, usd_export_dir]:
+            #     if not os.path.exists(export_dir):
+            #         os.makedirs(export_dir)
+            return maya_export_dir
+        @staticmethod
+        def get_usd_export_dir(session_path):
             """ 퍼블리쉬 경로 관련 메서드"""
             # 퍼블리쉬 경로 변경
             publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish" 
 
             # 파일 확장자명 변경
             usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
-            mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb  
 
             # 파일 최종 저장 경로
-            maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # maya dir
             usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir                     
             
-            # 디렉토리 존재 여부 확인 후 생성
-            for export_dir in [maya_export_dir, usd_export_dir]:
-                if not os.path.exists(export_dir):
-                    os.makedirs(export_dir)
-            return maya_export_dir, usd_export_dir
-            
+            # # 디렉토리 존재 여부 확인 후 생성
+            # for export_dir in [maya_export_dir, usd_export_dir]:
+            #     if not os.path.exists(export_dir):
+            #         os.makedirs(export_dir)
+            # return maya_export_dir, usd_export_dir
         @staticmethod
-        def maya_export(maya_export_dir):
+        def maya_export(path):
             """ maya 파일 내보내는 파트 """
             # MB 파일 내보내기
-            if not MayaUtils.file_export(maya_export_dir, file_format="mb"):
+            file, ext = os.path.splitext(path)
+            if ext == ".mb":
+                file_format = "mb"
+            elif ext == ".ma":
+                file_format = "ma"
+            else:
+                print(f"Unsupported file format: {ext}")
+            if not MayaUtils.file_export(path, file_format=file_format):
                 return False
             return True
 

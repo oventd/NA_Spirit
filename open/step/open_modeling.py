@@ -38,34 +38,12 @@ class ModelingStep(StepOpenMaya):
             return True
 
         @staticmethod
-        def publish(group_name="geo", session_path=None, step=None, category=None, group="geo"):
+        def publish(session_path: str ):
             """ 특정 그룹을 USD와 MB 파일로 export """
+            step = SgPathUtils.get_step_from_path(session_path)
+            category = SgPathUtils.get_category_from_path(session_path)
 
-            if not ModelingStep.Publish.validate(group_name):  # validate 호출 시 geo_group_name 전달
-                print("Publish aborted: Validation failed.")
-                return False  # 검증 실패 시 퍼블리싱 중단
-            
-            if not session_path or not step:
-                print("Error: No export path or step provided.")
-                return False
 
-            # 퍼블리시 설정 및 렌더 설정 가져오기
-            StepOpenMaya.Publish.export_setting(group_name, step)
-            render_settings = StepOpenMaya.Publish.render_setting(step, category, group)
-            
-            """ USD 파일 내보내는 파트 """
-            # USD 내보내기 옵션 가공
-            usd_export_options = render_settings.get("usd_export_options", [])
-            if usd_export_options:
-                usd_export_options = ";".join(usd_export_options)
-            else:
-                usd_export_options = ""  # 값이 없다면 빈 문자열로 대체
-
-            # USD 파일 내보내기
-            if not MayaUtils.file_export(usd_export_dir, file_format="usd", export_options=usd_export_options):
-                return False
-
-            print(f"Modeling publish completed for {group_name}.")
             return True
 
 if __name__ == "__main__":
