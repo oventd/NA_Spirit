@@ -5,7 +5,7 @@ from PySide6.QtCore import QFile, Signal
 from PySide6.QtCore import Qt
 
 class Widget(QWidget):
-    # 사용자 정의 시그널
+    # 사용자 정의 시s그널
     value_changed = Signal(str)  # 버튼 클릭 시 값을 전달하기 위한 시그널
 
     def __init__(self):
@@ -16,6 +16,7 @@ class Widget(QWidget):
         ui_file.open(QFile.ReadOnly)
         loader = QUiLoader()
         self.ui = loader.load(ui_file, self)  # UI 로드
+        self.setWindowFlags(Qt.FramelessWindowHint)  
         ui_file.close()
         self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 외곽선과 헤더를 없앰
         
