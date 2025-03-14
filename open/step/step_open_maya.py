@@ -3,11 +3,12 @@ import maya.cmds as cmds
 import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/utils')
-sys.path.append('/home/rapa/NA_Spirit/open/step')
+sys.path.append('/home/rapa/NA_Spirit/maya')
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-from 
+from export_reference import PublishUsdProcessor
+
 class StepOpenMaya(ABC):
     def __init__(self):
         pass
@@ -61,7 +62,7 @@ class StepOpenMaya(ABC):
                 all = options.get("all", False)
                 is_referenced = options.get("isReferenced", False)
                 if is_referenced is True:
-                    if 
+                    if PublishUsdProcessor
                 if all is True:
                     
 

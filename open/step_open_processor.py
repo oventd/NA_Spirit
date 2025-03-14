@@ -41,8 +41,8 @@ class OpenManager:
     def validate(self):
         self.open_class.Publish.validate()
     
-    def open(self):
-        self.open_class.Publish.publish(sess, )
+    def publish(self, session_path: str):
+        self.open_class.Publish.publish(session_path)
         
         
         
