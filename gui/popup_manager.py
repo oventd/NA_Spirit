@@ -7,7 +7,7 @@ from PySide6.QtGui import QPixmap
 
 
 
-class Widget(QWidget):
+class DownloadPopup(QWidget):
     # 사용자 정의 시s그널
     value_changed = Signal(str)  # 버튼 클릭 시 값을 전달하기 위한 시그널
 
@@ -141,7 +141,7 @@ class MainWindow(QMainWindow):
 
     def show_widget(self):
         # QWidget 창을 열고 시그널을 받아서 처리
-        self.widget = Widget()
+        self.widget = DownloadPopup()
         self.widget.value_changed.connect(self.update_label)  # 시그널을 메인 윈도우의 슬롯에 연결
         self.widget.show()
 

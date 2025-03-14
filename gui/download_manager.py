@@ -16,6 +16,7 @@ for root, dirs, files in os.walk(na_spirit_dir):
 from constant import *
 from logger import *
 from like_state import LikeState
+from popup_manager import DownloadPopup
 
 
 class DownloadManager:
@@ -30,7 +31,9 @@ class DownloadManager:
         print(f"전체 다운로드 버튼이 눌렸어요{download_list}")
 
         cls.logger.info(f"유저가 관심에셋 전체를 다운받았어요")
-
+        widget = DownloadPopup()
+        widget.value_changed.connect(download_list)  # 시그널을 메인 윈도우의 슬롯에 연결
+        widget.show()
 
     @classmethod
     def download_assets_one(cls):
