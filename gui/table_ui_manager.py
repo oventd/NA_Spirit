@@ -383,10 +383,7 @@ class TableUiManager:
             self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에 추가했습니다\n해당 에셋 정보 : {asset}")
             DictManager().save_dict_to_json(like_state.like_asset_list)
             
-            
-            like_state.like_count(like_state.like_asset_list)
-            print("라이크 갯수"+like_state.like_count)
-            
+  
             
 
             if LikeState().state == True:

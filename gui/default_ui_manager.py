@@ -83,7 +83,7 @@ class DefaultUiManager:
         self.user_num()
         
         TreeUiManager.tree_widget(self.ui)
-        TableUiManager(self.ui).table_widget(None,UPDATED_AT, 50, 0,None)
+        TableUiManager(self.ui).update_table(None,UPDATED_AT, 50, 0,None)
         self.set_search_area_design()
         
         self.ui.like_empty_notice.hide()

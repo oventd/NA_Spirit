@@ -137,7 +137,7 @@ class MainUi(QMainWindow):
         self.user_num()
         self.make_label_list()
         self.tree_widget()
-        self.table_widget(None,UPDATED_AT, 50, 0,None)
+        self.update_table(None,UPDATED_AT, 50, 0,None)
         self.set_search_area_design()
         
         self.ui.like_empty_notice.hide()
@@ -172,15 +172,15 @@ class MainUi(QMainWindow):
         #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
         if option == "오래된 순":
             print(f"오래된 순의 필터임 :{self.check_dict}")
-            self.table_widget(self.check_dict,UPDATED_AT, 40, 0,None)
+            self.update_table(self.check_dict,UPDATED_AT, 40, 0,None)
 
         elif option =="다운로드 순":
             print("다운로드된 순서를 정렬할게요")
-            self.table_widget(self.check_dict,DOWNLOADS, 40, 0,None)
+            self.update_table(self.check_dict,DOWNLOADS, 40, 0,None)
 
         else:
             print("최신 순서를 정렬할게요")
-            self.table_widget(self.check_dict,CREATED_AT, 40, 0, None)
+            self.update_table(self.check_dict,CREATED_AT, 40, 0, None)
 
     def toggle_change(self): 
 
@@ -212,7 +212,7 @@ class MainUi(QMainWindow):
                 self.like_active = False
                 self.ui.like_empty_notice.hide()
                 self.ui.tableWidget.clear()
-                self.table_widget(self.check_dict,UPDATED_AT, 40, 0,None)
+                self.update_table(self.check_dict,UPDATED_AT, 40, 0,None)
                 #사용자 pc에 저장해두고 라이크 받을때 마다 오브젝트 id를 json에 저장해두고 
 
 
@@ -284,11 +284,11 @@ class MainUi(QMainWindow):
             else:
                 sort_by = DOWNLOADS
                 
-            self.table_widget(filter_conditions = self.check_dict, sort_by= sort_by, limit = 20, skip = 0, fields =None)
+            self.update_table(filter_conditions = self.check_dict, sort_by= sort_by, limit = 20, skip = 0, fields =None)
 
             #만들어 진 리스트를 필터로 table에 정렬해주기 + s실제 콤보박스의 정렬이랑도 섞여야함
 
-    def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
+    def update_table(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
         # 리뷰 이거 셀프로 init에 구현 이거 근데 저장하는 변수명이 쫌...... 
         # 리뷰 static밖에 없는데 왜 객체 생성????
         self.ui.like_empty_notice.hide()
