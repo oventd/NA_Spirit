@@ -22,6 +22,7 @@ class LikeState:
         self._like_icon = QIcon("/nas/spirit/asset_project/source/like_icon_on.png")
         self._initialized = True
         self._like_asset_list = DictManager().load_dict_from_json()
+        self._like_count = len(self._like_asset_list)
 
     @property
     def state(self):
@@ -64,6 +65,14 @@ class LikeState:
         for obj_id in self._like_asset_list:
             result['_id'].append(ObjectId(obj_id))
         return result
+    
+    @property
+    def like_count(self):
+        return self._like_count
+    
+    @like_count.setter
+    def like_count(self, value):
+        self._like_count = value
     
 
     

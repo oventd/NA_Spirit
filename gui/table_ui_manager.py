@@ -377,6 +377,7 @@ class TableUiManager:
         
     
         current_icon = self.ui.like_btn.icon()
+     
         if current_icon.cacheKey() == like_state.like_icon_empty.cacheKey():  #빈하트 상태일때 
             self.ui.like_btn.setIcon(like_state.like_icon)
             like_state.like_asset_list.append(asset_object_id)
