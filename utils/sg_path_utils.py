@@ -55,20 +55,12 @@ class SgPathUtils:
         elif 'assets' in path:
             return 'assets'
         return None
-    
     @staticmethod
     def trim_entity_path(entity_path):
-        """
-        주어진 entity_path에서 "assets" 또는 "sequences" 폴더가 처음 나타나는 지점을 기준으로
-        하위 2단계 폴더까지만 유지하고 나머지 뒷부분은 제거하여 경로를 간략화합니다.
-        
-        예: '/project/show/assets/character/main/model/v001'
-            -> '/project/show/assets/character/main'
-        """
-        dirs = os.path.normpath(entity_path).split(os.sep)
+        dirs = os.path.normpath(entity_path).split(os.sep)  # OS에 맞게 경로 정규화
         symbolic_index = -1
 
-        # 경로에서 "assets" 또는 "sequences"의 첫 번째 위치를 찾음
+        # "assets" 또는 "sequences"가 포함된 첫 번째 위치 찾기
         for i, dir_name in enumerate(dirs):
             if dir_name in ("assets", "sequences"):
                 symbolic_index = i
@@ -77,14 +69,15 @@ class SgPathUtils:
         if symbolic_index == -1:
             raise ValueError(f"Invalid entity path (no 'assets' or 'sequences' found): {entity_path}")
 
+        # "assets" 또는 "sequences" 이후 2개 더 포함 (총 3개 유지)
         symbolic_index_added = symbolic_index + 3
 
-        if symbolic_index_added > len(dirs):
+        if symbolic_index_added > len(dirs):  # num보다 커야 정상
             raise ValueError(f"Invalid entity path (too short): {entity_path}")
 
         trimmed_path = os.sep.join(dirs[:symbolic_index_added])
-        return trimmed_path
-
+        trimmed_after = os.sep.join(dirs[symbolic_index_added:])
+        return trimmed_path ,trimmed_after
     @staticmethod
     def get_publish_dir(entity_path, step):
         """
@@ -107,6 +100,10 @@ class SgPathUtils:
         """
         SgPathUtils.trim_entity_path(publish_file)
         return os.path.basename(os.path.dirname(publish_file))
+    @staticmethod
+    def get_version(publish_file):
+        return os.path.splitext(publish_file)[0].split(".")[1]
+    
 
     @staticmethod
     def get_usd_publish_dir(entity_path, step):
@@ -191,6 +188,14 @@ class SgPathUtils:
             raise ValueError(f"Unsupported Maya file extension in {maya_file}")
         return result
 
+    @staticmethod
+    def get_step_from_path(path):
+        entity_path, after_path = SgPathUtils.trim_entity_path(path)
+        return after_path.split('/')[0]
+    @staticmethod
+    def get_category_from_path(path):
+        entity_path, after_path = SgPathUtils.trim_entity_path(path)
+        return entity_path.split('/')[-2]
 
 if __name__ == "__main__":
     session_path = "/nas/spirit/spirit/assets/Prop/apple/MDL/work/maya/scene.v002.ma"
@@ -199,16 +204,16 @@ if __name__ == "__main__":
     # session_path = SgPathUtils.get_maya_dcc_from_usd_dcc(session_path)
 
 # testtttt
-    publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish"
+    # publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish"
     
-    usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
-    mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb
+    # usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
+    # mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb
 
     
-    maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # usd dir
-    usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir
+    # maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # usd dir
+    # usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir
 
 
-    print(publish_path)
-    print(usd_filename)
-    print(f"{usd_export_dir} + {maya_export_dir}")
+    # print(publish_path)
+    # print(usd_filename)
+    # print(f"{usd_export_dir} + {maya_export_dir}")

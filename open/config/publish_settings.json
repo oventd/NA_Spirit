@@ -18,23 +18,24 @@
     },
     "layout": {
       "camera": {
-        "all": false,
+        "all": true,
         "isReferenced": true
       },
       "asset": {
-        "all": false,
+        "all": true,
         "isReferenced": true
       }
     },
     "animating": {
-      "rig": {
+      "asset": {
         "all": false,
         "isReferenced": true
       }
     },
     "light": {
       "light": {
-        "all": true
+        "all": true,
+        "isReferenced": false
       }
     }
   }
