@@ -375,9 +375,10 @@ class TableUiManager:
      
         if current_icon.cacheKey() == like_state.like_icon_empty.cacheKey():  #빈하트 상태일때 
             self.ui.like_btn.setIcon(like_state.like_icon)
-            like_state.like_asset_list.append(asset_object_id)
-            self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에 추가했습니다\n해당 에셋 정보 : {asset}")
-            DictManager().save_dict_to_json(like_state.like_asset_list)
+            print("여기에요여기~~~"+asset_object_id)
+            # like_state.like_asset_list.append(asset_object_id)
+            # self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에 추가했습니다\n해당 에셋 정보 : {asset}")
+            # DictManager().save_dict_to_json(like_state.like_asset_list)
             
   
             
