@@ -86,8 +86,11 @@ class MainUiManager(QMainWindow):
     
     #정리필요
     def update_table(self):
-        self.set_table_items(MayaReferenceManager.get_referenced_assets())
-
+        referenced_assets = MayaReferenceManager.get_referenced_assets()
+        if not referenced_assets:
+            print("⚠️ 참조된 에셋이 없습니다.")
+            return
+        self.set_table_items(referenced_assets)
 
     def set_table_items(self, version_data):
         """테이블 항목 설정"""

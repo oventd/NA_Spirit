@@ -39,12 +39,14 @@ class MainUi(QMainWindow):
 
   
             self.main_ui_manager = MainUiManager()
+            self.setCentralWidget(self.main_ui_manager)
             self.asset_manager = AssetManager()
             self.reference_manager = MayaReferenceManager()
 
  
             
 if __name__ == "__main__":
-
+    app = QApplication(sys.argv) 
     window = MainUi()
     window.show()
+    sys.exit(app.exec()) 
