@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>672</width>
+    <height>339</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>-15</y>
+     <width>691</width>
+     <height>371</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../../nas/spirit/asset_project/source/popup_source/bg.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>369</x>
+     <y>231</y>
+     <width>281</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Pretendard Variable</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color : #9CA0AC</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../../nas/spirit/asset_project/source/popup_source/down_btn.png</pixmap>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>374</x>
+     <y>208</y>
+     <width>261</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Pretendard Variable</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color : #9CA0AC</string>
+   </property>
+   <property name="text">
+    <string>체크 후 다운로드 버튼을 누르면 다운이 시작됩니다</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>139</y>
+     <width>139</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Pretendard Variable</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color : #ffffff</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../../nas/spirit/asset_project/source/popup_source/reference_toggle.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>394</x>
+     <y>65</y>
+     <width>211</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Pretendard Variable</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color : #ffffff</string>
+   </property>
+   <property name="text">
+    <string>다운로드 받을 
+유형을 골라주세요</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="already_download">
+   <property name="geometry">
+    <rect>
+     <x>47</x>
+     <y>38</y>
+     <width>87</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../../nas/spirit/asset_project/source/popup_source/down_list.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Asset_List">
+   <property name="geometry">
+    <rect>
+     <x>134</x>
+     <y>14</y>
+     <width>71</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Pretendard Variable</family>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color:#D0D0D0</string>
+   </property>
+   <property name="text">
+    <string>Asset List</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ready_download">
+   <property name="geometry">
+    <rect>
+     <x>203</x>
+     <y>43</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Pretendard Variable</family>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color:#a3a3a3</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../../nas/spirit/asset_project/source/popup_source/saved.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>174</x>
+     <y>92</y>
+     <width>140</width>
+     <height>220</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #101011; 
+color:#ffffff;
+</string>
+   </property>
+   <item>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="font">
+     <font>
+      <family>Pretendard Variable</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="checkState">
+     <enum>Unchecked</enum>
+    </property>
+   </item>
+  </widget>
+  <widget class="QListWidget" name="haved_asset">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>91</y>
+     <width>140</width>
+     <height>220</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #18181B; 
+color:#ffffff;
+</string>
+   </property>
+   <item>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="font">
+     <font>
+      <family>Pretendard Variable</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="checkState">
+     <enum>Unchecked</enum>
+    </property>
+   </item>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
