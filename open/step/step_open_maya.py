@@ -7,7 +7,7 @@ sys.path.append('/home/rapa/NA_Spirit/maya')
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-from export_reference import PublishUsdProcessor
+from export_reference import UsdAssetProcessor
 
 class StepOpenMaya(ABC):
     def __init__(self):
@@ -61,9 +61,9 @@ class StepOpenMaya(ABC):
             for item, options in publish_settings[step].items():
                 all = options.get("all", False)
                 is_referenced = options.get("isReferenced", False)
-                if is_referenced is True:
-                    if PublishUsdProcessor
-                if all is True:
+                # if is_referenced is True:
+                #     if PublishUsdProcessor
+                # if all is True:
                     
 
                 

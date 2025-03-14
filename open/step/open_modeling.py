@@ -5,6 +5,7 @@ import sys
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
+sys.path.append('/home/rapa/NA_Spirit/maya')
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
 

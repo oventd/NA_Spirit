@@ -20,20 +20,18 @@ class OpenManager:
     def __init__(self, step:str) -> None:
         self.step = step
         dcc_config_path = "/home/rapa/NA_Spirit/open/config/open_step.json"
-        self.types = ["assets", "sequences"]
-        self.default_file = "scene"
         
-        self.dcc_opens = load_classes_from_json(dcc_config_path)
-        self.validate_inputs()
+        self.dcc_opens_dict = load_classes_from_json(dcc_config_path)
+        self.validate_input()
 
-        self.open_class = self.dcc_opens[self.step]
+        self.open_class = self.dcc_opens_dict[self.step]
 
-    def validate_inputs(self) -> None:
+    def validate_input(self) -> None:
         """
         entity_type과 dcc가 올바른지 검증합니다.
         """
-        if self.step not in self.dcc_opens:
-            raise ValueError(f"Invalid step: {self.step}. Please choose one of: {', '.join(self.dcc_opens.keys())}.")
+        if self.step not in self.dcc_opens_dict:
+            raise ValueError(f"Invalid step: {self.step}. Please choose one of: {', '.join(self.dcc_opens_dict.keys())}.")
         
     def open_setup(self) -> None:
         self.open_class.Open.setup()
@@ -44,13 +42,3 @@ class OpenManager:
     def publish(self, session_path: str):
         self.open_class.Publish.publish(session_path)
         
-        
-        
-        
-
-
-
-
-
-
-if __name__ == "__main__":

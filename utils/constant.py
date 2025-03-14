@@ -81,7 +81,7 @@ ANM = 'ANM' # Animation
 LGT = 'LGT' # Light
 CMP = 'CMP' # Compositing
 
-shot_step_dict = {
+STEP_SHORT_DICT = {
     MODELING: MDL,
     RIGGING: RIG,
     LOOKDEV: LDV,
@@ -91,3 +91,40 @@ shot_step_dict = {
     LIGHTING: LGT,
     COMPOSITING: CMP
 }
+
+SHORT_STEP_DICT = {
+    MDL : MODELING,
+    RIG : RIGGING,
+    LDV : LOOKDEV,
+    MMV : MATCHMOVE,
+    LAY : LAYOUT,
+    ANM : ANIMATING,
+    LGT : LIGHTING,
+    CMP : COMPOSITING
+}
+#   "Rig": {
+#     "module": "open_rigging",
+#     "class": "RiggingStep",
+#     "path": "/home/rapa/NA_Spirit/open/step/open_rigging.py"
+#   }  ,
+#     },
+#   "Matchmove": {
+#     "module": "open_matchmove",
+#     "class": "MatchMoveStep",
+#     "path": "/home/rapa/NA_Spirit/open/step/open_matchmove.py"
+#   },
+#   "Layout": {
+#     "module": "open_layout",
+#     "class": "LayoutStep",
+#     "path": "/home/rapa/NA_Spirit/open/step/open_layout.py"
+#   },
+#   "Animation": {
+#     "module": "open_animating",
+#     "class": "AnimatingStep",
+#     "path": "/home/rapa/NA_Spirit/open/step/open_animating.py"
+#   },
+#   "Light": {
+#     "module": "open_lighting",
+#     "class": "LightingStep",
+#     "path": "/home/rapa/NA_Spirit/open/step/open_lighting.py"
+#   }  
