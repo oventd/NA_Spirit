@@ -5,6 +5,7 @@ import pymongo  # MongoDB 작업을 위한 라이브러리
 
 # MongoDB 연결
 client = pymongo.MongoClient("mongodb://spirt:1234@localhost:27017/")  # 로컬 MongoDB 서버에 연결
+print("MongoDB 연결 시작")
 db = client["filter_test"]  # 사용할 데이터베이스 'filter_test'에 연결
 asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 
@@ -324,13 +325,12 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 # def update_3d_model_urls():
 #     # "3D Model" 타입의 자산 조회
 #     for asset in asset_collection.find({"asset_type": "3D Model"}):
-#         asset_name = asset.get("name", "")
+#         asset_name = asset.get("turnaround_url", "rig_url")
 #         if asset_name in mp4_mapping:  # 이름이 매핑에 존재하면 업데이트
-#             turnaround_url = f"/nas/spirit/DB/turnaround/{mp4_mapping[asset_name]}"
             
 #             update_data = {
 #                 "$set": {
-#                     "turnaround_url": turnaround_url  # URL 업데이트
+#                     "video_url": turnaround_url  # URL 업데이트
 #                 }
 #             }
 
@@ -342,6 +342,115 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 # # 함수 실행
 # update_3d_model_urls()
 
+"""인덱스 생성 및 수정 중"""
+def update_3d_model_urls():
+    for asset in asset_collection.find({"asset_type": "3D Model"}):
+        turnaround_url = asset.get("turnaround_url")
+        rig_url = asset.get("rig_url")
+
+        # image_url 리스트 생성 (None 값 제외)
+        image_urls = [url for url in [turnaround_url, rig_url] if url]
+
+        update_data = {
+            "$set": {
+                "image_url": image_urls,  # 통합된 URL 리스트
+                "source_url": None  # 필요에 따라 적절한 값 설정
+            },
+            "$unset": {
+                "turnaround_url": "",  # 기존 필드 삭제 
+                "rig_url": ""
+            }
+        }
+
+        asset_collection.update_one({"_id": asset["_id"]}, update_data)
+        print(f"Updated asset {asset['_id']} with image_url: {image_urls}")
+
+
+    print("3D Model 타입 자산의 image_url 업데이트 완료.")
+update_3d_model_urls()
+
+
+"""Texture 인덱스 생성 및 수정 중"""
+def update_texture_urls():
+    for asset in asset_collection.find({"asset_type": "Texture"}):
+        detail_url = asset.get("detail_url")
+        presetting_url1 = asset.get("presetting_url1")
+        presetting_url2 = asset.get("presetting_url2")
+        presetting_url3 = asset.get("presetting_url3")
+
+        # image_url 리스트 생성 (None 값 제외)
+        image_urls = [url for url in [detail_url, presetting_url1, presetting_url2, presetting_url3] if url]
+
+        update_data = {
+            "$set": {
+                "image_url": image_urls,  # 통합된 URL 리스트
+                "source_url": None  # 필요에 따라 적절한 값 설정
+            },
+            "$unset": {
+                "detail_url": "",  # 기존 필드 삭제 
+                "presetting_url1": "",
+                "presetting_url2": "",
+                "presetting_url3": ""
+            }
+        }
+
+        asset_collection.update_one({"_id": asset["_id"]}, update_data)
+        print(f"Updated asset {asset['_id']} with image_url: {image_urls}")
+
+
+    print("3D Model 타입 자산의 image_url 업데이트 완료.")
+update_texture_urls()
+
+"""HDRI 인덱스 생성 및 수정 중"""
+def update_hdri_urls():
+    for asset in asset_collection.find({"asset_type": "HDRI"}):
+        applyhdri_url = asset.get("applyhdri_url")
+        hdri_url = asset.get("hdri_url")
+
+        # image_url 리스트 생성 (None 값 제외)
+        image_urls = [url for url in [applyhdri_url, hdri_url] if url]
+
+        update_data = {
+            "$set": {
+                "image_url": image_urls,  # 통합된 URL 리스트
+                "source_url": None  # 필요에 따라 적절한 값 설정
+            },
+            "$unset": {
+                "applyhdri_url": "",  # 기존 필드 삭제 
+                "hdri_url": ""
+            }
+        }
+
+        asset_collection.update_one({"_id": asset["_id"]}, update_data)
+        print(f"Updated asset {asset['_id']} with image_url: {image_urls}")
+
+
+    print("3D Model 타입 자산의 image_url 업데이트 완료.")
+update_hdri_urls()
+
+"""Material 인덱스 생성 및 수정 중"""
+def update_material_urls():
+    for asset in asset_collection.find({"asset_type": "Material"}):
+        material_urls = asset.get("material_urls")
+
+        # 업데이트할 데이터 정의
+        update_data = {
+            "$set": {
+                "image_url": material_urls,  # material_urls을 그대로 image_url로 변경
+                "source_url": None  # 필요에 따라 적절한 값 설정
+            },
+            "$unset": {
+                "material_urls": ""  # 기존 material_urls 필드 삭제
+            }
+        }
+
+        asset_collection.update_one({"_id": asset["_id"]}, update_data)
+        print(f"Updated asset {asset['_id']} with image_url: {material_urls}")
+
+    print("Material 타입 자산의 image_url 업데이트 완료.")
+
+# 실행
+update_material_urls()
 
 """모든 인덱스 삭제"""
 # asset_collection.drop_indexes()
