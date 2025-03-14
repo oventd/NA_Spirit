@@ -30,7 +30,7 @@ class Widget(QWidget):
 
     def load_ui(self):
         # .ui 파일을 로드
-        ui_file = QFile("/home/rapa/NA_Spirit/gui/popup.ui")  # UI 파일 경로를 지정 (현재 경로에서 widget.ui 파일을 찾음)
+        ui_file = QFile("/home/llly/NA_Spirit/gui/popup.ui")  # UI 파일 경로를 지정 (현재 경로에서 widget.ui 파일을 찾음)
         loader = QUiLoader()
         self.ui = loader.load(ui_file, self)  # UI 로드
         ui_file.close()
