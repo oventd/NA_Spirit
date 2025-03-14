@@ -2,6 +2,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget
 from PySide6.QtUiTools import QUiLoader  # .ui 파일을 동적으로 로드하는 데 사용
 from PySide6.QtCore import QFile, Signal
+from PySide6.QtCore import Qt
 
 class Widget(QWidget):
     # 사용자 정의 시그널
@@ -16,6 +17,10 @@ class Widget(QWidget):
         loader = QUiLoader()
         self.ui = loader.load(ui_file, self)  # UI 로드
         ui_file.close()
+        self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 외곽선과 헤더를 없앰
+        
+        
+        self.ui.setWindowTitle("Download Popup")  # 윈도우 제목
 
         # # 버튼 클릭 시 시그널 발생
         # self.ui.pushButton.clicked.connect(self.on_button_click)
