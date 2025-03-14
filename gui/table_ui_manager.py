@@ -77,7 +77,7 @@ class TableUiManager:
 
     def search_input(self, search_word):
         self.search_word = search_word
-        self.table_widget()
+        self.update_table()
 
 #라벨 초기화 함수 실행
     def remove_lable(self):
@@ -159,19 +159,19 @@ class TableUiManager:
         #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
         if option == "오래된 순":
             print(f"오래된 순의 필터임 :{Check().dict}")
-            self.table_widget(CREATED_AT, 40, 0,None)
+            self.update_table(CREATED_AT, 40, 0,None)
 
         elif option =="다운로드 순":
             print("다운로드된 순서를 정렬할게요")
-            self.table_widget(DOWNLOADS, 40, 0,None)
+            self.update_table(DOWNLOADS, 40, 0,None)
 
         else:
             print("최신 순서를 정렬할게요")
-            self.table_widget(UPDATED_AT, 40, 0, None)
+            self.update_table(UPDATED_AT, 40, 0, None)
         
         
     
-    def table_widget(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
+    def update_table(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
         ui = self.ui
 
         ui.like_empty_notice.hide()
@@ -372,6 +372,7 @@ class TableUiManager:
         like_state = LikeState()
         asset = Asset().current
         asset_object_id = str(asset[OBJECT_ID])
+  
 
         
     
@@ -381,14 +382,21 @@ class TableUiManager:
             like_state.like_asset_list.append(asset_object_id)
             self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에 추가했습니다\n해당 에셋 정보 : {asset}")
             DictManager().save_dict_to_json(like_state.like_asset_list)
+            
+            
+            like_state.like_count(like_state.like_asset_list)
+            print("라이크 갯수"+like_state.like_count)
+            
+            
 
             if LikeState().state == True:
                 print("저 서브바가 열려있을때만 닫혀요")
                 self.ui.tableWidget.clear()
-                like_asset_dict = []
-                self.table_widget(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
+                self.update_table(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
                 self.ui.like_download_btn.show()
                 self.ui.like_download_btn_area.show()
+
+         
             
       
             
@@ -407,11 +415,7 @@ class TableUiManager:
             if LikeState().state == True:
                 print("저 서브바가 열려있을때만 닫혀요")
                 self.ui.tableWidget.clear()
-                like_asset_dict = []
-
-                self.table_widget(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
-                    
-                self.make_table(like_asset_dict)
+                self.update_table(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
                 self.ui.like_download_btn.show()
                 self.ui.like_download_btn_area.show()
           
@@ -435,8 +439,7 @@ class TableUiManager:
                 
             else:
                 self.ui.tableWidget.clear()
-                like_asset_dict = []
-                self.table_widget(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
+                self.update_table(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
                 self.ui.like_download_btn.show()
                 self.ui.like_download_btn_area.show()
 
@@ -455,7 +458,7 @@ class TableUiManager:
                 LikeState().state = False
                 self.ui.like_empty_notice.hide()
                 self.ui.tableWidget.clear()
-                self.table_widget(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
+                self.update_table(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
                 #사용자 pc에 저장해두고 라이크 받을때 마다 오브젝트 id를 json에 저장해두고 
 
     def remove_widget_with_children(self,widget):
