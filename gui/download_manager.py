@@ -15,6 +15,7 @@ for root, dirs, files in os.walk(na_spirit_dir):
 
 from constant import *
 from logger import *
+from like_state import LikeState
 
 
 class DownloadManager:
@@ -25,7 +26,8 @@ class DownloadManager:
         
     @classmethod
     def download_likged_assets_all(cls):
-        print("전체 다운로드 버튼이 눌렸어요")
+        download_list=LikeState().like_asset_list
+        print(f"전체 다운로드 버튼이 눌렸어요{download_list}")
 
         cls.logger.info(f"유저가 관심에셋 전체를 다운받았어요")
 
