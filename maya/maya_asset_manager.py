@@ -19,15 +19,17 @@ except ImportError:
 
 import maya.cmds as cmds
 
+
+
 ASSET_DIRECTORY = "/nas/spirit/spirit/assets/Prop"
 
 class AssetManager(QMainWindow):
-    """🚀 파일 및 버전 정보를 관리하는 클래스"""
+    """파일 및 버전 정보를 관리하는 클래스"""
     ASSET_DIRECTORY = "/nas/spirit/spirit/assets/Prop"
 
     @staticmethod
     def update_asset_info():
-        """🔹 현재 씬에서 참조된 에셋 정보를 JSON에 저장"""
+        """현재 씬에서 참조된 에셋 정보를 JSON에 저장"""
         references = cmds.file(q=True, reference=True) or []
         asset_data = {}
 
@@ -45,7 +47,7 @@ class AssetManager(QMainWindow):
 
     @staticmethod
     def get_clean_asset_name(asset_path):
-        """✅ 파일 경로에서 'Prop/' 다음에 오는 폴더명을 에셋 이름으로 가져오기"""
+        """ 파일 경로에서 'Prop/' 다음에 오는 폴더명을 에셋 이름으로 가져오기"""
         match = re.search(r"/Prop/([^/]+)/RIG/", asset_path)
         if match:
             return match.group(1)  # `Prop/` 다음 폴더명(에셋 이름) 반환

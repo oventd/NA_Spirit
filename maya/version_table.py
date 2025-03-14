@@ -21,13 +21,18 @@ sys.path.append('/home/rapa/NA_Spirit/maya')
 
 
 from maya_ui_manager import MainUiManager
-from maya_ui_manager import MayaReferenceManager
+from maya_reference_manager import MayaReferenceManager
 from maya_asset_manager import AssetManager
 
 
-
+# 테이블 위젯 내 ui 기능만 배치
 class VersionTable:
     def __init__(self):
+        # self.setWindowTitle("ASSET & Maya Version Matching Check")
+        # self.setGeometry(100, 100, 800, 600)
+        # self.setup_ui()
+        # self.update_table()
+        # self.table.cellClicked.connect(self.onCellClicked)    
         self.table = QTableWidget()
         self.table.setColumnCount(4)
         self.table.setHorizontalHeaderLabels(["Check Box", "Asset", "Current", "Latest"])

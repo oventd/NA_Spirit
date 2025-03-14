@@ -17,37 +17,37 @@ except ImportError:
     from PySide2.QtCore import QFile, Qt
     from PySide2.QtGui import QColor
 
-# import maya.cmds as cmds
+import maya.cmds as cmds
 
-
-# from maya_ui_manager import MainUiManager
-# from maya_ui_manager import MayaReferenceManager
-# from maya_asset_manager import AssetManager
+from maya_reference_manager import MayaReferenceManager
+from maya_asset_manager import AssetManager
 
 ASSET_DIRECTORY = "/nas/spirit/spirit/assets/Prop"
 
+# 테이블의 기능 구현 
 
 class MainUiManager(QMainWindow):
     _instance = None  # 싱글톤 인스턴스 저장
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
+        if cls._instance is None:  # 인스턴스가 없다면 생성
             cls._instance = super(MainUiManager, cls).__new__(cls)
-        return cls._instance
+        return cls._instance  # 이미 존재하는 인스턴스를 반환
 
     def __init__(self):
-        if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
+        if not hasattr(self, "_initialized"):  # 초기화 여부 체크
+            self._initialized = True
             super().__init__()
+
             self.setWindowTitle("ASSET & Maya Version Matching Check")
             self.setGeometry(100, 100, 800, 600)
             self.setup_ui()
             self.update_table()
-        
+
             self.table.cellClicked.connect(self.onCellClicked)
 
 
-
-
+            
     def setup_ui(self):
         """UI 요소 초기화 및 설정"""
         self.table = QTableWidget()
@@ -96,7 +96,8 @@ class MainUiManager(QMainWindow):
 
         for row, (asset_name, current_version, latest_version) in enumerate(version_data):
             current_version = current_version or "v001"
-    
+            latest_version = AssetManager.get_latest_version(asset_name)
+
             try:
                 current_version_int = int(re.sub(r"\D", "", current_version))
                 latest_version_int = int(re.sub(r"\D", "", latest_version))
@@ -178,7 +179,7 @@ class MainUiManager(QMainWindow):
         checked = False
         for row in range(self.table.rowCount()):
             widget = self.table.cellWidget(row, 0)
-            if widget and widget.layout():  # 체크박스가 존재하는지 확인
+            if widget and widget.layout():  # 🔹 체크박스가 존재하는지 확인
                 checkbox = widget.layout().itemAt(0).widget()
                 if checkbox and checkbox.isChecked():
                     checked = True
@@ -204,6 +205,16 @@ class MainUiManager(QMainWindow):
                 self.update_version_status(row, combo, latest_item)  # UI 갱신
                 self.table.setItem(row, 3, latest_item)  # 'Latest' 열을 갱신
 
+    def refresh_maya_reference(self):
+        references = cmds.file(q=True, reference=True) or []
+        for ref in references:
+            try:
+                ref_node = cmds.referenceQuery(ref, referenceNode=True)
+                cmds.file(unloadReference=ref_node)  # 참조 파일 언로드
+                cmds.file(ref, loadReference=ref_node, force=True)  # 최신 버전으로 참조 파일 로드
+                print(f"✅ 참조 업데이트 완료: {ref}")
+            except Exception as e:
+                print(f"⚠️ 참조 업데이트 실패: {e}")
 
     def toggle_all_checkboxes(self):
         """모든 체크박스를 선택/해제하는 기능"""
@@ -231,7 +242,7 @@ class MainUiManager(QMainWindow):
             latest_version_int = int(latest_version_str)  # 최신 버전 (숫자)
             print ( current_version)
         except ValueError as e:
-            print(f"⚠️ 버전 값 변환 오류: {e}")
+            print(f"버전 값 변환 오류: {e}")
             return
 
         # 최신 상태 반영 (🟢 최신 / 🟡 구버전)
@@ -281,12 +292,13 @@ class MainUiManager(QMainWindow):
         references = cmds.file(q=True, reference=True) or []
 
         if row >= len(references):
-            print(f"⚠️ 참조 파일을 찾을 수 없음: {row}")
+            print(f"참조 파일을 찾을 수 없음: {row}")
             return
 
         # 🔹 현재 참조된 파일 경로 가져오기
         ref_path = cmds.referenceQuery(references[row], filename=True, withoutCopyNumber=True)
-
+        print(f"안녕 난느 {ref_path}")
+        
         if not ref_path or not os.path.exists(ref_path):
             print(f"⚠️ 참조 경로를 찾을 수 없습니다: {ref_path}")
             return
@@ -299,6 +311,8 @@ class MainUiManager(QMainWindow):
         base_name, ext = os.path.splitext(os.path.basename(ref_path))
         base_name_no_version = re.sub(r"\.v\d{3}", "", base_name)  # `v001` 같은 버전 제거
 
+
+        # file_extension = '.ma'  if ref_path.endswith('.ma') else ('.mb')
         # 파일 확장자를 확실하게 설정하기
       
         try :
@@ -306,15 +320,20 @@ class MainUiManager(QMainWindow):
         except:
             file_extension = '.mb'
     
+
+
+
+
         # 선택된 버전으로 파일명 갱신
         new_filename = f"{base_name_no_version}{new_version}{file_extension}"  # 새 파일명 생성
 
         #  해당 디렉토리 내에서 선택된 버전 찾기
         latest_path = os.path.join(asset_dir, new_filename)
 
+        print(f" 자 업뎃 드가자{latest_path}")  # Debugging line to check if correct version is being used
 
         if not os.path.exists(latest_path):
-            print(f"⚠️ {new_filename} 파일이 존재하지 않습니다.")
+            print(f"{new_filename} 파일이 존재하지 않습니다.")
             return
 
 
@@ -328,13 +347,7 @@ class MainUiManager(QMainWindow):
 
             # 새 버전 파일 로드
             cmds.file(latest_path, loadReference=ref_node, force=True)
-            print(f"✅ 참조 업데이트 완료: {ref_path} → {latest_path}")
+            print(f" 참조 업데이트 완료: {ref_path} → {latest_path}")
         except Exception as e:
-            print(f"⚠️ 참조 업데이트 실패: {e}")
+            print(f" 참조 업데이트 실패: {e}")
 
-
-
-if __name__ == "__main__":
-
-    window = MainUiManager()
-    window.show()

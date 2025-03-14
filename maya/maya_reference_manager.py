@@ -19,6 +19,8 @@ except ImportError:
     from PySide2.QtGui import QColor
 
 
+import maya.cmds as cmds
+from maya_asset_manager import AssetManager
 
 
 
@@ -43,7 +45,7 @@ class MayaReferenceManager:
 
     @staticmethod
     def get_referenced_assets():
-        """✅ 현재 씬에서 참조된 에셋을 가져오기 (파일 경로에서 정확한 버전 가져오기)"""
+        """현재 씬에서 참조된 에셋을 가져오기 (파일 경로에서 정확한 버전 가져오기)"""
         references = cmds.file(q=True, reference=True) or []
         asset_data = []
 
