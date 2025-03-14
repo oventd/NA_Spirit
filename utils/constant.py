@@ -25,11 +25,20 @@ DOWNLOADS = "downloads"  # downloads 값
 CREATED_AT = "created_at"  # created_at 값
 UPDATED_AT = "updated_at"  # updated_at 값
 PRICE = "price"  # price 값
+PREVIEW_URL = "preview_url"  # preview_url 값
+
+SEARCH_FIELDS = ["_id", "name", "description", "asset_type", "category", 
+"style", "resolution", "file_format", "size", "license_type",
+"creator_id", "creator_name", "downloads", "price", 
+"image_url","source_url","video_url", "preview_url",
+"created_at", "updated_at"]
+
+
+# 버려도 되는 친구
 DETAIL_URL = "detail_url"  # particular_url 값
 PRESETTING_URL1 = "presetting_url1"  # presetting_url1 값
 PRESETTING_URL2 = "presetting_url2"  # presetting_url2 값
 PRESETTING_URL3 = "presetting_url3"  # presetting_url3 값
-PREVIEW_URL = "preview_url"  # preview_url 값
 TURNAROUND_URL = "turnaround_url" # turnaround_url 값
 RIG_URL = "rig_url" # rig_url 값
 APPLY_HDRI = "applyhdri_url" # applyhdri_url 값

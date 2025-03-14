@@ -171,14 +171,12 @@ class DbCrud:
         #     "presetting_url1": 1, "presetting_url2": 1, "presetting_url3": 1, "preview_url": 1
         # }
         if fields == None:
-            fields = [
-                "_id", "name", "description", "asset_type", "category", 
-                "style", "resolution", "file_format", "size", "license_type",
-                "creator_id", "creator_name", "downloads", "price", "detail_url",
-                "presetting_url1", "presetting_url2", "presetting_url3", "preview_url",CREATED_AT,UPDATED_AT,TURNAROUND_URL,RIG_URL,
-                "image_url","source_url","video_url",
-                "material_urls"
-            ]
+            fields = SEARCH_FIELDS
+                
+                
+                # "detail_url",
+                # "presetting_url1", "presetting_url2", "presetting_url3", "preview_url",CREATED_AT,UPDATED_AT,TURNAROUND_URL,RIG_URL,
+                # "material_urls"
         # 기본 파이프라인 생성
         pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields,user_quaery=user_query)
 
@@ -294,7 +292,7 @@ class AssetDb(DbCrud):
             # )
             self.logger.info("Indexes set up for AssetDb")
 
-    def set_url_fields(self, data, fields=None):
+    # def set_url_fields(self, data, fields=None):
         """
         자산의 URL 필드를 확인하고, 없는 경우 기본값(None)으로 처리합니다.
         :param data: 자산 데이터 (단일 자산 또는 자산 리스트)
@@ -312,22 +310,22 @@ class AssetDb(DbCrud):
         #         data[url_field] = data.get(url_field, None)
         
         # return data
-        url_fields = [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
-                    PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS, MATERIAL_URLS]
+        # url_fields = [DETAIL_URL, PRESETTING_URL1, PRESETTING_URL2,
+        #             PRESETTING_URL3, TURNAROUND_URL, RIG_URL, APPLY_HDRI, HDRI_URL, MATERIAL_URLS, MATERIAL_URLS]
 
-        if isinstance(data, list):  # 결과가 리스트인 경우
-            for item in data:
-                for url_field in url_fields:
-                    # fields에 해당 URL 필드가 포함된 경우에만 추가
-                    if fields and url_field in fields:
-                        item[url_field] = item.get(url_field, None)
-        else:  # 단일 자산인 경우
-            for url_field in url_fields:
-                # fields에 해당 URL 필드가 포함된 경우에만 추가
-                if fields and url_field in fields:
-                    data[url_field] = data.get(url_field, None)
+        # if isinstance(data, list):  # 결과가 리스트인 경우
+        #     for item in data:
+        #         for url_field in url_fields:
+        #             # fields에 해당 URL 필드가 포함된 경우에만 추가
+        #             if fields and url_field in fields:
+        #                 item[url_field] = item.get(url_field, None)
+        # else:  # 단일 자산인 경우
+        #     for url_field in url_fields:
+        #         # fields에 해당 URL 필드가 포함된 경우에만 추가
+        #         if fields and url_field in fields:
+        #             data[url_field] = data.get(url_field, None)
         
-        return data 
+        # return data 
        
     def find(self, filter_conditions=None, sort_by=None, limit=0, skip=0, fields=None):
         """
@@ -340,7 +338,7 @@ class AssetDb(DbCrud):
         :return: 자산들의 상세 정보 리스트
         """
         details = super().find(filter_conditions, sort_by, limit, skip, fields)
-        return self.set_url_fields(details)
+        return # self.set_url_fields(details)
     
     def find_one(self, object_id, fields=None):
         """
@@ -351,15 +349,15 @@ class AssetDb(DbCrud):
         """
         # 부모 클래스의 find_one 호출
         details = super().find_one(object_id, fields)
-        return self.set_url_fields(details)
+        return # self.set_url_fields(details)
     
     def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
         # 부모 클래스의 search 호출
         result = super().search(user_query, filter_conditions, limit, skip, fields, sort_by, sort_order)
-        return self.set_url_fields(result)
+        return # self.set_url_fields(result)
     
     def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
                     limit=0, skip=0, fields=None):
         result = super().find_and_sort(filter_conditions, sort_by, sort_order, limit, skip, fields)
-        return self.set_url_fields(result)
+        return # self.set_url_fields(result)
 
