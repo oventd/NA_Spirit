@@ -354,7 +354,7 @@ class TableUiManager:
        
 
         else:
-            for url in asset["material_urls"]:
+            for url in asset["image_url"]:
                 detail_thum_urls.append(url)
                
             

@@ -176,6 +176,7 @@ class DbCrud:
                 "style", "resolution", "file_format", "size", "license_type",
                 "creator_id", "creator_name", "downloads", "price", "detail_url",
                 "presetting_url1", "presetting_url2", "presetting_url3", "preview_url",CREATED_AT,UPDATED_AT,TURNAROUND_URL,RIG_URL,
+                "image_url","source_url","video_url",
                 "material_urls"
             ]
         # 기본 파이프라인 생성
