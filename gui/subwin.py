@@ -32,13 +32,12 @@ from assetmanager import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
-from add_video_player import *
-from video_player_manager import VLCVideoPlayer
+from video_player_manager import VideoPlayer
 
 from like_state import LikeState
 
 from asset import Asset
-from lunch_test import VideoPlayer, VideoToImageExtractor
+from gui.video_player_manager import VideoPlayer, VideoToImageExtractor
 
 
 class SubWin:
