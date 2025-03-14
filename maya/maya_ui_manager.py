@@ -40,7 +40,7 @@ class MainUiManager(QMainWindow):
             super().__init__()
 
             self.setWindowTitle("ASSET & Maya Version Matching Check")
-            self.setGeometry(100, 100, 800, 600)
+            self.setGeometry(100, 100, 900, 600)
             self.setup_ui()
             self.update_table()
 
@@ -69,13 +69,18 @@ class MainUiManager(QMainWindow):
         self.update_button.setEnabled(False)  
         self.update_button.clicked.connect(self.apply_selected_versions)
 
+        self.refresh_maya_reference_button = QPushButton("Refresh Maya Reference")
+        self.refresh_maya_reference_button.clicked.connect(self.refresh_maya_reference)
+
         self.select_all_button = QPushButton("Select All / Deselect All")
         self.select_all_button.clicked.connect(self.toggle_all_checkboxes)
 
         # 버튼 배치
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.update_button)
+        button_layout.addWidget(self.refresh_maya_reference_button)
         button_layout.addWidget(self.select_all_button)
+        
 
         main_widget = QWidget(self)
         main_layout = QVBoxLayout(main_widget)
@@ -86,12 +91,19 @@ class MainUiManager(QMainWindow):
     
     #정리필요
     def update_table(self):
-        referenced_assets = MayaReferenceManager.get_referenced_assets()
-        if not referenced_assets:
-            print("⚠️ 참조된 에셋이 없습니다.")
-            return
-        self.set_table_items(referenced_assets)
+        try:
+            referenced_assets = MayaReferenceManager.get_referenced_assets()
+            if not referenced_assets:
+                print("⚠️ 참조된 에셋이 없습니다.")
+                return
 
+            # 기존 테이블 항목 초기화 (행 삭제)
+            self.table.setRowCount(0)
+
+            # 에셋 정보를 테이블에 추가
+            self.set_table_items(referenced_assets)
+        except Exception as e:
+            print(f"⚠️ 에셋 정보를 불러오는 중 오류 발생: {e}")
     def set_table_items(self, version_data):
         """테이블 항목 설정"""
 
@@ -208,16 +220,63 @@ class MainUiManager(QMainWindow):
                 self.update_version_status(row, combo, latest_item)  # UI 갱신
                 self.table.setItem(row, 3, latest_item)  # 'Latest' 열을 갱신
 
+
     def refresh_maya_reference(self):
         references = cmds.file(q=True, reference=True) or []
         for ref in references:
             try:
+                # 참조 노드를 찾기 전에 참조를 언로드
                 ref_node = cmds.referenceQuery(ref, referenceNode=True)
                 cmds.file(unloadReference=ref_node)  # 참조 파일 언로드
-                cmds.file(ref, loadReference=ref_node, force=True)  # 최신 버전으로 참조 파일 로드
-                print(f"✅ 참조 업데이트 완료: {ref}")
+
+                # 참조 파일의 최신 버전 경로 얻기
+                latest_ref_path = cmds.referenceQuery(ref, filename=True)  # 레퍼런스 조회
+                cmds.file(latest_ref_path, loadReference=ref_node, force=True)  # 최신 버전으로 참조 파일 로드
+
+                print(f"참조 업데이트 완료: {ref}")
+
+                # 테이블에서 참조 파일의 최신 버전으로 업데이트
+                row = self.find_reference_row(ref)  # 테이블에서 참조 파일이 있는 행을 찾음
+                if row is not None:
+                    # 최신 버전 가져오기 (예: AssetManager에서 최신 버전 조회)
+                    latest_version = AssetManager.get_latest_version(ref)  # 최신 버전 정보 얻기
+                    
+                    # 디버깅: 최신 버전이 잘 반환되는지 확인
+                    print(f"최신 버전: {latest_version}")
+
+                    # 테이블에서 해당 행의 'Latest' 열 업데이트
+                    latest_item = self.table.item(row, 3)
+                    if latest_item is not None:
+                        latest_item.setText(latest_version)  # 'Latest' 열 업데이트
+                    else:
+                        print("Error: 'Latest' 열이 비어있습니다.")
+
+                    # 'Current' 열도 최신 버전으로 업데이트
+                    current_item = self.table.item(row, 2)
+                    if current_item is not None:
+                        current_item.setText(latest_version)  # 'Current' 열 업데이트
+                    else:
+                        print("Error: 'Current' 열이 비어있습니다.")
+
+                # UI 테이블 갱신
+                self.update_table()
+
             except Exception as e:
                 print(f"⚠️ 참조 업데이트 실패: {e}")
+
+
+    def find_reference_row(self, ref):
+        """
+        테이블에서 참조 파일에 해당하는 행을 찾아 반환합니다.
+        참조 파일의 이름 또는 경로를 기준으로 테이블에서 해당 행을 찾는 로직입니다.
+        """
+        for row in range(self.table.rowCount()):
+            # 테이블의 'Asset' 열에서 참조 파일을 찾기
+            asset_name = self.table.item(row, 0).text()  # 'Asset' 열 (예: 첫 번째 열)
+            if asset_name == ref:  # 참조 파일 이름과 일치하는지 비교
+                return row
+        return None
+
 
     def toggle_all_checkboxes(self):
         """모든 체크박스를 선택/해제하는 기능"""
@@ -233,7 +292,7 @@ class MainUiManager(QMainWindow):
     def update_version_status(self, row, combo, latest_item):
         """최신 버전 상태 UI 업데이트"""
         asset_name = self.table.item(row, 1).text()
-        latest_version = AssetManager.get_latest_version(asset_name)  # 🔹 최신 버전 다시 가져오기
+        latest_version = AssetManager.get_latest_version(asset_name)  #  최신 버전 다시 가져오기
 
         # 버전 비교 전에 .v를 제거하고 숫자만 남기기
         current_version_str = combo.currentText().replace("v", "").replace(".", "")  # .v와 .을 모두 제거
@@ -297,7 +356,6 @@ class MainUiManager(QMainWindow):
         if row >= len(references):
             print(f"참조 파일을 찾을 수 없음: {row}")
             return
-
         # 🔹 현재 참조된 파일 경로 가져오기
         ref_path = cmds.referenceQuery(references[row], filename=True, withoutCopyNumber=True)
         print(f"안녕 난느 {ref_path}")
@@ -309,45 +367,32 @@ class MainUiManager(QMainWindow):
         # 참조된 파일이 존재하는 디렉토리 가져오기
         asset_dir = os.path.dirname(ref_path)
         
-
         # 파일 이름에서 버전 정보 제거
         base_name, ext = os.path.splitext(os.path.basename(ref_path))
         base_name_no_version = re.sub(r"\.v\d{3}", "", base_name)  # `v001` 같은 버전 제거
 
-
-        # file_extension = '.ma'  if ref_path.endswith('.ma') else ('.mb')
         # 파일 확장자를 확실하게 설정하기
-      
         try :
             file_extension = '.ma'
         except:
             file_extension = '.mb'
     
-
-
-
-
         # 선택된 버전으로 파일명 갱신
         new_filename = f"{base_name_no_version}{new_version}{file_extension}"  # 새 파일명 생성
 
         #  해당 디렉토리 내에서 선택된 버전 찾기
         latest_path = os.path.join(asset_dir, new_filename)
-
-        print(f" 자 업뎃 드가자{latest_path}")  # Debugging line to check if correct version is being used
+        print(f" 자 업뎃 드가자{latest_path}") 
 
         if not os.path.exists(latest_path):
             print(f"{new_filename} 파일이 존재하지 않습니다.")
             return
-
-
         # 참조 파일을 언로드하고, 새 버전으로 로드
         try:
             # 참조 노드 가져오기
             ref_node = cmds.referenceQuery(references[row], referenceNode=True)
-
             # 기존 참조를 언로드
             cmds.file(unloadReference=ref_node)
-
             # 새 버전 파일 로드
             cmds.file(latest_path, loadReference=ref_node, force=True)
             print(f" 참조 업데이트 완료: {ref_path} → {latest_path}")

@@ -62,6 +62,18 @@ class MayaReferenceManager:
 
             asset_data.append((asset_name, current_version, latest_version)) 
         return asset_data
+    
+    @staticmethod
+    def refresh_maya_reference(self):
+        references = cmds.file(q=True, reference=True) or []
+        for ref in references:
+            try:
+                ref_node = cmds.referenceQuery(ref, referenceNode=True)
+                cmds.file(unloadReference=ref_node)  # 참조 파일 언로드
+                cmds.file(ref, loadReference=ref_node, force=True)  # 최신 버전으로 참조 파일 로드
+                print(f"✅ 참조 업데이트 완료: {ref}")
+            except Exception as e:
+                print(f"⚠️ 참조 업데이트 실패: {e}")
 
     @staticmethod
     def select_asset(row):

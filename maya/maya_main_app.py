@@ -43,10 +43,8 @@ class MainUi(QMainWindow):
             self.asset_manager = AssetManager()
             self.reference_manager = MayaReferenceManager()
 
- 
             
 if __name__ == "__main__":
-    app = QApplication(sys.argv) 
     window = MainUi()
     window.show()
-    sys.exit(app.exec()) 
+
