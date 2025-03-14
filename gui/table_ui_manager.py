@@ -329,29 +329,24 @@ class TableUiManager:
 
         # 이미지 URL 가져오기
         if asset[ASSET_TYPE]=="Texture":
-            print(f"에셋 타입 >>>>>>>>{asset[ASSET_TYPE]}")
-            detail_thum_urls = [
-                asset["detail_url"],
-                asset["presetting_url1"],
-                asset["presetting_url2"],
-                asset["presetting_url3"]
-            ]
+
+            for url in asset["image_url"]:
+                detail_thum_urls.append(url)
+          
       
 
         elif asset[ASSET_TYPE]=="3D Model":
-            detail_thum_urls = [
-                asset["turnaround_url"],
-                asset["rig_url"]
-            ]
+            
+            for url in asset["video_url"]:
+                detail_thum_urls.append(url)
+            
             print(detail_thum_urls)
       
 
         elif asset[ASSET_TYPE]=="HDRI":
-            detail_thum_urls = [
-                asset["applyhdri_url"],
-                asset["hdri_url"]
-            ]
-       
+            for url in asset["image_url"]:
+                detail_thum_urls.append(url)
+   
 
         else:
             for url in asset["image_url"]:
