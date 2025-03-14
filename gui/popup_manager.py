@@ -1,55 +1,64 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton
+import sys
+from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget
+from PySide6.QtUiTools import QUiLoader  # .ui 파일을 동적으로 로드하는 데 사용
+from PySide6.QtCore import QFile, Signal
+from PySide6.QtCore import Qt
 
-class ConfirmDialog(QDialog):
+class Widget(QWidget):
+    # 사용자 정의 시그널
+    value_changed = Signal(str)  # 버튼 클릭 시 값을 전달하기 위한 시그널
+
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("확인")
-        self.setModal(True)  # 모달 창 설정 (메인 윈도우 조작 불가)
-        self.setGeometry(200, 200, 200, 100)
+        # .ui 파일을 로드
+        ui_file = QFile("/home/rapa/NA_Spirit/gui/popup.ui")  # UI 파일 경로를 지정 (현재 경로에서 widget.ui 파일을 찾음)
+        ui_file.open(QFile.ReadOnly)
+        loader = QUiLoader()
+        self.ui = loader.load(ui_file, self)  # UI 로드
+        ui_file.close()
+        self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 외곽선과 헤더를 없앰
+        
+        
+        self.ui.setWindowTitle("Download Popup")  # 윈도우 제목
 
-        layout = QVBoxLayout()
+        # # 버튼 클릭 시 시그널 발생
+        # self.ui.pushButton.clicked.connect(self.on_button_click)
 
-        # 안내 문구
-        self.label = QLabel("정말로 실행하시겠습니까?")
-        layout.addWidget(self.label)
-
-        # 버튼 추가
-        self.button_yes = QPushButton("Yes")
-        self.button_no = QPushButton("No")
-        layout.addWidget(self.button_yes)
-        layout.addWidget(self.button_no)
-
-        self.setLayout(layout)
-
-        # 버튼 클릭 시 다이얼로그 결과 설정
-        self.button_yes.clicked.connect(self.accept)  # Yes 선택 시 QDialog.accept() 호출
-        self.button_no.clicked.connect(self.reject)  # No 선택 시 QDialog.reject() 호출
+    def on_button_click(self):
+        # 버튼 클릭 시 입력된 값을 MainWindow로 전달하는 시그널 발생
+        value = self.ui.lineEdit.text()  # 입력된 텍스트 가져오기
+        self.value_changed.emit(value)  # 시그널 발생
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("메인 윈도우")
-        self.setGeometry(100, 100, 400, 300)
+        self.setWindowTitle("Main Window")
+        self.setGeometry(100, 100, 300, 200)
 
-        # 버튼 추가
-        self.button = QPushButton("팝업 열기", self)
-        self.button.setGeometry(150, 130, 100, 40)
-        self.button.clicked.connect(self.show_popup)
+        # 메인 윈도우에 표시할 레이아웃 및 위젯
+        self.label = QLabel("No input yet", self)
+        self.label.setGeometry(50, 50, 200, 40)
 
-    def show_popup(self):
-        dialog = ConfirmDialog()  # 팝업 창 생성
-        result = dialog.exec()  # 팝업 실행 및 결과 반환
+        self.open_widget_button = QPushButton("Open Widget", self)
+        self.open_widget_button.setGeometry(50, 100, 200, 40)
 
-        if result == QDialog.Accepted:
-            print("사용자가 'Yes'를 선택했습니다.")
-        else:
-            print("사용자가 'No'를 선택했습니다.")
+        # 버튼 클릭 시 위젯을 띄우는 슬롯 연결
+        self.open_widget_button.clicked.connect(self.show_widget)
 
-# 애플리케이션 실행
+    def show_widget(self):
+        # QWidget 창을 열고 시그널을 받아서 처리
+        self.widget = Widget()
+        self.widget.value_changed.connect(self.update_label)  # 시그널을 메인 윈도우의 슬롯에 연결
+        self.widget.show()
+
+    def update_label(self, value):
+        # QWidget에서 전달된 값으로 라벨 업데이트
+        self.label.setText(f"Received value: {value}")
+
 if __name__ == "__main__":
-    app = QApplication([])
+    app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-    app.exec()
+    sys.exit(app.exec())
