@@ -1,8 +1,11 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget
+from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget,QListWidgetItem
 from PySide6.QtUiTools import QUiLoader  # .ui 파일을 동적으로 로드하는 데 사용
 from PySide6.QtCore import QFile, Signal
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
+
+
 
 class Widget(QWidget):
     # 사용자 정의 시s그널
@@ -10,21 +13,75 @@ class Widget(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.exemple = ["apple", "banana", "cherry","cherry","cherry","cherry","cherry","cherry","cherry","cherry","cherry"]
+        self.load_ui()
+        self.add_list_widget()
+        self.setWindowTitle("Download Popup")  # 윈도우 제목
+        self.setWindowFlags(Qt.FramelessWindowHint)  # 외곽선과 헤더를 없앰
+        self.ui.cancel_touch_area.clicked.connect(self.close)
+        self.ref_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/reference_toggle.png")
+        self.import_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/import_toggle.png")
 
+        self.setDownloadFormat = False  #False가 레퍼런스
+        self.ui.download_format_touch_area.clicked.connect(self.set_download_format)
+        self.ui.download_touch_area.clicked.connect(self.download)
+
+        
+
+    def load_ui(self):
         # .ui 파일을 로드
         ui_file = QFile("/home/rapa/NA_Spirit/gui/popup.ui")  # UI 파일 경로를 지정 (현재 경로에서 widget.ui 파일을 찾음)
-        ui_file.open(QFile.ReadOnly)
         loader = QUiLoader()
         self.ui = loader.load(ui_file, self)  # UI 로드
-        self.setWindowFlags(Qt.FramelessWindowHint)  
         ui_file.close()
-        self.ui.setWindowFlags(Qt.FramelessWindowHint)  # 외곽선과 헤더를 없앰
         
-        
-        self.ui.setWindowTitle("Download Popup")  # 윈도우 제목
+    def set_download_format(self):
+        if self.setDownloadFormat == False:
+            self.setDownloadFormat = True #임포트
+            self.ui.download_format_label.setPixmap(self.import_download_toggle_pixmap)
+        else:
+            self.setDownloadFormat = False
+            self.ui.download_format_label.setPixmap(self.ref_download_toggle_pixmap)
 
-        # # 버튼 클릭 시 시그널 발생
-        # self.ui.pushButton.clicked.connect(self.on_button_click)
+    def add_list_widget(self):
+        for item_text in self.exemple:
+            item = QListWidgetItem(item_text)  # 항목 생성
+            item.setCheckState(Qt.Unchecked)  # 체크박스를 체크된 상태로 설정
+            self.ui.download_listwidget.addItem(item) 
+        self.list_widget_stylesheet()
+
+    def list_widget_stylesheet(self):
+
+        self.ui.download_listwidget.setStyleSheet("""
+            QListWidget {
+                background-color: #101011;  /* 리스트의 배경을 투명하게 설정 */
+                color:#ffffff;
+            }
+
+            QListWidget::item:checked::indicator {
+            
+                border-radius: 50%;  /* 체크박스를 원형으로 설정 */
+                width: 16px;  /* 체크박스 크기 설정 */
+                height: 24px;
+            }
+
+            QListWidget::item:unchecked::indicator {
+             
+                border: 0.5px solid #ffffff;  /* 체크박스의 테두리 색상 */
+                border-radius: 50%;  /* 체크박스를 원형으로 설정 */
+                width: 16px;  /* 체크박스 크기 설정 */
+                height: 24px;
+            }
+        """)
+            
+            
+    def download(self):
+        if self.setDownloadFormat == False:
+            print("apple에셋이 레퍼런스로 다운로드되었습니다")
+        else:  
+            print("apple에셋이 임포트로 다운되었습니다")
+
+    
 
     def on_button_click(self):
         # 버튼 클릭 시 입력된 값을 MainWindow로 전달하는 시그널 발생

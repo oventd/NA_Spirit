@@ -10,6 +10,11 @@
     <height>339</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Pretendard Light</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -85,7 +90,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="label_5">
+  <widget class="QLabel" name="download_format_label">
    <property name="geometry">
     <rect>
      <x>430</x>
@@ -201,7 +206,7 @@
     <pixmap>../../../../nas/spirit/asset_project/source/popup_source/saved.png</pixmap>
    </property>
   </widget>
-  <widget class="QListWidget" name="listWidget">
+  <widget class="QListWidget" name="download_listwidget">
    <property name="geometry">
     <rect>
      <x>174</x>
@@ -211,24 +216,8 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: #101011; 
-color:#ffffff;
-</string>
+    <string notr="true"/>
    </property>
-   <item>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="font">
-     <font>
-      <family>Pretendard Variable</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="checkState">
-     <enum>Unchecked</enum>
-    </property>
-   </item>
   </widget>
   <widget class="QListWidget" name="haved_asset">
    <property name="geometry">
@@ -258,6 +247,63 @@ color:#ffffff;
      <enum>Unchecked</enum>
     </property>
    </item>
+  </widget>
+  <widget class="QPushButton" name="cancel_touch_area">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>240</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    background: transparent;  /* 배경 투명 */
+    border: none;  /* 테두리 제거 */
+}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="download_touch_area">
+   <property name="geometry">
+    <rect>
+     <x>506</x>
+     <y>240</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    background: transparent;  /* 배경 투명 */
+    border: none;  /* 테두리 제거 */
+}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="download_format_touch_area">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>130</y>
+     <width>181</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    background: transparent;  /* 배경 투명 */
+    border: none;  /* 테두리 제거 */
+}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
   </widget>
  </widget>
  <resources/>
