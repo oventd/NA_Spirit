@@ -69,8 +69,8 @@ class SubWin:
       # 리뷰 순서를 정리를 
 
     def show_asset_detail_image(stackedWidget_2, detail_thum_urls , image_labels):
-        video_path = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4"
-        detail_thum_urls.append(video_path)
+        # video_path = "/nas/spirit/DB/thum/3d_assets/turnaround/3d_turnaround.mp4"
+        # detail_thum_urls.append(video_path)
         for img_path in detail_thum_urls:
             ext = os.path.splitext(img_path)[1]
             if ext == ".mp4":

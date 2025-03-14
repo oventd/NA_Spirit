@@ -367,11 +367,12 @@ class TableUiManager:
             self.timer = SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
 
         else:
-            for url in asset["material_urls"]:
+            for url in asset["image_url"]:
                 detail_thum_urls.append(url)
+                print(f"디테일 url>>>>>>>>{detail_thum_urls}")
                
 
-            detail_thum_urls.append(asset["preview_url"])
+            # detail_thum_urls.append(asset["preview_url"])
           
             self.make_label_list(len(detail_thum_urls))
             self.timer = SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
