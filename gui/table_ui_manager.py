@@ -67,7 +67,12 @@ class TableUiManager:
             self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
             self.ui.search.textEdited.connect(self.search_input)
+
+            DownloadManager.set_ui(self.ui)
+
+# 버튼 이벤트 연결 (추가 인자 없이 호출)
             self.ui.like_download_btn_area.clicked.connect(DownloadManager.download_likged_assets_all)
+            
             self.ui.download_btn.clicked.connect(DownloadManager.download_assets_one)
 
             self.logger = create_logger(UX_Like_ASSET_LOGGER_NAME, UX_Like_ASSET_LOGGER_DIR)

@@ -31,6 +31,9 @@ current_fomat =".abc"
 #     print(f"Task ID: {upstream_task['id']}, Name: {upstream_task['name']}")
 
 
+# 포멧은 신영지정 >> 지정이 없으면 업스트림 정보가 담긴 모든 포멧을 리턴
+# 지정이 있다면 해당 포멧만 리턴
+
 def find_published_file(current_id, current_format):
     """
     특정 Task ID와 파일 확장자에 맞는 PublishedFile의 경로를 반환하는 함수

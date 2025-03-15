@@ -28,7 +28,6 @@ for root, dirs, files in os.walk(na_spirit_dir):
 
 from assetmanager import ClickableLabel
 
-from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
 
 
@@ -40,6 +39,7 @@ from table_ui_manager import TableUiManager
 from tree_ui_manager import TreeUiManager
 
 from assetmanager import AssetService
+from download_manager import DownloadManager    
 
 
 class MainUi(QMainWindow):
@@ -68,6 +68,8 @@ class MainUi(QMainWindow):
             self.default_ui_manager = DefaultUiManager(self.ui )
 
             self.tree_ui_manager = TreeUiManager(self.ui)
+            self.download_manager = DownloadManager(self.ui)
+            
             
 
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
