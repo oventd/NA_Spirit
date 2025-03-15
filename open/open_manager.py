@@ -12,13 +12,16 @@ sys.path.append(utils_dir)
 
 from class_loader import load_classes_from_json
 from sg_path_utils import SgPathUtils
+from constant import *
 
 # 로깅 설정 (필요에 따라 파일 로깅 등 추가 가능)
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 class OpenManager:
-    def __init__(self, step:str) -> None:
-        self.step = step
+    def __init__(self, context) -> None:
+        self.context = context
+        self.step = STEP_SHORT_DICT[context.step["name"]]
+        # print("task id issssssssssssssss",context.task["id"])
         dcc_config_path = "/home/rapa/NA_Spirit/open/config/open_step.json"
         
         self.dcc_opens_dict = load_classes_from_json(dcc_config_path)
@@ -34,7 +37,9 @@ class OpenManager:
             raise ValueError(f"Invalid step: {self.step}. Please choose one of: {', '.join(self.dcc_opens_dict.keys())}.")
         
     def open_setup(self) -> None:
-        self.open_class.Open.setup()
+        task_id = self.context.task["id"]
+        print(f"Debug: open_setup() is passing task_id={task_id}")
+        self.open_class.Open.setup(task_id=task_id)
     
     def validate(self):
         self.open_class.Publish.validate()

@@ -14,7 +14,7 @@ class MatchMoveStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(group_name="terrain", camera_group_name="camera", camera_name="main_cam"):
+        def setup(group_name="terrain", camera_group_name="camera", camera_name="main_cam", task_id=None, file_format=None):
             MayaUtils.create_group(group_name)
             camera_name = MayaUtils.create_camera(group_name=camera_group_name, camera_name=camera_name)
    

@@ -15,7 +15,7 @@ class AnimatingStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(rig_group_name = "rig", terrain_group_name="terrain", camera_group_name="camera"):
+        def setup(rig_group_name = "rig", terrain_group_name="terrain", camera_group_name="camera", task_id=None, file_format=None):
             #리그 그룹
             MayaUtils.create_group(rig_group_name)
             MayaUtils.create_group(terrain_group_name)
