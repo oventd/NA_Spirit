@@ -74,7 +74,7 @@ class MainUi(QMainWindow):
             
 
     def load_ui(self):
-        ui_file_path = "/home/llly/NA_Spirit/gui/asset_main2.ui"
+        ui_file_path = "/home/rapa/NA_Spirit/gui/asset_main2.ui"
         ui_file = QFile(ui_file_path)
         loader = QUiLoader()
         self.ui = loader.load(ui_file)
