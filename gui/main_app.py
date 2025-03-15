@@ -68,7 +68,7 @@ class MainUi(QMainWindow):
             self.default_ui_manager = DefaultUiManager(self.ui )
 
             self.tree_ui_manager = TreeUiManager(self.ui)
-            self.download_manager = DownloadManager(self.ui)
+         
             
             
 
