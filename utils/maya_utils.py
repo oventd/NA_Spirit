@@ -185,33 +185,31 @@ class MayaUtils:
             print(f"USD Proxy Node linked to: {usd_file}")
 
     @staticmethod
-    def file_export(file_path, file_format, export_options=None):
+    def file_export(file_path, export_options=None):
         """
         파일을 지정된 포맷으로 저장하는 함수.
         :param file_path: 저장할 파일의 경로
         :param file_format: 저장할 파일 포맷 (기본값: mayaBinary)
         :param export_options: 포맷에 해당하는 추가 옵션 (기본값: None)
         """
-        if not os.path.exists(os.path.dirname(file_path)):
-            print(f"Error: Path {file_path} does not exist")
-            return False
+        _, ext = os.path.splitext(file_path)
+
+        if ext == ".mb":
+            return cmds.file(file_path, force=True, type="mayaBinary", exportSelected=True) # 호출 방식 확인
         
-        if file_format.lower() == "mb":
-            return MayaUtils.export_maya_binary(file_path)  # 호출 방식 확인
+        elif ext == ".ma":
+            return cmds.file(file_path, force=True, type="mayaAscii", exportSelected=True) # 호출 방식 확인
         
-        elif file_format.lower() == "ma":
-            return MayaUtils.export_maya_ascii(file_path)  # 호출 방식 확인
-        
-        elif file_format.lower() == "usd":       
-            return MayaUtils.export_usd(file_path, export_options)  # 호출 방식 확인
+        elif ext == ".usd":       
+            return cmds.file(file_path, force=True, options=export_options, type="USD Export", exportSelected=True)  # 호출 방식 확인
         else:
-            print(f"Error: Unsupported file format {file_format}")
+            print(f"Error: Unsupported file format {ext}")
             return False
 
     @staticmethod
     def export_maya_binary(file_path):
         """Maya Binary 형식으로 파일을 저장하는 함수."""
-        cmds.file(file_path, force=True, type="mayaBinary", exportSelected=True)
+        
         print(f"Export {file_path} as Maya Binary.")
         return True
 

@@ -2,40 +2,47 @@
     "modeling": {
       "geo": {
         "all": false,
-        "isReferenced": false
+        "isReferenced": false,
+        "maya": true
       }
     },
     "rig": {},
     "match_move": {
       "camera": {
         "all": false,
-        "isReferenced": false
+        "isReferenced": false,
+        "maya":true
       },
       "terrain": {
         "all": true,
-        "isReferenced": false
+        "isReferenced": false,
+        "maya":true
       }
     },
     "layout": {
       "camera": {
         "all": true,
-        "isReferenced": true
+        "isReferenced": true,
+        "maya":true
       },
       "asset": {
         "all": true,
-        "isReferenced": true
+        "isReferenced": true,
+        "maya":true
       }
     },
     "animating": {
       "asset": {
         "all": false,
-        "isReferenced": true
+        "isReferenced": true,
+        "maya":false
       }
     },
     "light": {
       "light": {
         "all": true,
-        "isReferenced": false
+        "isReferenced": false,
+        "maya":false
       }
     }
   }

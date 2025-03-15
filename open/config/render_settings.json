@@ -1,84 +1,72 @@
 {
-    "modeling": {
-      "geo": {
-        "usd_export_options": [
-          "exportUVs=1",
-          "filterTypes=",
-          "defaultMeshScheme=none",
-          "exportInstances=1",
-          "mergeTransformAndShape=0",
-          "stripNamespaces=1",
-          "includeEmptyTransforms=0",
-          "worldspace=0",
-          "excludeExportTypes=[Cameras,Lights]",
-          "exportSkels=0",
-          "exportBlendShapes=0",
-          "exportVisibility=1"
-        ]
-      }
-    },
-    "rig": {
-      "usd_export_options": [
-        "exportInstances=1",
-        "mergeTransformAndShape=1",
-        "stripNamespaces=1",
-        "worldspace=0",
-        "exportSkels=1",
-        "exportBlendShapes=1",
-        "exportVisibility=1"
-      ]
-    },
-    "match_move": {
-      "camera": {
-        "usd_export_options": [
-          "exportUVs=0",
-          "excludeExportTypes=[Lights]",
-          "exportVisibility=1"
-        ]
-      },
-      "terrain": {
-        "usd_export_options": [
-          "exportUVs=1",
-          "stripNamespaces=1",
-          "worldspace=1",
-          "exportVisibility=1"
-        ]
-      }
-    },
-    "layout": {
-      "camera": {
-        "usd_export_options": [
-          "exportInstances=0",
-          "exportVisibility=1"
-        ]
-      },
-      "asset": {
-        "usd_export_options": [
-          "exportUVs=1",
-          "exportInstances=1",
-          "mergeTransformAndShape=0",
-          "stripNamespaces=1",
-          "includeEmptyTransforms=0",
-          "worldspace=0",
-          "exportVisibility=1"
-        ]
-      }
-    },
-    "animating": {
-      "rig": {
-        "usd_export_options": [
-          "exportSkels=1",
-          "exportBlendShapes=1",
-          "exportVisibility=1"
-        ]
-      }
-    },
-    "light": {
-      "light": {
-        "usd_export_options": [
-          "exportVisibility=1"
-        ]
-      }
-    }
-  }
-  
+  "export_usd_static_mesh":[
+    "exportUVs=1",
+    "exportSkels=none",
+    "exportSkin=none",
+    "exportBlendShapes=0",
+    "exportDisplayColor=0",
+    "filterTypes=nurbsCurve",
+    "exportColorSets=0",
+    "exportComponentTags=0",
+    "defaultMeshScheme=catmullClark",
+    "eulerFilter=0",
+    "staticSingleSample=0",
+    "frameStride=1",
+    "frameSample=0.0",
+    "defaultUSDFormat=usda",
+    "rootPrim=",
+    "rootPrimType=xform",
+    "defaultPrim=geo",
+    "exportMaterials=0",
+    "shadingMode=useRegistry",
+    "convertMaterialsTo=[UsdPreviewSurface]",
+    "exportAssignedMaterials=1",
+    "exportRelativeTextures=automatic",
+    "exportInstances=1",
+    "exportVisibility=1",
+    "mergeTransformAndShape=1",
+    "includeEmptyTransforms=1",
+    "stripNamespaces=0",
+    "worldspace=0",
+    "exportStagesAsRefs=1",
+    "excludeExportTypes=[]",
+    "legacyMaterialScope=0"
+  ],
+  "export_usd_animated_mesh":[
+    "exportUVs=1",
+    "exportSkels=none",
+    "exportSkin=none",
+    "exportBlendShapes=0",
+    "exportDisplayColor=0",
+    "filterTypes=nurbsCurve",
+    "exportColorSets=0",
+    "exportComponentTags=0",
+    "defaultMeshScheme=catmullClark",
+    "animation=0",
+    "eulerFilter=0",
+    "staticSingleSample=0",
+    "startTime=1",
+    "endTime=48",
+    "frameStride=1",
+    "frameSample=0.0",
+    "defaultUSDFormat=usda",
+    "rootPrim=",
+    "rootPrimType=xform",
+    "defaultPrim=geo",
+    "exportMaterials=0",
+    "shadingMode=useRegistry",
+    "convertMaterialsTo=[UsdPreviewSurface]",
+    "exportAssignedMaterials=1",
+    "exportRelativeTextures=automatic",
+    "exportInstances=1",
+    "exportVisibility=1",
+    "mergeTransformAndShape=1",
+    "includeEmptyTransforms=1",
+    "stripNamespaces=0",
+    "worldspace=0",
+    "exportStagesAsRefs=1",
+    "excludeExportTypes=[]",
+    "legacyMaterialScope=0"
+    ]
+}  
+

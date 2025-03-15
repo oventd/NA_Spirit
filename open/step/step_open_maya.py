@@ -52,27 +52,41 @@ class StepOpenMaya(ABC):
             step = SgPathUtils.get_step_from_path(session_path)
             category = SgPathUtils.get_category_from_path(session_path)
             
-            usd_export_dir = StepOpenMaya.Publish.get_usd_export_dir(session_path)
-
             # 퍼블리시 설정 및 렌더 설정 가져오기
             publish_settings = StepOpenMaya.Publish.get_publish_settings()
+            
+            if not publish_settings[step]:
+                return
+
             render_settings = StepOpenMaya.Publish.render_setting(step, category)
 
+            usd_export_path = StepOpenMaya.Publish.get_usd_export_path(session_path)
+            usd_export_options = render_settings.get("usd_export_options", [])
+
             for item, options in publish_settings[step].items():
+                if not options:
+                    continue
+                
                 all = options.get("all", False)
-                is_referenced = options.get("isReferenced", False)
+                is_referenced = options.get("isReferenced",False)
+                maya = options.get("maya", False)
+
                 if is_referenced is True:
                     if all is True:
-                        UsdAssetProcessor(step, usd_export_dir).run()
+                        UsdAssetProcessor(step, usd_export_path).run()
                     elif all is not True:
-                        UsdAssetProcessor(step, usd_export_dir, export_animated = False).run()
-                if all is True:
+                        UsdAssetProcessor(step, usd_export_path, export_animated = False).run()
+                if is_referenced is False:
                     if all is True:
-                        continue
+                        cmds.select(item)
+                        MayaUtils.file_export(usd_export_path,usd_export_options)
                     elif all is not True:
-                        continue
-
-                
+                        children = cmds.listRelatives(item, type='transform')
+                        for child in children:
+                            cmds.select(item)
+                            usd_export_path
+                            MayaUtils.file_export(usd_export_path,usd_export_options)
+                                            
                 cmds.select(item)
 
 
@@ -169,7 +183,7 @@ class StepOpenMaya(ABC):
             #         os.makedirs(export_dir)
             return maya_export_dir
         @staticmethod
-        def get_usd_export_dir(session_path):
+        def get_usd_export_path(session_path, suffix=False):
             """ 퍼블리쉬 경로 관련 메서드"""
             # 퍼블리쉬 경로 변경
             publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish" 
@@ -178,7 +192,9 @@ class StepOpenMaya(ABC):
             usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
 
             # 파일 최종 저장 경로
-            usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir                     
+            usd_export_path = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir                     
+
+            return usd_export_path
             
             # # 디렉토리 존재 여부 확인 후 생성
             # for export_dir in [maya_export_dir, usd_export_dir]:
