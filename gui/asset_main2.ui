@@ -581,7 +581,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-image: url('/home/llly/spirit/source/bg.png');
+     <string notr="true">background-image: url('/home/rapa/spirit/source/bg.png');
 background-repeat: no-repeat; 
 background-position: center;  
 border: none;              
