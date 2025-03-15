@@ -65,17 +65,10 @@ class MainUi(QMainWindow):
             self.media_players = []  # 각 동영상 플레이어(QMediaPlayer) 리스트
             self.video_widgets = []  # 각 동영상을 표시할 `QVideoWidget` 리스트
             self.labels = []
-            #"file_format", "updated_at", "downloads" << 가지고 있는 정렬 기준
-
             self.asset_manager = AssetManager()
             self.table_ui_manager = TableUiManager()
             self.default_ui_manager = DefaultUiManager()
-
             self.tree_ui_manager = TreeUiManager()
-         
-            
-            
-
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             
 

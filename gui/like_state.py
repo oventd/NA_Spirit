@@ -1,5 +1,5 @@
 from PySide6.QtGui import QPixmap, QIcon
-from json_manager import DictManager
+
 from bson import ObjectId
 
 class LikeState:

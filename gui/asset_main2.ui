@@ -989,7 +989,7 @@ color:#ffffff;
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="page_3">
      <widget class="QPushButton" name="exit_btn">
@@ -2081,7 +2081,6 @@ color:#ffffff;
    <zorder>label</zorder>
    <zorder>comboBox</zorder>
    <zorder>like_download_btn</zorder>
-   <zorder>like_download_btn_area</zorder>
    <zorder>tableWidget</zorder>
    <zorder>user_num</zorder>
    <zorder>treeWidget</zorder>
@@ -2091,6 +2090,7 @@ color:#ffffff;
    <zorder>like_empty_notice</zorder>
    <zorder>horizontalWidget_3</zorder>
    <zorder>stackedWidget</zorder>
+   <zorder>like_download_btn_area</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

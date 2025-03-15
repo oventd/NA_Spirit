@@ -19,6 +19,9 @@ for root, dirs, files in os.walk(na_spirit_dir):
 
 from constant import *
 from logger import *
+from like_state import LikeState
+from check import Check
+from assetmanager import AssetService
 
 
 class DownloadManager:
@@ -34,6 +37,7 @@ class DownloadManager:
     def __init__(self):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
             super().__init__()
+            self.like_state = LikeState()
         
             ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
@@ -48,6 +52,7 @@ class DownloadManager:
 
             self.add_list_widget()
             self.setDownloadFormat = False  #False가 레퍼런스
+            self.ui.like_download_btn_area.clicked.connect(self.download_likged_assets_all)
             self.ui.download_format_touch_area.clicked.connect(self.set_download_format)
             self.ui.download_touch_area.clicked.connect(self.download)
             self.ui.exit_btn_2.clicked.connect(self.exit_download_bar)
@@ -58,9 +63,23 @@ class DownloadManager:
     
     def download_likged_assets_all(self):
         print("전체 다운로드 버튼이 눌렸어요")
+        
+        filter_conditions = {}
+        
+        if Check().dict:
+            
+            filter_conditions[OBJECT_ID] = LikeState().like_asset_list
+            
+        assets  = list(AssetService.get_all_assets(filter_conditions=filter_conditions, sort_by=None, limit=0, skip=0,user_query = None)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+        print(f"저프린트되고있어요~{assets}")
+        self.ui.stackedWidget.show()
         self.ui.stackedWidget.setCurrentIndex(1)
 
         self.logger.info(f"유저가 관심에셋 전체를 다운받았어요")
+   
+    def download_assets_one(self):
+        print("단일 에셋의 다운로드 버튼이 눌렸어요")
+        self.ui.stackedWidget.setCurrentIndex(1)
 
     def exit_sub_bar(self):
         self.ui.stackedWidget.hide()
@@ -70,10 +89,6 @@ class DownloadManager:
         self.ui.stackedWidget.setCurrentIndex(0)
 
         
-   
-    def download_assets_one(self):
-        print("단일 에셋의 다운로드 버튼이 눌렸어요")
-        self.ui.stackedWidget.setCurrentIndex(1)
 
 
         self.logger.info(f"유저가 단일 에셋을 다운받았어요")
