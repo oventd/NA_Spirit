@@ -1,27 +1,20 @@
 import sys
 import vlc
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QStackedWidget, QHBoxLayout
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QStackedWidget
 from PySide6.QtCore import Qt
-import re
-
 
 class VLCVideoPlayer(QWidget):
     def __init__(self):
         super().__init__()
 
         # VLC 인스턴스 및 플레이어 생성
-        
         self.instance = vlc.Instance()
         self.media_player = self.instance.media_player_new()
-      
-
- 
+        self.setFixedSize(300, 300)  # 크기 설정
 
         # 비디오 출력용 QWidget
         self.container = QWidget(self)
-        self.container.setFixedSize(380, 261)
-
-
+        self.container.setFixedSize(300, 250)
 
         # 버튼 (재생/일시정지/정지)
         self.play_button = QPushButton("🎬 재생", self)
@@ -35,17 +28,11 @@ class VLCVideoPlayer(QWidget):
 
         # 레이아웃 설정
         self.layout = QVBoxLayout(self)
-        self.btn_layout = QHBoxLayout(self)
         self.layout.addWidget(self.container)
-        self.btn_layout.addWidget(self.play_button)
-        self.btn_layout.addWidget(self.pause_button)
-        self.btn_layout.addWidget(self.stop_button)
-        self.layout.addLayout(self.btn_layout)
+        self.layout.addWidget(self.play_button)
+        self.layout.addWidget(self.pause_button)
+        self.layout.addWidget(self.stop_button)
         self.layout.setContentsMargins(0, 0, 0, 0)
-
-        
-
-        
 
         # VLC가 QWidget을 비디오 출력으로 사용하도록 설정
         if sys.platform.startswith("linux"): 
@@ -55,11 +42,8 @@ class VLCVideoPlayer(QWidget):
         elif sys.platform == "darwin": 
             self.media_player.set_nsobject(int(self.container.winId()))  # ✅ 수정됨
 
-        
-
     def set_video_source(self, file_path):
         """ 비디오 파일 경로를 설정하고 재생 """
-        file_path = self.clean_path(file_path)  # VLC에서 사용할 경로    
         if file_path:
             print(f"🎥 파일 경로 설정됨: {file_path}")  # 디버깅용 출력
             media = self.instance.media_new(file_path)
@@ -78,7 +62,3 @@ class VLCVideoPlayer(QWidget):
     def stop_video(self):
         """비디오 정지"""
         self.media_player.stop()
-
-    def clean_path(self,path):
-        """파일 경로에서 보이지 않는 특수문자 및 공백 제거"""
-        return re.sub(r"[^\x21-\x7E]", "", path).strip()  # ASCII 범위의 정상 문자만 유지
