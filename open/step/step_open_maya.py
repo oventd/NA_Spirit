@@ -52,13 +52,21 @@ class StepOpenMaya(ABC):
             step = SgPathUtils.get_step_from_path(session_path)
             category = SgPathUtils.get_category_from_path(session_path)
             
-            usd_export_dir = StepOpenMaya.Publish.get_usd_export_dir(session_path)
-
             # 퍼블리시 설정 및 렌더 설정 가져오기
             publish_settings = StepOpenMaya.Publish.get_publish_settings()
+            
+            if not publish_settings[step]:
+                return
+
             render_settings = StepOpenMaya.Publish.render_setting(step, category)
 
+
+
+            usd_export_dir = StepOpenMaya.Publish.get_usd_export_dir(session_path)
+
             for item, options in publish_settings[step].items():
+                if not options:
+                    continue
                 all = options.get("all", False)
                 is_referenced = options.get("isReferenced", False)
                 if is_referenced is True:
@@ -68,6 +76,9 @@ class StepOpenMaya(ABC):
                         UsdAssetProcessor(step, usd_export_dir, export_animated = False).run()
                 if all is True:
                     if all is True:
+                        usd_export_options = render_settings.get("usd_export_options", [])
+                        cmds.select(item)
+                        
                         continue
                     elif all is not True:
                         continue
