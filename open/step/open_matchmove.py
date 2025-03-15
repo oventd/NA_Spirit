@@ -26,16 +26,27 @@ class MatchMoveStep(StepOpenMaya):
                 camera_name = "main_cam"
 
             # 카메라 그룹 검증
-            if MayaUtils.validate_hierarchy(group_name=camera_group_name, child_list=[camera_name]):
-                print(f"Validation passed: Camera '{camera_name}' exists in group '{camera_group_name}'.")
-            else:
+            if not MayaUtils.validate_hierarchy(group_name=camera_group_name, child_list=[camera_name]):
                 print(f"Validation failed: Camera '{camera_name}' does not exist in group '{camera_group_name}'.")
+                return False
 
             # 환경 그룹 검증
-            if MayaUtils.validate_hierarchy(group_name):
-                print(f"Validation passed: terrain '{group_name}' exists.")
-            else:
+            if not MayaUtils.validate_hierarchy(group_name):
                 print(f"Validation failed: terrain '{group_name}' does not exist.") 
+                return False
+
+            # # 카메라 그룹 검증
+            # if MayaUtils.validate_hierarchy(group_name=camera_group_name, child_list=[camera_name]):
+            #     print(f"Validation passed: Camera '{camera_name}' exists in group '{camera_group_name}'.")
+            # else:
+            #     print(f"Validation failed: Camera '{camera_name}' does not exist in group '{camera_group_name}'.")
+
+            # # 환경 그룹 검증
+            # if MayaUtils.validate_hierarchy(group_name):
+            #     print(f"Validation passed: terrain '{group_name}' exists.")
+            # else:
+            #     print(f"Validation failed: terrain '{group_name}' does not exist.") 
+
 
 if __name__ == "__main__":
     matchmove = MatchMoveStep()

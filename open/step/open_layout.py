@@ -6,6 +6,7 @@ sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
 from maya_utils import MayaUtils
+from sg_path_utils import SgPathUtils
 
 class LayoutStep(StepOpenMaya):
     def __init__(self):
@@ -34,24 +35,44 @@ class LayoutStep(StepOpenMaya):
             exception_group = {"rig"} # 검증 예외처리 할 객체
 
             # rig 그룹이 존재하는지 체크
-            if MayaUtils.validate_hierarchy(rig_group_name, exception_group=exception_group):
-                print(f"Validation passed: Rig group '{rig_group_name}' exists.")
-            else:
+            if not MayaUtils.validate_hierarchy(rig_group_name, exception_group=exception_group):
                 print(f"Validation failed: Rig group '{rig_group_name}' does not exist.")  
+                return False
 
             # terrain 그룹이 존재하는지 체크
             if MayaUtils.validate_hierarchy(terrain_group_name):
-                print(f"Validation passed: terrain '{terrain_group_name}' exists.")
-            else:
                 print(f"Validation failed: terrain '{terrain_group_name}' does not exist.")  
+                return False
 
             # camera 그룹이 존재하는지 체크
             if MayaUtils.validate_hierarchy(camera_group_name):
-                print(f"Validation passed: Camera group '{camera_group_name}' exists.")
-            else:
                 print(f"Validation failed: Camera group '{camera_group_name}' does not exist.")  
-        def publish():
-            
+                return False  
+
+            # # rig 그룹이 존재하는지 체크
+            # if MayaUtils.validate_hierarchy(rig_group_name, exception_group=exception_group):
+            #     print(f"Validation passed: Rig group '{rig_group_name}' exists.")
+            # else:
+            #     print(f"Validation failed: Rig group '{rig_group_name}' does not exist.")  
+
+            # # terrain 그룹이 존재하는지 체크
+            # if MayaUtils.validate_hierarchy(terrain_group_name):
+            #     print(f"Validation passed: terrain '{terrain_group_name}' exists.")
+            # else:
+            #     print(f"Validation failed: terrain '{terrain_group_name}' does not exist.")  
+
+            # # camera 그룹이 존재하는지 체크
+            # if MayaUtils.validate_hierarchy(camera_group_name):
+            #     print(f"Validation passed: Camera group '{camera_group_name}' exists.")
+            # else:
+            #     print(f"Validation failed: Camera group '{camera_group_name}' does not exist.") 
+        
+        @staticmethod
+        def publish(session_path: str ):
+            """ 특정 그룹을 USD와 MB 파일로 export """
+            step = SgPathUtils.get_step_from_path(session_path)
+            category = SgPathUtils.get_category_from_path(session_path)
+            return True
 
             
 if __name__ == "__main__":
