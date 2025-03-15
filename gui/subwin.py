@@ -25,8 +25,8 @@ for root, dirs, files in os.walk(na_spirit_dir):
         sys.path.append(root)
 
 
-from asset_service import AssetService  # AssetService 임포트
-from asset_service import ClickableLabel
+from assetmanager import AssetService  # AssetService 임포트
+from assetmanager import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
@@ -87,9 +87,9 @@ class SubWin:
         print("디테일 썸네일 이미지 리스트>>>> " + str(detail_thum_urls))
         print("이미지라벨 4개 >>>>"+str(image_labels))
     
-    
+    @staticmethod
 
-    def show_asset_detail_video(self, stackedWidget_2, turnaround_urls):
+    def show_asset_detail_video(stackedWidget_2, turnaround_urls):
         """QStackedWidget에 VLC 기반 동영상 플레이어 추가"""
 
         for video_path in turnaround_urls:
@@ -104,3 +104,5 @@ class SubWin:
             stackedWidget_2.addWidget(video_widget)
 
         stackedWidget_2.setCurrentIndex(0)  # 첫 번째 동영상을 표시
+        stackedWidget_2.raise_()  # ✅ `stackedWidget_2`를 UI의 가장 앞(front)으로 이동
+
