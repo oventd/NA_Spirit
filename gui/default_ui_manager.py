@@ -35,6 +35,7 @@ from table_ui_manager import TableUiManager
 
 
 from like_state import LikeState
+from ui_loader import UILoader   
 
 
 class DefaultUiManager:
@@ -46,10 +47,12 @@ class DefaultUiManager:
 
         return cls._instance
     
-    def __init__(self, ui):
+    def __init__(self):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
             super().__init__()
-            self.ui = ui
+            ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+            self.ui = ui_loader.load_ui()
+            self.ui.show()
 
             self.main_ui_setting()
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
@@ -82,8 +85,8 @@ class DefaultUiManager:
         
         self.user_num()
         
-        TreeUiManager.tree_widget(self.ui)
-        TableUiManager(self.ui).update_table(None,UPDATED_AT, 50, 0,None)
+        TreeUiManager.tree_widget()
+        TableUiManager().update_table(None,UPDATED_AT, 50, 0,None)
         self.set_search_area_design()
         
         self.ui.like_empty_notice.hide()

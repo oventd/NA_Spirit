@@ -39,7 +39,8 @@ from table_ui_manager import TableUiManager
 from tree_ui_manager import TreeUiManager
 
 from assetmanager import AssetService
-from download_manager import DownloadManager    
+from download_manager import DownloadManager 
+from ui_loader import UILoader   
 
 
 class MainUi(QMainWindow):
@@ -56,33 +57,27 @@ class MainUi(QMainWindow):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
             super().__init__()
 
-            self.load_ui()
-            
+            # self.load_ui()
+            ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+            self.ui = ui_loader.load_ui()
+            self.ui.show()
+                        
             self.media_players = []  # 각 동영상 플레이어(QMediaPlayer) 리스트
             self.video_widgets = []  # 각 동영상을 표시할 `QVideoWidget` 리스트
             self.labels = []
             #"file_format", "updated_at", "downloads" << 가지고 있는 정렬 기준
 
-            self.asset_manager = AssetManager(self.ui)
-            self.table_ui_manager = TableUiManager(self.ui)
-            self.default_ui_manager = DefaultUiManager(self.ui )
+            self.asset_manager = AssetManager()
+            self.table_ui_manager = TableUiManager()
+            self.default_ui_manager = DefaultUiManager()
 
-            self.tree_ui_manager = TreeUiManager(self.ui)
+            self.tree_ui_manager = TreeUiManager()
          
             
             
 
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             
-
-    def load_ui(self):
-        ui_file_path = "/home/llly/NA_Spirit/gui/asset_main2.ui"
-        ui_file = QFile(ui_file_path)
-        loader = QUiLoader()
-        self.ui = loader.load(ui_file)
-
-        self.ui.show()
-        ui_file.close()
 
 app = QApplication(sys.argv)
 window = MainUi()

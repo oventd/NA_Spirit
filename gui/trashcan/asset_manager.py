@@ -24,6 +24,9 @@ from constant import *
 # from add_video_player import *
 
 from emitter_class import EmitterParent
+from ui_loader import UILoader
+
+
 class AssetManager:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -34,9 +37,9 @@ class AssetManager:
 
         return cls._instance
     
-    def __init__(self,ui):
+    def __init__(self):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
             super().__init__()
-            self.ui = ui
-            self._initialized = True  # 인스턴스가 초기화되었음을 표시
-
+            ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+            self.ui = ui_loader.load_ui()
+            self.ui.show()

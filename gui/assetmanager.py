@@ -17,12 +17,15 @@ from bson import ObjectId
 
 from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import Signal, Qt
+from ui_loader import UILoader
+
 
 
 class AssetManager:
-    def __init__(self, main_window):
-        self.main_window = main_window
-        self.ui = main_window.ui
+    def __init__(self):
+        ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+        self.ui = ui_loader.load_ui()
+        self.ui.show()
 
         
     def load_assets(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):

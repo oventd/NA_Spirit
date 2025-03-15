@@ -32,6 +32,8 @@ from add_video_player import *
 
 from check import Check
 from table_ui_manager import TableUiManager
+from ui_loader import UILoader
+
 class TreeUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -41,10 +43,11 @@ class TreeUiManager:
 
         return cls._instance
     
-    def __init__(self, ui):
+    def __init__(self):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
-            self.ui=ui
-            self._initialized = True  # 인스턴스가 초기화되었음을 표시
+            ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+            self.ui = ui_loader.load_ui()
+            self.ui.show()
 
             self.ui.treeWidget.itemClicked.connect(self.toggle_checkbox)
             self.ui.treeWidget.itemClicked.connect(self.get_checked_items)
@@ -69,11 +72,13 @@ class TreeUiManager:
         
 
     @staticmethod
-    def tree_widget(ui): # 리뷰 메서드 이름
+    def tree_widget(): # 리뷰 메서드 이름
         """
         트리 위젯 스타일 시트 설정
         """
-    
+        ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+        ui = ui_loader.load_ui()
+        ui.show()
         ui.treeWidget.setStyleSheet("""
             QTreeWidget::item {
                 color: white;

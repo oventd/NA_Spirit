@@ -21,7 +21,7 @@ class LikeState:
         self._like_icon_empty = QIcon("/nas/spirit/asset_project/source/like_icon.png")
         self._like_icon = QIcon("/nas/spirit/asset_project/source/like_icon_on.png")
         self._initialized = True
-        self._like_asset_list = DictManager().load_dict_from_json()
+        self._like_asset_list = []
         self._like_count = len(self._like_asset_list)
 
     @property

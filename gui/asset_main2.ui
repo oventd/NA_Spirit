@@ -486,7 +486,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::FocusPolicy::NoFocus</enum>
+     <enum>Qt::NoFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">background: #080808;
@@ -494,13 +494,13 @@
 </string>
     </property>
     <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+     <enum>Qt::ScrollBarAsNeeded</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+     <enum>Qt::ScrollBarAsNeeded</enum>
     </property>
     <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
+     <enum>QAbstractScrollArea::AdjustIgnored</enum>
     </property>
     <property name="autoScroll">
      <bool>false</bool>
@@ -509,7 +509,7 @@
      <number>0</number>
     </property>
     <property name="textElideMode">
-     <enum>Qt::TextElideMode::ElideLeft</enum>
+     <enum>Qt::ElideLeft</enum>
     </property>
     <property name="showGrid">
      <bool>true</bool>
@@ -581,7 +581,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-image: url('/home/rapa/spirit/source/bg.png');
+     <string notr="true">background-image: url('/home/llly/spirit/source/bg.png');
 background-repeat: no-repeat; 
 background-position: center;  
 border: none;              
@@ -698,10 +698,10 @@ color:#ffffff;
 </string>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+     <enum>QAbstractItemView::NoSelection</enum>
     </property>
     <property name="indentation">
      <number>10</number>
@@ -970,7 +970,7 @@ color:#ffffff;
      </font>
     </property>
     <property name="layoutDirection">
-     <enum>Qt::LayoutDirection::LeftToRight</enum>
+     <enum>Qt::LeftToRight</enum>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -986,10 +986,10 @@ color:#ffffff;
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::Shape::NoFrame</enum>
+     <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page_3">
      <widget class="QPushButton" name="exit_btn">
@@ -1005,6 +1005,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1054,6 +1055,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1085,6 +1087,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1114,6 +1117,9 @@ color:#ffffff;
       </property>
       <property name="styleSheet">
        <string notr="true"/>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page"/>
       <widget class="QWidget" name="page_2"/>
@@ -1167,7 +1173,7 @@ color:#ffffff;
         <number>0</number>
        </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+        <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <property name="topMargin">
         <number>0</number>
@@ -1187,6 +1193,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1224,6 +1231,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1265,6 +1273,7 @@ color:#ffffff;
        <font>
         <family>Pretendard</family>
         <pointsize>9</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1288,6 +1297,7 @@ color:#ffffff;
        <font>
         <family>Pretendard</family>
         <pointsize>9</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1311,6 +1321,7 @@ color:#ffffff;
        <font>
         <family>Sans</family>
         <pointsize>15</pointsize>
+        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -1335,7 +1346,7 @@ color:#ffffff;
         <number>12</number>
        </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+        <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
         <widget class="QLabel" name="license_type">
@@ -1488,7 +1499,7 @@ color:#ffffff;
         <x>141</x>
         <y>748</y>
         <width>145</width>
-        <height>20</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="font">
@@ -1498,7 +1509,7 @@ color:#ffffff;
        </font>
       </property>
       <property name="layoutDirection">
-       <enum>Qt::LayoutDirection::LeftToRight</enum>
+       <enum>Qt::LeftToRight</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">QComboBox {
@@ -1523,7 +1534,7 @@ QComboBox QAbstractItemView {
        <string>4096x4096 (281MB)</string>
       </property>
       <property name="sizeAdjustPolicy">
-       <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
+       <enum>QComboBox::AdjustToContents</enum>
       </property>
       <item>
        <property name="text">
@@ -1577,6 +1588,7 @@ resolution     |</string>
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1659,7 +1671,318 @@ resolution     |</string>
      <zorder>like_btn</zorder>
      <zorder>stackedWidget_2</zorder>
     </widget>
-    <widget class="QWidget" name="page_4"/>
+    <widget class="QWidget" name="page_4">
+     <widget class="QListWidget" name="download_listwidget">
+      <property name="geometry">
+       <rect>
+        <x>203</x>
+        <y>299</y>
+        <width>140</width>
+        <height>298</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="ready_download">
+      <property name="geometry">
+       <rect>
+        <x>226</x>
+        <y>245</y>
+        <width>91</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard Variable</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:#a3a3a3</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../../nas/spirit/asset_project/source/popup_source/saved.png</pixmap>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="download_format_touch_area">
+      <property name="geometry">
+       <rect>
+        <x>105</x>
+        <y>124</y>
+        <width>181</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background: transparent;  /* 배경 투명 */
+    border: none;  /* 테두리 제거 */
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="download_format_label">
+      <property name="geometry">
+       <rect>
+        <x>125</x>
+        <y>135</y>
+        <width>139</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard Variable</family>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color : #ffffff</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../../nas/spirit/asset_project/source/popup_source/reference_toggle.png</pixmap>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>180</y>
+        <width>281</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color : #9CA0AC</string>
+      </property>
+      <property name="text">
+       <string>체크 후 다운로드 버튼을 누르면 다운이 시작됩니다</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>60</y>
+        <width>211</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard Variable</family>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color : #ffffff</string>
+      </property>
+      <property name="text">
+       <string>다운로드 받을 
+유형을 골라주세요</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="haved_asset">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>298</y>
+        <width>140</width>
+        <height>300</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: #18181B; 
+color:#ffffff;
+</string>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="font">
+        <font>
+         <family>Pretendard Variable</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="checkState">
+        <enum>Unchecked</enum>
+       </property>
+      </item>
+     </widget>
+     <widget class="QPushButton" name="cancel_touch_area">
+      <property name="geometry">
+       <rect>
+        <x>59</x>
+        <y>659</y>
+        <width>131</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background: transparent;  /* 배경 투명 */
+    border: none;  /* 테두리 제거 */
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>58</x>
+        <y>650</y>
+        <width>281</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Pretendard Variable</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color : #9CA0AC</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../../nas/spirit/asset_project/source/popup_source/down_btn.png</pixmap>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="exit_btn_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>PT Sans</family>
+        <pointsize>24</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../../../../../../../nas/spirit/asset_project/source/ic___white.png</normaloff>../../../../../../../nas/spirit/asset_project/source/ic___white.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>30</width>
+        <height>30</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="download_touch_area">
+      <property name="geometry">
+       <rect>
+        <x>195</x>
+        <y>659</y>
+        <width>131</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background: transparent;  /* 배경 투명 */
+    border: none;  /* 테두리 제거 */
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>391</width>
+        <height>770</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:#181818;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="already_download">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>240</y>
+        <width>87</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../../nas/spirit/asset_project/source/popup_source/down_list.png</pixmap>
+      </property>
+     </widget>
+     <zorder>label_6</zorder>
+     <zorder>download_listwidget</zorder>
+     <zorder>ready_download</zorder>
+     <zorder>download_format_touch_area</zorder>
+     <zorder>download_format_label</zorder>
+     <zorder>label_9</zorder>
+     <zorder>label_7</zorder>
+     <zorder>haved_asset</zorder>
+     <zorder>cancel_touch_area</zorder>
+     <zorder>label_8</zorder>
+     <zorder>exit_btn_2</zorder>
+     <zorder>download_touch_area</zorder>
+     <zorder>already_download</zorder>
+    </widget>
    </widget>
    <widget class="QLabel" name="like_empty_notice">
     <property name="geometry">
@@ -1778,7 +2101,7 @@ resolution     |</string>
      <x>0</x>
      <y>0</y>
      <width>1250</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

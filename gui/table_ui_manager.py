@@ -14,6 +14,7 @@ import os
 from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtCore import QUrl
+from ui_loader import UILoader   
 
 # 현재 파일(ui.py)의 절대 경로
 current_file_path = os.path.abspath(__file__)
@@ -44,6 +45,7 @@ from logger import *
 from download_manager import DownloadManager
 from json_manager import DictManager
 from bson import ObjectId
+from ui_loader import UILoader   
 
 class TableUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
@@ -54,10 +56,13 @@ class TableUiManager:
 
         return cls._instance
 
-    def __init__(self,ui):
+    def __init__(self):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
             super().__init__()
-            self.ui = ui
+            ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+            self.ui = ui_loader.load_ui()
+            self.ui.show()
+
             self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.search_word =None
@@ -68,10 +73,10 @@ class TableUiManager:
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
             self.ui.search.textEdited.connect(self.search_input)
 
-            DownloadManager.set_ui(self.ui)
+            
 
 # 버튼 이벤트 연결 (추가 인자 없이 호출)
-            self.ui.like_download_btn_area.clicked.connect(DownloadManager.download_likged_assets_all)
+            self.ui.download_touch_area.clicked.connect(DownloadManager.download_likged_assets_all)
             
             # self.ui.download_btn.clicked.connect(DownloadManager.download_assets_one)
 
