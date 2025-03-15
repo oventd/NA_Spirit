@@ -61,10 +61,16 @@ class StepOpenMaya(ABC):
             for item, options in publish_settings[step].items():
                 all = options.get("all", False)
                 is_referenced = options.get("isReferenced", False)
-                # if is_referenced is True:
-                #     if PublishUsdProcessor
-                # if all is True:
-                    
+                if is_referenced is True:
+                    if all is True:
+                        UsdAssetProcessor(step, usd_export_dir).run()
+                    elif all is not True:
+                        UsdAssetProcessor(step, usd_export_dir, export_animated = False).run()
+                if all is True:
+                    if all is True:
+                        continue
+                    elif all is not True:
+                        continue
 
                 
                 cmds.select(item)
