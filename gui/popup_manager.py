@@ -7,14 +7,19 @@ from PySide6.QtGui import QPixmap
 
 
 
-class Widget(QWidget):
+
+
+class DownloadPopup(QWidget):
     # 사용자 정의 시s그널
     value_changed = Signal(str)  # 버튼 클릭 시 값을 전달하기 위한 시그널
 
     def __init__(self):
         super().__init__()
-        self.exemple = ["apple", "banana", "cherry","cherry","cherry","cherry","cherry","cherry","cherry","cherry","cherry"]
+        self.exm_list =[]
+        self.list = {}
+        self.download_dict = {}
         self.load_ui()
+        self.exemples = [{"apple":"1"}, {"banana":"2"}, {"cherry":"3"}]
         self.add_list_widget()
         self.setWindowTitle("Download Popup")  # 윈도우 제목
         self.setWindowFlags(Qt.FramelessWindowHint)  # 외곽선과 헤더를 없앰
@@ -44,11 +49,16 @@ class Widget(QWidget):
             self.ui.download_format_label.setPixmap(self.ref_download_toggle_pixmap)
 
     def add_list_widget(self):
-        for item_text in self.exemple:
+        """동적으로 리스트 위젯의 항목을 추가하는 메서드"""
+
+        coverted_list=self.dict_to_list(self.exemples)
+
+        for item_text in coverted_list:
             item = QListWidgetItem(item_text)  # 항목 생성
             item.setCheckState(Qt.Unchecked)  # 체크박스를 체크된 상태로 설정
             self.ui.download_listwidget.addItem(item) 
         self.list_widget_stylesheet()
+        
 
     def list_widget_stylesheet(self):
 
@@ -74,14 +84,40 @@ class Widget(QWidget):
             }
         """)
             
+    def dict_to_list(self, original_dict):
+        """리스트로 감싸진 딕셔너리에서 리스트로 변환"""
+        
+        for exemple in original_dict:
+            for keys,values in exemple.items():
+                self.exm_list.append(keys)
+        return self.exm_list
+
+
             
     def download(self):
+        
+        download_fix_list=self.get_checked_items(self.ui.download_listwidget)
+        info=self.find_id(download_fix_list)
+        print(info)
         if self.setDownloadFormat == False:
-            print("apple에셋이 레퍼런스로 다운로드되었습니다")
+            print(f"{download_fix_list}이 레퍼런스로 다운로드되었습니다")
         else:  
-            print("apple에셋이 임포트로 다운되었습니다")
+            print(f"{download_fix_list}에셋이 임포트로 다운되었습니다")
 
-    
+    def find_id(self, download_list_name):
+        download_dict = {}
+        for name in download_list_name:
+            for item in self.exemples:  # dict 대신 item 사용
+                if name in item:  # 키 비교
+                    id_value = item[name]  # 올바른 값 가져오기
+                    download_dict[id_value] = name  # id를 키로 저장
+        return download_dict  # 루프가 끝난 후 반환
+
+
+    def get_checked_items(self, list_widget):
+        return [list_widget.item(i).text() for i in range(list_widget.count()) if list_widget.item(i).checkState() == Qt.Checked]
+
+
 
     def on_button_click(self):
         # 버튼 클릭 시 입력된 값을 MainWindow로 전달하는 시그널 발생
@@ -107,7 +143,7 @@ class MainWindow(QMainWindow):
 
     def show_widget(self):
         # QWidget 창을 열고 시그널을 받아서 처리
-        self.widget = Widget()
+        self.widget = DownloadPopup()
         self.widget.value_changed.connect(self.update_label)  # 시그널을 메인 윈도우의 슬롯에 연결
         self.widget.show()
 
@@ -115,6 +151,7 @@ class MainWindow(QMainWindow):
         # QWidget에서 전달된 값으로 라벨 업데이트
         self.label.setText(f"Received value: {value}")
 
+    
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()

@@ -2,8 +2,8 @@
 Spirit 전체 상수 파일입니다.
 """
 # DB 커넥션 상수
-MONGODB_ADRESS = "mongodb://192.168.5.10:27017/" # mongoDB 주소
-DATA_BASE = "spiritDatabase" # 접속할 데이터 베이스 명
+MONGODB_ADRESS = "mongodb://localhost:27017" # mongoDB 주소
+DATA_BASE = "filter_test" # 접속할 데이터 베이스 명
 USER_COLLECTION = "test" # 데이터 베이스에서 접속할 컬렉션 명
 
 
