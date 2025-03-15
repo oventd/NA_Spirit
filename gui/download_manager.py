@@ -39,14 +39,19 @@ class DownloadManager:
             self.ui = ui_loader.load_ui()
             self.ui.show()
             
-            self.exm_list = []
-            self.exemples = [{"apple":"1"}, {"banana":"2"}, {"cherry":"3"}]
-            self.add_list_widget()
             self.ref_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/reference_toggle.png")
             self.import_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/import_toggle.png")
+            self.ui.download_format_label.setPixmap(self.ref_download_toggle_pixmap)
+            self.exm_list = []
+
+            self.exemples = [{"apple":"1"}, {"banana":"2"}, {"cherry":"3"}]
+
+            self.add_list_widget()
             self.setDownloadFormat = False  #False가 레퍼런스
             self.ui.download_format_touch_area.clicked.connect(self.set_download_format)
             self.ui.download_touch_area.clicked.connect(self.download)
+            self.ui.exit_btn_2.clicked.connect(self.exit_download_bar)
+            self.ui.cancel_touch_area.clicked.connect(self.exit_sub_bar)
     
     
             self.logger = create_logger(UX_DOWNLOAD_LOGGER_NAME, UX_DOWNLOAD_LOGGER_DIR)
@@ -57,7 +62,14 @@ class DownloadManager:
 
         self.logger.info(f"유저가 관심에셋 전체를 다운받았어요")
 
+    def exit_sub_bar(self):
+        self.ui.stackedWidget.hide()
+        print("저 전으로 돌아갈 건데요")
 
+    def exit_download_bar(self):
+        self.ui.stackedWidget.setCurrentIndex(0)
+
+        
    
     def download_assets_one(self):
         print("단일 에셋의 다운로드 버튼이 눌렸어요")

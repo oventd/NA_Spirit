@@ -989,7 +989,7 @@ color:#ffffff;
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page_3">
      <widget class="QPushButton" name="exit_btn">
@@ -1750,9 +1750,6 @@ resolution     |</string>
       <property name="text">
        <string/>
       </property>
-      <property name="pixmap">
-       <pixmap>../../../../../nas/spirit/asset_project/source/popup_source/reference_toggle.png</pixmap>
-      </property>
      </widget>
      <widget class="QLabel" name="label_9">
       <property name="geometry">
@@ -1972,16 +1969,16 @@ color:#ffffff;
      <zorder>label_6</zorder>
      <zorder>download_listwidget</zorder>
      <zorder>ready_download</zorder>
-     <zorder>download_format_touch_area</zorder>
      <zorder>download_format_label</zorder>
      <zorder>label_9</zorder>
      <zorder>label_7</zorder>
      <zorder>haved_asset</zorder>
-     <zorder>cancel_touch_area</zorder>
      <zorder>label_8</zorder>
      <zorder>exit_btn_2</zorder>
-     <zorder>download_touch_area</zorder>
      <zorder>already_download</zorder>
+     <zorder>download_touch_area</zorder>
+     <zorder>cancel_touch_area</zorder>
+     <zorder>download_format_touch_area</zorder>
     </widget>
    </widget>
    <widget class="QLabel" name="like_empty_notice">
