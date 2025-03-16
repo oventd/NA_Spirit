@@ -20,13 +20,16 @@ class RiggingStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(group_name="rig", task_id=None, file_format=".ma"):
+        def setup(group_name="rig", task_id=None, file_format=None):
             MayaUtils.create_group(group_name)
-
         # @staticmethod
         # def reference_modeling(task_id=None, file_format="ma"):
             modeling_file = find_published_file(task_id, file_format)
-            MayaUtils.reference_file(modeling_file, "modeling")
+            # MayaUtils.reference_file(modeling_file, "modeling")
+            if modeling_file:
+                MayaUtils.reference_file(modeling_file, "modeling")
+            else:
+                print(f"⚠ Warning: No published file found for Task ID {task_id} with format {file_format}")
    
     class Publish:
         @staticmethod
@@ -55,6 +58,7 @@ class RiggingStep(StepOpenMaya):
 
         @staticmethod
         def publish():
+            print("Publishing rigging step")
             pass
 
 if __name__ == "__main__":
@@ -77,3 +81,6 @@ if __name__ == "__main__":
 #     "class": "AnimatingStep",
 #     "path": "/home/rapa/NA_Spirit/open/step/open_animating.py"
 #   }
+
+if __name__ == "__main__":
+    rigging = RiggingStep()
