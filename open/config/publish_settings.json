@@ -13,9 +13,7 @@
         "isReferenced": false,
         "maya":true
       },
-      "terrain": {
-        "all": true,
-        "isReferenced": false,
+      "asset": {
         "maya":true
       }
     },

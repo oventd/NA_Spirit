@@ -27,7 +27,7 @@ class EntityUsdConnector:
             RIGGING: [],
             LOOKDEV: ["material"],
             MATCHMOVE: ["camera"],
-            LAYOUT: ["Asset"],
+            LAYOUT: ["asset"],
             ANIMATING: ["anim_cache"],
             LIGHTING: ["light"],
         }
@@ -45,10 +45,11 @@ class EntityUsdConnector:
         }
 
     @staticmethod
-    def get_arg_dict(geo=None, char=None, anim_cache=None, terrain=None, camera=None, light=None):
+    def get_arg_dict(geo=None, char=None, anim_cache=None, material=None, camera=None, light=None):
         return {
             "geo": geo,
-            "Asset": char,
+            "asset": char,
+            "material": material,
             "anim_cache": anim_cache,
             "camera": camera,
             "light": light,
@@ -96,7 +97,7 @@ class EntityUsdConnector:
             raise ValueError(f"Unsupported step: {step}")
 
         # 올바르게 getattr을 호출해야 함 (self가 아니라 클래스에서 가져옴)
-        step_class = getattr(PublishUsdProcessor, class_name, None)
+        step_class = getattr(EntityUsdConnector, class_name, None)
         if not step_class:
             raise ValueError(f"Step class {class_name} not found in {self.__class__.__name__}")
 

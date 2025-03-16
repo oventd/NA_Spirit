@@ -12,13 +12,14 @@ sys.path.append(USD_DIR)
 from constant import *
 from usd_utils import UsdUtils
 from sg_path_utils import SgPathUtils
-from published_version_usd_connector import UsdVersionConnector
+from usd_version_connector import UsdVersionConnector
+from json_utils import JsonUtils
 
 
 class MayaReferenceUsdExporter:
     """Maya 씬에서 데이터를 추출하고 USD를 생성 및 업데이트하는 클래스"""
 
-    def __init__(self,step, usd_file_path,export_animated=True, export_static=True):
+    def __init__(self,step, usd_file_path, export_animated=True, export_static=True, frame_range=None):
         self.step = step
         self.usd_file_path = usd_file_path
         self.stage = None
@@ -27,6 +28,8 @@ class MayaReferenceUsdExporter:
         self.export_animated = export_animated
         self.export_static = export_static
         self.root_curve_name = "root"
+        self.frame_range = frame_range
+        self.export_setting_path = "/home/rapa2/NA_Spirit/open/config/render_settings.json"
 
     def setup_usd(self):
         """USD 파일을 생성하거나 기존 파일을 불러옴"""
@@ -118,6 +121,7 @@ class MayaReferenceUsdExporter:
 
         UsdUtils.set_transform(asset_xform, translate=transform_translate, rotate=transform_rotate, scale=transform_scale)
         print("Transform applied.")
+
     @staticmethod
     def create_anim_asset_dir(usd_file_path, category, asset_name):
         usd_dir = os.path.dirname(usd_file_path)
@@ -131,27 +135,23 @@ class MayaReferenceUsdExporter:
         # 애니메이션 오브젝트 선택
         cmds.select(asset)
         export_path = os.path.join(asset_usd_dir,f"{asset_name}_{self.step},",self.version,".usd")
-        
+
         # USD Export 옵션
-        export_options = {
-            "filterTypes": "nurbsCurve",
-            "animation": 1,
-            "startTime": 1,
-            "endTime": 48,
-            "defaultUSDFormat": "usdc",
-            "rootPrim": "",
-            "rootPrimType": "scope",
-            "defaultPrim": "Assets",
-            "exportMaterials": 0,
-            "mergeTransformAndShape": 1,
-            "includeEmptyTransforms": 1
-        }
+        export_options = JsonUtils.read_json(self.export_setting_path)["export_usd_animated_mesh"]
 
         # 딕셔너리를 문자열 옵션으로 변환
         export_options_str = ";".join(f"{key}={value}" for key, value in export_options.items())
 
         # USD export 실행
-        cmds.file(export_path, force=True, options=export_options_str, type="USD Export", preserveReferences=True, exportSelected=True)
+        cmds.file(export_path,
+                  force=True,
+                  options=export_options_str,
+                  type="USD Export",
+                  preserveReferences=True,
+                  exportSelected=True,
+                  animation=True,
+                  startTime = self.frame_range[0],
+                  endTime = self.frame_range[1])  
         return export_path
 
     def process_usd_animated_asset(self, category_scope_path, asset_name, anim_usd_path, mod_usd_path):

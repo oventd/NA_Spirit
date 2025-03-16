@@ -3,11 +3,12 @@ import maya.cmds as cmds
 import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/utils')
-sys.path.append('/home/rapa/NA_Spirit/maya')
+sys.path.append('/home/rapa/NA_Spirit/usd')
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-from export_reference import MayaReferenceUsdExporter
+from usd_verion_connector import UsdVersionConnector
+from maya_reference_usd_exporter import MayaReferenceUsdExporter
 
 class StepOpenMaya(ABC):
     def __init__(self):
@@ -63,6 +64,7 @@ class StepOpenMaya(ABC):
             usd_export_path = StepOpenMaya.Publish.get_usd_export_path(session_path)
             usd_export_options = render_settings.get("usd_export_options", [])
 
+            
             for item, options in publish_settings[step].items():
                 if not options:
                     continue
@@ -80,31 +82,17 @@ class StepOpenMaya(ABC):
                     if all is True:
                         cmds.select(item)
                         MayaUtils.file_export(usd_export_path,usd_export_options)
+                        root_usd_path = UsdVersionConnector.connect(usd_export_path)
                     elif all is not True:
                         children = cmds.listRelatives(item, type='transform')
                         for child in children:
                             cmds.select(item)
                             usd_export_path
                             MayaUtils.file_export(usd_export_path,usd_export_options)
-                                            
-                cmds.select(item)
-
-
-            """ USD 파일 내보내는 파트 """
-            # USD 내보내기 옵션 가공
-            usd_export_options = render_settings.get("usd_export_options", [])
-            if usd_export_options:
-                usd_export_options = ";".join(usd_export_options)
-            else:
-                usd_export_options = ""  # 값이 없다면 빈 문자열로 대체
-
-            # USD 파일 내보내기
-            if not MayaUtils.file_export(usd_export_dir, file_format="usd", export_options=usd_export_options):
-                return False
-
-            print(f"Modeling publish completed for {group}.")
-
             
+            return 
+                                            
+                         
 
         @staticmethod
         def export_cache(group_name, step, file_path=""):
