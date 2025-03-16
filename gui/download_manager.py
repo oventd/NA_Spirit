@@ -62,18 +62,14 @@ class DownloadManager:
     
     def download_likged_assets_all(self):
         print("전체 다운로드 버튼이 눌렸어요")
-        #버그 : list_widget 초기화
-        filter_conditions = {}
+  
         self.ui.download_format_touch_area.clicked.connect(self.set_download_format_all)
         self.ui.download_touch_area.clicked.connect(self.download_all)
         self.ui.exit_btn_2.clicked.connect(self.exit_sub_bar_all)
         self.ui.cancel_touch_area.clicked.connect(self.exit_sub_bar_all)
+        self.ui.download_listwidget.clear()
         
-        # if Check().dict:
-            
-        #     filter_conditions[OBJECT_ID] = LikeState().like_asset_list
-            
-        # assets  = list(AssetService.get_all_assets(filter_conditions=filter_conditions, sort_by=None, limit=0, skip=0,user_query = None)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+      
         self.exemples = self.like_state.like_asset_list
         self.download_list_asset=AssetService.get_assets_by_ids(self.exemples)
         self.add_list_widget()
@@ -81,13 +77,14 @@ class DownloadManager:
         self.ui.stackedWidget.show()
         self.ui.stackedWidget.setCurrentIndex(2)
 
-        self.logger.info(f"유저가 관심에셋 전체를 다운받았어요")
+        self.logger.info(f"유저가 {self.exemples}를 다운받았어요")
    
     def download_assets_one(self):
         print("단일 에셋의 다운로드 버튼이 눌렸어요")
         self.ui.stackedWidget.setCurrentIndex(1)
         self.exemples = self.like_state.like_asset_list
         self.download_list_asset=AssetService.get_assets_by_ids(self.exemples)
+       
         self.add_list_widget()
        
 
