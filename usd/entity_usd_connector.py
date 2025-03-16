@@ -9,7 +9,7 @@ from usd_utils import UsdUtils
 from sg_path_utils import SgPathUtils
 
 
-class PublishUsdProcessor:
+class EntityUsdConnector:
     def __init__(self, session_path: str):
         self.session_path = session_path
         self.entity_path = SgPathUtils.trim_entity_path(session_path)
