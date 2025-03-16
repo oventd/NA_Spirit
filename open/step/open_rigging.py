@@ -9,8 +9,7 @@ sys.path.append('/home/rapa/NA_Spirit/maya')
 sys.path.append('/home/rapa/NA_Spirit/flow')
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-from get_upstream_tasks import find_published_file
-
+from flow_utils import FlowUtils
 
 """각 스텝에 맞는 match move 파일을 불러올 클래스입니다."""
 class RiggingStep(StepOpenMaya):
@@ -20,11 +19,11 @@ class RiggingStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(group_name="rig", task_id=None, file_format=None):
+        def setup(group_name="rig", task_id=None, file_format=".usd"):
             MayaUtils.create_group(group_name)
         # @staticmethod
         # def reference_modeling(task_id=None, file_format="ma"):
-            modeling_file = find_published_file(task_id, file_format)
+            modeling_file = FlowUtils.get_upstream_tasks(task_id, file_format)
             # MayaUtils.reference_file(modeling_file, "modeling")
             if modeling_file:
                 MayaUtils.reference_file(modeling_file, "modeling")
