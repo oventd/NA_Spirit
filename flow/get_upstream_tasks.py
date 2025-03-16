@@ -12,7 +12,6 @@ current_fomat =".abc"
 
 
 
-
 # task_id = 1234
 
 # # 필터 설정: 특정 작업 ID에 해당하는 작업을 찾습니다
