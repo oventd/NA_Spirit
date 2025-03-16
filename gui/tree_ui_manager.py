@@ -45,7 +45,7 @@ class TreeUiManager:
     
     def __init__(self):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
-            ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+            ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
 
@@ -76,7 +76,7 @@ class TreeUiManager:
         """
         트리 위젯 스타일 시트 설정
         """
-        ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+        ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
         ui = ui_loader.load_ui()
         ui.show()
         ui.treeWidget.setStyleSheet("""

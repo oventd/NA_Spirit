@@ -23,7 +23,7 @@ from ui_loader import UILoader
 
 class AssetManager:
     def __init__(self):
-        ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+        ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
         self.ui = ui_loader.load_ui()
         self.ui.show()
 

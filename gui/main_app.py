@@ -58,7 +58,7 @@ class MainUi(QMainWindow):
             super().__init__()
 
             # self.load_ui()
-            ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+            ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
                         
