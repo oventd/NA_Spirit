@@ -16,7 +16,7 @@ class LightingStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(env_usd):
+        def setup(env_usd, task_id=None, file_format=None):
             print("Opening lighting step")
 
             # 라이트 그룹 생성

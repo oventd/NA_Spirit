@@ -15,7 +15,7 @@ class LayoutStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(terrain_group_name="terrain", camera_group_name="camera", rig_group_name = "rig"):
+        def setup(terrain_group_name="terrain", camera_group_name="camera", rig_group_name = "rig", task_id=None, file_format=None):
             MayaUtils.create_group(rig_group_name)
             MayaUtils.create_group(terrain_group_name)
             MayaUtils.create_group(camera_group_name)
@@ -40,12 +40,12 @@ class LayoutStep(StepOpenMaya):
                 return False
 
             # terrain 그룹이 존재하는지 체크
-            if MayaUtils.validate_hierarchy(terrain_group_name):
+            if not MayaUtils.validate_hierarchy(terrain_group_name):
                 print(f"Validation failed: terrain '{terrain_group_name}' does not exist.")  
                 return False
 
             # camera 그룹이 존재하는지 체크
-            if MayaUtils.validate_hierarchy(camera_group_name):
+            if not MayaUtils.validate_hierarchy(camera_group_name):
                 print(f"Validation failed: Camera group '{camera_group_name}' does not exist.")  
                 return False  
 

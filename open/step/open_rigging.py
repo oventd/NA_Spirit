@@ -6,19 +6,29 @@ sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
 sys.path.append('/home/rapa/NA_Spirit/maya')
+sys.path.append('/home/rapa/NA_Spirit/flow')
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
+from flow_utils import FlowUtils
 
 """각 스텝에 맞는 match move 파일을 불러올 클래스입니다."""
 class RiggingStep(StepOpenMaya):
     def __init__(self):
         super().__init__()
-        print("Opening match move step")
+        print("Opening rigging step")
 
     class Open:
         @staticmethod
-        def setup(group_name="rig"):
+        def setup(group_name="rig", task_id=None, file_format=".usd"):
             MayaUtils.create_group(group_name)
+        # @staticmethod
+        # def reference_modeling(task_id=None, file_format="ma"):
+            modeling_file = FlowUtils.get_upstream_tasks(task_id, file_format)
+            # MayaUtils.reference_file(modeling_file, "modeling")
+            if modeling_file:
+                MayaUtils.reference_file(modeling_file, "modeling")
+            else:
+                print(f"⚠ Warning: No published file found for Task ID {task_id} with format {file_format}")
    
     class Publish:
         @staticmethod
@@ -47,4 +57,29 @@ class RiggingStep(StepOpenMaya):
 
         @staticmethod
         def publish():
+            print("Publishing rigging step")
             pass
+
+if __name__ == "__main__":
+    rigging = RiggingStep()
+    RiggingStep.Open.setup()
+    RiggingStep.Publish.validate()
+
+#   "MMV": {
+#     "module": "open_matchmove",
+#     "class": "MatchMoveStep",
+#     "path": "/home/rapa/NA_Spirit/open/step/open_matchmove.py"
+#   },
+#   "LAY": {
+#     "module": "open_layout",
+#     "class": "LayoutStep",
+#     "path": "/home/rapa/NA_Spirit/open/step/open_layout.py"
+#   },
+#   "ANM": {
+#     "module": "open_animating",
+#     "class": "AnimatingStep",
+#     "path": "/home/rapa/NA_Spirit/open/step/open_animating.py"
+#   }
+
+if __name__ == "__main__":
+    rigging = RiggingStep()
