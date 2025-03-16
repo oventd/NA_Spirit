@@ -1,6 +1,6 @@
 from shotgun_api3 import Shotgun
 import os
-from shotgrid_client_config import get_shotgrid_client
+from flow.before.shotgrid_client_config import get_shotgrid_client
 
 sg = get_shotgrid_client()
 
