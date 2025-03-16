@@ -1,11 +1,5 @@
 from shotgun_api3 import Shotgun
 import os
-from shotgrid_client_config import get_shotgrid_client
-
-
-
-
-
 
 class FlowUtils:
 
@@ -63,10 +57,13 @@ class FlowUtils:
 
         for current_step in current_steps:
             path_data = current_step.get("path", {})
+            if not path_data:
+                print(f"No path data found for Task ID: {current_id}")
 
 
             local_path = path_data.get("local_path")
             if not local_path:
+                print(f"No local path found for Task ID: {current_id}")
                 continue 
 
             _, file_extension = os.path.splitext(local_path)
