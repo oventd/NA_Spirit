@@ -100,6 +100,16 @@ class AssetService:
     UI와 DB 사이의 중간 계층 역할을 수행하는 서비스 클래스.
     - UI에서는 직접 db_crud.py를 호출하지 않고, 이 클래스를 통해서만 데이터 요청을 함.
     """
+    @staticmethod
+    def get_assets_by_ids(ids_list):
+        #여기서 리스트를 받아 에셋으로 변환하고 해당 내용을 id: name 형식으로 변환하기 
+
+        asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
+        dowmload_list_asset= asset_manager.find_and_sort(filter_conditions = ids_list)  # 자산 삭제
+        
+        asset_dict = {asset["name"] : str(asset["_id"]) for asset in dowmload_list_asset}
+        return asset_dict
+                
 
     @staticmethod
     def get_all_assets(filter_conditions, sort_by, limit, skip,user_query): # 리뷰 메서드 이상함 all과 limit가 공존하는 이름 

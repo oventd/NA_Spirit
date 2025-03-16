@@ -37,6 +37,9 @@ class DownloadManager:
     def __init__(self):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
             super().__init__()
+            self.exm_list = []
+            self.exemples = []
+            self.download_list_asset ={}
             self.like_state = LikeState()
         
             ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
@@ -46,9 +49,8 @@ class DownloadManager:
             self.ref_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/reference_toggle.png")
             self.import_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/import_toggle.png")
             self.ui.download_format_label.setPixmap(self.ref_download_toggle_pixmap)
-            self.exm_list = []
 
-            self.exemples = [{"apple":"1"}, {"banana":"2"}, {"cherry":"3"}]
+            
 
             self.add_list_widget()
             self.setDownloadFormat = False  #False가 레퍼런스
@@ -71,7 +73,6 @@ class DownloadManager:
             filter_conditions[OBJECT_ID] = LikeState().like_asset_list
             
         assets  = list(AssetService.get_all_assets(filter_conditions=filter_conditions, sort_by=None, limit=0, skip=0,user_query = None)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
-        print(f"저프린트되고있어요~{assets}")
         self.ui.stackedWidget.show()
         self.ui.stackedWidget.setCurrentIndex(1)
 
@@ -80,6 +81,10 @@ class DownloadManager:
     def download_assets_one(self):
         print("단일 에셋의 다운로드 버튼이 눌렸어요")
         self.ui.stackedWidget.setCurrentIndex(1)
+        self.exemples = self.like_state.like_asset_list
+        self.download_list_asset=AssetService.get_assets_by_ids(self.exemples)
+        self.add_list_widget()
+       
 
     def exit_sub_bar(self):
         self.ui.stackedWidget.hide()
@@ -104,9 +109,7 @@ class DownloadManager:
     def add_list_widget(self):
         """동적으로 리스트 위젯의 항목을 추가하는 메서드"""
 
-        coverted_list=self.dict_to_list(self.exemples)
-
-        for item_text in coverted_list:
+        for item_text in self.download_list_asset:
             item = QListWidgetItem(item_text)  # 항목 생성
             item.setCheckState(Qt.Unchecked)  # 체크박스를 체크된 상태로 설정
             self.ui.download_listwidget.addItem(item) 
@@ -137,13 +140,7 @@ class DownloadManager:
             }
         """)
             
-    def dict_to_list(self, original_dict):
-        """리스트로 감싸진 딕셔너리에서 리스트로 변환"""
-        
-        for exemple in original_dict:
-            for keys,values in exemple.items():
-                self.exm_list.append(keys)
-        return self.exm_list
+
 
 
             
