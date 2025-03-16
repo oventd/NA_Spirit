@@ -12,6 +12,7 @@ current_fomat =".abc"
 
 
 
+
 # task_id = 1234
 
 # # 필터 설정: 특정 작업 ID에 해당하는 작업을 찾습니다
@@ -30,6 +31,9 @@ current_fomat =".abc"
 # for upstream_task in upstream_tasks:
 #     print(f"Task ID: {upstream_task['id']}, Name: {upstream_task['name']}")
 
+
+# 포멧은 신영지정 >> 지정이 없으면 업스트림 정보가 담긴 모든 포멧을 리턴
+# 지정이 있다면 해당 포멧만 리턴
 
 def find_published_file(current_id, current_format):
     """
