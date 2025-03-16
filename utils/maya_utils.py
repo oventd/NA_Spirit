@@ -194,6 +194,8 @@ class MayaUtils:
         """
         _, ext = os.path.splitext(file_path)
 
+        export_options_str = ";".join(f"{key}={value}" for key, value in export_options.items())
+
         if ext == ".mb":
             return cmds.file(file_path, force=True, type="mayaBinary", exportSelected=True) # 호출 방식 확인
         
@@ -201,7 +203,7 @@ class MayaUtils:
             return cmds.file(file_path, force=True, type="mayaAscii", exportSelected=True) # 호출 방식 확인
         
         elif ext == ".usd":       
-            return cmds.file(file_path, force=True, options=export_options, type="USD Export", exportSelected=True)  # 호출 방식 확인
+            return cmds.file(file_path, force=True, options=export_options_str, type="USD Export", exportSelected=True)  # 호출 방식 확인
         else:
             print(f"Error: Unsupported file format {ext}")
             return False

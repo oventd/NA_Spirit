@@ -3,11 +3,16 @@ import maya.cmds as cmds
 import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/utils')
-sys.path.append('/home/rapa/NA_Spirit/maya')
+sys.path.append('/home/rapa/NA_Spirit/usd')
+sys.path.append("/home/rapa2/NA_Spirit/")
+sys.path.append("/home/rapa/NA_Spirit/flow")
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-from export_reference import UsdAssetProcessor
+from usd_verion_connector import UsdVersionConnector
+from maya_reference_usd_exporter import MayaReferenceUsdExporter
+from flow_utils import FlowUtils
+from entity_usd_connector import EntityUsdConnector
 
 class StepOpenMaya(ABC):
     def __init__(self):
@@ -48,7 +53,7 @@ class StepOpenMaya(ABC):
             pass
         
         @abstractmethod
-        def publish(session_path: str, step: str):
+        def publish(session_path: str):
             step = SgPathUtils.get_step_from_path(session_path)
             category = SgPathUtils.get_category_from_path(session_path)
             
@@ -58,50 +63,51 @@ class StepOpenMaya(ABC):
             if not publish_settings[step]:
                 return
 
-            render_settings = StepOpenMaya.Publish.render_setting(step, category)
+            render_settings = JsonUtils.read_json("/home/rapa/NA_Spirit/open/config/render_settings.json")
 
+            usd_export_path = StepOpenMaya.Publish.get_usd_export_path(session_path)
+            usd_export_options = render_settings.get("export_usd_static_mesh", {})
 
-
-            usd_export_dir = StepOpenMaya.Publish.get_usd_export_dir(session_path)
-
+            # frame_range = FlowUtils.get_cut_in_out(session_path)
+            frame_range = (2, 10)
+            
+            published_usds = {}
             for item, options in publish_settings[step].items():
                 if not options:
                     continue
+                
                 all = options.get("all", False)
-                is_referenced = options.get("isReferenced", False)
+                is_referenced = options.get("isReferenced",False)
+                maya = options.get("maya", False)
+
                 if is_referenced is True:
                     if all is True:
-                        UsdAssetProcessor(step, usd_export_dir).run()
+                        MayaReferenceUsdExporter(step, usd_export_path,frame_range).run()
+                        root_usd_path = UsdVersionConnector.connect(usd_export_path)
+                        published_usds[item] = [root_usd_path]
                     elif all is not True:
-                        UsdAssetProcessor(step, usd_export_dir, export_animated = False).run()
-                if all is True:
+                        MayaReferenceUsdExporter(step, usd_export_path, export_animated = False).run()
+                        root_usd_path = UsdVersionConnector.connect(usd_export_path)
+                        published_usds[item] = [root_usd_path]
+                if is_referenced is False:
                     if all is True:
-                        usd_export_options = render_settings.get("usd_export_options", [])
                         cmds.select(item)
-                        
-                        continue
-                    elif all is not True:
-                        continue
-
-                
-                cmds.select(item)
-
-
-            """ USD 파일 내보내는 파트 """
-            # USD 내보내기 옵션 가공
-            usd_export_options = render_settings.get("usd_export_options", [])
-            if usd_export_options:
-                usd_export_options = ";".join(usd_export_options)
-            else:
-                usd_export_options = ""  # 값이 없다면 빈 문자열로 대체
-
-            # USD 파일 내보내기
-            if not MayaUtils.file_export(usd_export_dir, file_format="usd", export_options=usd_export_options):
-                return False
-
-            print(f"Modeling publish completed for {group}.")
-
+                        MayaUtils.file_export(usd_export_path,usd_export_options)
+                        root_usd_path = UsdVersionConnector.connect(usd_export_path)
+                        published_usds[item] = [root_usd_path]
+                    # elif all is not True:
+                    #     children = cmds.listRelatives(item, type='transform')
+                    #     child_usds = []
+                    #     for child in children:
+                    #         cmds.select(item)
+                    #         MayaUtils.file_export(usd_export_path,usd_export_options)
+                    #         child_usds.append
             
+
+            EntityUsdConnector(session_path).connect(step, published_usds)
+            return 
+                                            
+                         
 
         @staticmethod
         def export_cache(group_name, step, file_path=""):
@@ -180,7 +186,7 @@ class StepOpenMaya(ABC):
             #         os.makedirs(export_dir)
             return maya_export_dir
         @staticmethod
-        def get_usd_export_dir(session_path):
+        def get_usd_export_path(session_path, suffix=False):
             """ 퍼블리쉬 경로 관련 메서드"""
             # 퍼블리쉬 경로 변경
             publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish" 
@@ -189,7 +195,9 @@ class StepOpenMaya(ABC):
             usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
 
             # 파일 최종 저장 경로
-            usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir                     
+            usd_export_path = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir                     
+
+            return usd_export_path
             
             # # 디렉토리 존재 여부 확인 후 생성
             # for export_dir in [maya_export_dir, usd_export_dir]:
@@ -211,11 +219,4 @@ class StepOpenMaya(ABC):
                 return False
             return True
 
-            
-
-
-   
-
-        
-        
-
+    

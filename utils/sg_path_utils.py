@@ -199,21 +199,20 @@ class SgPathUtils:
 
 if __name__ == "__main__":
     session_path = "/nas/spirit/spirit/assets/Prop/apple/MDL/work/maya/scene.v002.ma"
-    # session_path = SgPathUtils.get_usd_ext_from_maya_ext(session_path)
-    # session_path = SgPathUtils.get_publish_from_work(session_path)
-    # session_path = SgPathUtils.get_maya_dcc_from_usd_dcc(session_path)
+    session_path = SgPathUtils.get_usd_ext_from_maya_ext(session_path)
+    session_path = SgPathUtils.get_publish_from_work(session_path)
+    session_path = SgPathUtils.get_maya_dcc_from_usd_dcc(session_path)
 
-# testtttt
-    # publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish"
+    publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish"
     
-    # usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
-    # mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb
+    usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
+    mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb
 
     
-    # maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # usd dir
-    # usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir
+    maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # usd dir
+    usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir
 
 
-    # print(publish_path)
-    # print(usd_filename)
-    # print(f"{usd_export_dir} + {maya_export_dir}")
+    print(publish_path)
+    print(usd_filename)
+    print(f"{usd_export_dir} + {maya_export_dir}")

@@ -7,7 +7,7 @@ from constant import *
 from usd_utils import UsdUtils
 from sg_path_utils import SgPathUtils
 
-class PublishUsd2StepUsdConnector:
+class UsdVersionConnector:
 
     @staticmethod
     def get_root_path(published_version):
@@ -22,7 +22,7 @@ class PublishUsd2StepUsdConnector:
     
     @staticmethod
     def connect(publish_file_path):
-        root_path = PublishUsd2StepUsdConnector.get_root_path(published_version)
+        root_path = UsdVersionConnector.get_root_path(published_version)
         version = SgPathUtils.get_version(published_version)
 
         if not os.path.exists(root_path):
@@ -45,7 +45,7 @@ class PublishUsd2StepUsdConnector:
 if __name__ == "__main__":
     published_version = "/nas/spirit/spirit/assets/Prop/apple/MDL/publish/maya/scene.v001.usd"
 
-    root_path = PublishUsd2StepUsdConnector.get_root_path(published_version)
+    root_path = UsdVersionConnector.get_root_path(published_version)
     print(root_path)
 
-    print(PublishUsd2StepUsdConnector.connect(published_version))
+    print(UsdVersionConnector.connect(published_version))

@@ -17,8 +17,8 @@ from sg_path_utils import SgPathUtils
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 class OpenManager:
-    def __init__(self, step:str) -> None:
-        self.step = step
+    def __init__(self, session_path:str) -> None:
+        self.step = SgPathUtils.get_step_from_path(session_path)
         dcc_config_path = "/home/rapa/NA_Spirit/open/config/open_step.json"
         
         self.dcc_opens_dict = load_classes_from_json(dcc_config_path)
@@ -39,6 +39,6 @@ class OpenManager:
     def validate(self):
         self.open_class.Publish.validate()
     
-    def publish(self, session_path: str):
-        self.open_class.Publish.publish(session_path)
+    def publish(self):
+        self.open_class.Publish.publish(self.session_path)
         
