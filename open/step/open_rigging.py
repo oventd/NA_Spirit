@@ -19,11 +19,11 @@ class RiggingStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(group_name="rig", task_id=None, file_format=".usd"):
+        def setup(group_name="rig", task_id=None, file_format=".ma"):
             MayaUtils.create_group(group_name)
         # @staticmethod
         # def reference_modeling(task_id=None, file_format="ma"):
-            modeling_file = FlowUtils.get_upstream_tasks(task_id, file_format)
+            modeling_file = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
             # MayaUtils.reference_file(modeling_file, "modeling")
             if modeling_file:
                 MayaUtils.reference_file(modeling_file, "modeling")
