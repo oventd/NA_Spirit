@@ -1,6 +1,6 @@
 from shotgun_api3 import Shotgun
 import os
-from shotgrid_client_config import get_shotgrid_client
+# from shotgrid_client_config import get_shotgrid_client
 
 
 
@@ -10,9 +10,9 @@ from shotgrid_client_config import get_shotgrid_client
 class FlowUtils:
 
 
-    SERVER_PATH = 'https://hi.shotgrid.autodesk.com'
+    SERVER_PATH = 'https://5thacademy.shotgrid.autodesk.com'
     SCRIPT_NAME = 'nayeon_key'
-    API_KEY = 'syeswcrleslhjbh4bd!poRvde'
+    API_KEY = 'h0mvmfnhuochunhzpgR~zlpur'
 
     sg = Shotgun(SERVER_PATH, SCRIPT_NAME, API_KEY)
 
@@ -63,13 +63,18 @@ class FlowUtils:
 
         for current_step in current_steps:
             path_data = current_step.get("path", {})
+            if not path_data:
+                print(f"No path_data found for Task ID: {current_id}")
+                continue             
 
 
             local_path = path_data.get("local_path")
             if not local_path:
+                print(f"No local path found for Task ID: {current_id}")
                 continue 
 
             _, file_extension = os.path.splitext(local_path)
+            print("이거 파일 확장자 형식>>>>"+file_extension)
 
             if file_extension == current_format:
                 return local_path
@@ -88,5 +93,14 @@ class FlowUtils:
 
         return updated_published_file
 
+if __name__ == "__main__":
+    result = FlowUtils.sg.find(
+        "PublishedFile",
+        [["task", "is", {"type": "Task", "id": 6183}]], 
+        ["id", "upstream_tasks"]
+    )
 
+    print("DEBUG: ShotGrid Response >>>", result)
+
+    print(FlowUtils.get_upstream_tasks(6183,".ma"))
 
