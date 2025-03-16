@@ -41,11 +41,8 @@ class ModelingStep(StepOpenMaya):
         @staticmethod
         def publish(session_path: str ):
             """ 특정 그룹을 USD와 MB 파일로 export """
-            step = SgPathUtils.get_step_from_path(session_path)
-            category = SgPathUtils.get_category_from_path(session_path)
+            super().publish(session_path)
 
-
-            return True
 
 if __name__ == "__main__":
     modeling = ModelingStep()

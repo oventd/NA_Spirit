@@ -229,6 +229,7 @@ class MayaReferenceUsdExporter:
         self.setup_usd()
         self.print_references()
         self.process_assets()
+        return self.usd_file_path
 
 if __name__ == "__main__":
     # 실행 코드

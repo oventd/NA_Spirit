@@ -31,7 +31,7 @@ class EntityUsdConnector:
             ANIMATING: ["anim_cache"],
             LIGHTING: ["light"],
         }
-        self.step_usd_dict = {}
+        # self.step_usd_dict = {}
 
         # Step을 문자열로 선언하여 객체를 동적으로 불러올 수 있도록 변경
         self.step_class_mapping = {
@@ -80,14 +80,14 @@ class EntityUsdConnector:
         except:
             self.entity_root_prim = UsdUtils.create_scope(self.entity_usd_stage,root_path)
         
-        step_usd = os.path.join(self.publish_dir, self.step, f"{self.entity_name}_{self.step}.usda")
-        UsdUtils.create_usd_file(step_usd)
+        # step_usd = os.path.join(self.entity_path, self.step, f"{self.entity_name}_{self.step}.usda")
+        # UsdUtils.create_usd_file(step_usd)
 
-        self.step_usd_dict[self.step] = step_usd
+        # self.step_usd_dict[self.step] = step_usd
 
-    def process(self, step, provided_args):
+    def connect(self, step, provided_args):
         """ 클래스 이름을 문자열로 저장하고, getattr()을 사용해 동적으로 로드 """
-        if step is RIGGING:
+        if step == RIGGING:
             return
         
         self.validate_args(step, provided_args)
@@ -103,14 +103,14 @@ class EntityUsdConnector:
 
         # 동적으로 클래스 인스턴스 생성 후 실행
         processor = step_class(self)
-        processor.process(**provided_args)
+        processor.connect(**provided_args)
 
     # 내부 클래스들 정의
     class Model:
         def __init__(self, parent):
             self.parent = parent
 
-        def process(self, geo_path):
+        def connect(self, geo_path):
             print(f"Processing Model step with geo: {geo_path}")
             if geo_path:
                 geo_xform_path = os.path.join(self.parent.entity_root_prim.GetPath(),"geo")
@@ -121,7 +121,7 @@ class EntityUsdConnector:
     class Lookdev:
         def __init__(self, parent):
             self.parent = parent
-        def process(self, material_path):
+        def connect(self, material_path):
             print(f"Processing Lookdev step with material: {material_path}")
             if material_path:
                 material_xform_path = os.path.join(self.parent.entity_root_prim.GetPath(),"mat")
@@ -132,7 +132,7 @@ class EntityUsdConnector:
         def __init__(self, parent):
             self.parent = parent
 
-        def process(self, camera_path):
+        def connect(self, camera_path):
             print(f"Processing Matchmove step with camera: {camera_path}")
             if camera_path:
                 UsdUtils.add_sublayer(self.parent.entity_usd_stage, camera_path)
@@ -142,7 +142,7 @@ class EntityUsdConnector:
         def __init__(self, parent):
             self.parent = parent
 
-        def process(self, asset_path, camera_path=None):
+        def connect(self, asset_path, camera_path=None):
             print(f"Processing Layout step with assets_path: {asset_path}, camera: {camera_path}")
             if camera_path:
                 UsdUtils.add_sublayer(self.parent.entity_usd_stage, camera_path)
@@ -153,7 +153,7 @@ class EntityUsdConnector:
         def __init__(self, parent):
             self.parent = parent
 
-        def process(self, anim_cache_path=None, camera_path=None):
+        def connect(self, anim_cache_path=None, camera_path=None):
             print(f"Processing Animating step with anim_cache: {anim_cache_path}, camera: {camera_path}")
             if camera_path:
                 UsdUtils.add_sublayer(self.parent.entity_usd_stage, camera_path)
@@ -164,7 +164,7 @@ class EntityUsdConnector:
         def __init__(self, parent):
             self.parent = parent
 
-        def process(self, light=None):
+        def connect(self, light=None):
             print(f"Processing Lighting step with light: {light}")
             if light:
                 UsdUtils.add_sublayer(self.parent.entity_usd_stage, light)
@@ -174,5 +174,5 @@ if __name__ == "__main__":
     root1_path = "/nas/sam/show/applestore/assets/Character/Bille"
 
     processor = PublishUsdProcessor(root1_path)
-    processor.process(MODELING, {"geo": "/path/to/geo.usda"})
-    processor.process(MATCHMOVE, {"camera": "/path/to/camera.usda", "terrain": "/path/to/terrain.usda"})
+    processor.connect(MODELING, {"geo": "/path/to/geo.usda"})
+    processor.connect(MATCHMOVE, {"camera": "/path/to/camera.usda", "terrain": "/path/to/terrain.usda"})

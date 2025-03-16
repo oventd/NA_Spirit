@@ -4,11 +4,15 @@ import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/utils')
 sys.path.append('/home/rapa/NA_Spirit/usd')
+sys.path.append("/home/rapa2/NA_Spirit/")
+sys.path.append("/home/rapa/NA_Spirit/flow")
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
 from usd_verion_connector import UsdVersionConnector
 from maya_reference_usd_exporter import MayaReferenceUsdExporter
+from flow_utils import FlowUtils
+from entity_usd_connector import EntityUsdConnector
 
 class StepOpenMaya(ABC):
     def __init__(self):
@@ -49,7 +53,7 @@ class StepOpenMaya(ABC):
             pass
         
         @abstractmethod
-        def publish(session_path: str, step: str):
+        def publish(session_path: str):
             step = SgPathUtils.get_step_from_path(session_path)
             category = SgPathUtils.get_category_from_path(session_path)
             
@@ -59,12 +63,15 @@ class StepOpenMaya(ABC):
             if not publish_settings[step]:
                 return
 
-            render_settings = StepOpenMaya.Publish.render_setting(step, category)
+            render_settings = JsonUtils.read_json("/home/rapa/NA_Spirit/open/config/render_settings.json")
 
             usd_export_path = StepOpenMaya.Publish.get_usd_export_path(session_path)
-            usd_export_options = render_settings.get("usd_export_options", [])
+            usd_export_options = render_settings.get("export_usd_static_mesh", {})
 
+            # frame_range = FlowUtils.get_cut_in_out(session_path)
+            frame_range = (2, 10)
             
+            published_usds = {}
             for item, options in publish_settings[step].items():
                 if not options:
                     continue
@@ -75,21 +82,29 @@ class StepOpenMaya(ABC):
 
                 if is_referenced is True:
                     if all is True:
-                        MayaReferenceUsdExporter(step, usd_export_path).run()
+                        MayaReferenceUsdExporter(step, usd_export_path,frame_range).run()
+                        root_usd_path = UsdVersionConnector.connect(usd_export_path)
+                        published_usds[item] = [root_usd_path]
                     elif all is not True:
                         MayaReferenceUsdExporter(step, usd_export_path, export_animated = False).run()
+                        root_usd_path = UsdVersionConnector.connect(usd_export_path)
+                        published_usds[item] = [root_usd_path]
                 if is_referenced is False:
                     if all is True:
                         cmds.select(item)
                         MayaUtils.file_export(usd_export_path,usd_export_options)
                         root_usd_path = UsdVersionConnector.connect(usd_export_path)
-                    elif all is not True:
-                        children = cmds.listRelatives(item, type='transform')
-                        for child in children:
-                            cmds.select(item)
-                            usd_export_path
-                            MayaUtils.file_export(usd_export_path,usd_export_options)
+                        published_usds[item] = [root_usd_path]
+                    # elif all is not True:
+                    #     children = cmds.listRelatives(item, type='transform')
+                    #     child_usds = []
+                    #     for child in children:
+                    #         cmds.select(item)
+                    #         MayaUtils.file_export(usd_export_path,usd_export_options)
+                    #         child_usds.append
             
+
+            EntityUsdConnector(session_path).connect(step, published_usds)
             return 
                                             
                          
@@ -204,11 +219,4 @@ class StepOpenMaya(ABC):
                 return False
             return True
 
-            
-
-
-   
-
-        
-        
-
+    

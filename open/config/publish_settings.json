@@ -1,7 +1,7 @@
 {
     "modeling": {
       "geo": {
-        "all": false,
+        "all": true,
         "isReferenced": false,
         "maya": true
       }
@@ -9,7 +9,7 @@
     "rig": {},
     "match_move": {
       "camera": {
-        "all": false,
+        "all": true,
         "isReferenced": false,
         "maya":true
       },
