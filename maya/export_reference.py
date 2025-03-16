@@ -217,8 +217,7 @@ class MayaReferenceUsdExporter:
                 asset_usd_dir = self.create_anim_asset_dir(self.usd_file_path,category, asset_name)
                 anim_usd_path = self.export_anim_asset_usd(asset_usd_dir, asset, asset_name, self.find_scene_animation_range())
                 anim_root_usd_path = PublishUsd2StepUsdConnector.connect(anim_usd_path)
-                self.process_usd_animated_asset(category_scope_path, asset_name, anim_usd_path,usd_mod_root_file)
-
+                self.process_usd_animated_asset(category_scope_path, asset_name, anim_root_usd_path,usd_mod_root_file)
                 
             else:
                 if self.export_static == False:
@@ -230,7 +229,6 @@ class MayaReferenceUsdExporter:
         self.setup_usd()
         self.print_references()
         self.process_assets()
-
 
 if __name__ == "__main__":
     # 실행 코드
