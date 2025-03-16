@@ -3,10 +3,10 @@ import os
 
 class FlowUtils:
 
-
-    SERVER_PATH = 'https://hi.shotgrid.autodesk.com'
+    
+    SERVER_PATH = 'https://5thacademy.shotgrid.autodesk.com'
     SCRIPT_NAME = 'nayeon_key'
-    API_KEY = 'syeswcrleslhjbh4bd!poRvde'
+    API_KEY = 'h0mvmfnhuochunhzpgR~zlpur'
 
     sg = Shotgun(SERVER_PATH, SCRIPT_NAME, API_KEY)
 
