@@ -147,9 +147,14 @@ class FlowUtils:
             return []
         
     @classmethod
-    def get_upstream_tasks(cls, task_id):
+    def get_upstream_published_files(cls, task_id, extensions=None):
         """
-        특정 Task의 Upstream Tasks(선행 작업)를 찾는 함수
+        특정 Task의 Upstream Tasks(선행 작업)의 퍼블리쉬된 파일 경로를 가져오는 함수.
+        주어진 확장자(extensions)와 일치하는 파일만 반환한다.
+
+        :param task_id: 기준이 되는 Task ID
+        :param extensions: 필터링할 확장자의 리스트 (예: [".exr", ".abc"])
+        :return: 필터링된 퍼블리쉬 파일 경로 리스트
         """
         if not isinstance(task_id, int):
             try:
@@ -158,7 +163,12 @@ class FlowUtils:
                 print(f"{task_id}라는 Task ID가 잘못되었습니다")
                 return None
 
+        if extensions:
+            # 확장자 리스트를 소문자로 통일
+            extensions = {ext.lower() for ext in extensions}
+
         try:
+            # 현재 Task의 Upstream Task 가져오기
             task_data = cls.sg.find_one(
                 "Task",
                 [["id", "is", task_id]],  # 특정 Task ID 필터
@@ -166,17 +176,42 @@ class FlowUtils:
             )
 
             if not task_data or not task_data.get("upstream_tasks"):
-                print(f"{task_id}에서 upstream tasks를 찾을 수 없어요.")
+                print(f"Task {task_id}에서 upstream tasks를 찾을 수 없습니다.")
                 return []
 
             upstream_tasks = task_data["upstream_tasks"]
-            print(f"{task_id}는 {len(upstream_tasks)}개의 upstream tasks를 가지고 있어요.")
-            return upstream_tasks
+            upstream_task_ids = [t["id"] for t in upstream_tasks]
+
+            print(f"Task {task_id}는 {len(upstream_tasks)}개의 upstream tasks를 가지고 있습니다.")
+
+            # Upstream Task에서 퍼블리쉬된 파일 찾기
+            upstream_files = cls.sg.find(
+                "PublishedFile",
+                [["task", "in", upstream_task_ids]],  # 업스트림 Task들의 퍼블리쉬 파일 검색
+                ["id", "path_cache", "task"]
+            )
+
+            # 확장자 필터링 (extensions가 주어진 경우)
+            if extensions:
+                matching_files = [
+                    file["path_cache"]
+                    for file in upstream_files
+                    if file.get("path_cache") and os.path.splitext(file["path_cache"])[-1].lower() in extensions
+                ]
+            else:
+                matching_files = [file["path_cache"] for file in upstream_files if file.get("path_cache")]
+
+            if not matching_files:
+                print(f"Task {task_id}에서 주어진 확장자와 일치하는 업스트림 퍼블리쉬 파일이 없습니다.")
+            else:
+                print(f"Task {task_id}에서 찾은 업스트림 파일 경로들: {matching_files}")
+
+            return matching_files
 
         except Exception as e:
-            print(f"Task ID에 대한 Upstream Tasks를 가져오는 중 오류 발생 {task_id}: {e}")
+            print(f"Task ID {task_id}의 업스트림 퍼블리쉬 파일을 가져오는 중 오류 발생: {e}")
             return []
-        
+            
 
     @classmethod
     def get_published_file_path(cls, task_id, file_format):
