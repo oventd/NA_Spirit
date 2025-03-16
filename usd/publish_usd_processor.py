@@ -11,8 +11,9 @@ class PublishUsdProcessor:
 
     def __init__(self, entity_path:str):
 
-        self.entity_path = self.trim_entity_path(entity_path)
+        self.entity_path = SgPathUtils.trim_entity_path(entity_path)
         self.entity_name = os.path.basename(entity_path)
+        self.entity_usd_path=""
 
         self.entity_type = SgPathUtils.get_entity_type(entity_path)
         
@@ -89,6 +90,37 @@ class PublishUsdProcessor:
             print("UsdProcessor Animate")
         elif step == LIGHTING:
             print("UsdProcessor Lighting")
+            
+	class Model:
+		def process(geo_path):
+			#add reference
+			pass
+	class Rig:
+		def process():
+			pass
+	class Matchmove:
+		def process(camera_path):
+			#add camera sublayer
+			pass
+	class Layout:
+		def process(assets_path, camera_path=None):
+			if not camera_path:
+				#add camera over sublayer
+			#add assets sublayer
+			#add 
+			pass
+	class Animating(cache_path, camera_path=None):
+		def process():
+			if not camera_path:
+				#add camera over sublayer
+			#add anim cache sublayer
+			pass
+	class Lighting:
+		def process(light_path):
+			#add sublayer
+			pass
+		
+	
 
 if __name__ == "__main__":
     root_path = "/nas/sam/show/applestore/assets/Character/Bille/RIG/work/maya/scene.v012.ma"
