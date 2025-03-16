@@ -20,8 +20,9 @@ for root, dirs, files in os.walk(na_spirit_dir):
 from constant import *
 from logger import *
 from like_state import LikeState
-from check import Check
+from asset import Asset
 from assetmanager import AssetService
+
 
 
 class DownloadManager:
@@ -82,8 +83,11 @@ class DownloadManager:
     def download_assets_one(self):
         print("단일 에셋의 다운로드 버튼이 눌렸어요")
         self.ui.stackedWidget.setCurrentIndex(1)
-        self.exemples = self.like_state.like_asset_list
-        self.download_list_asset=AssetService.get_assets_by_ids(self.exemples)
+        
+        asset_one=asset = Asset().current
+
+        print(f"다운로드하는 에셋 :{asset_one}")
+       
        
         self.add_list_widget()
        
