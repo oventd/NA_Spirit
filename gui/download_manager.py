@@ -46,6 +46,7 @@ class DownloadManager:
             self.ui = ui_loader.load_ui()
             self.ui.show()
             
+            self.ui.like_download_btn_area.clicked.connect(self.download_likged_assets_all)
             self.ref_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/reference_toggle.png")
             self.import_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/import_toggle.png")
             self.ui.download_format_label.setPixmap(self.ref_download_toggle_pixmap)
@@ -54,27 +55,31 @@ class DownloadManager:
 
             self.add_list_widget()
             self.setDownloadFormat = False  #False가 레퍼런스
-            self.ui.like_download_btn_area.clicked.connect(self.download_likged_assets_all)
-            self.ui.download_format_touch_area.clicked.connect(self.set_download_format)
-            self.ui.download_touch_area.clicked.connect(self.download)
-            self.ui.exit_btn_2.clicked.connect(self.exit_download_bar)
-            self.ui.cancel_touch_area.clicked.connect(self.exit_sub_bar)
+            
     
     
             self.logger = create_logger(UX_DOWNLOAD_LOGGER_NAME, UX_DOWNLOAD_LOGGER_DIR)
     
     def download_likged_assets_all(self):
         print("전체 다운로드 버튼이 눌렸어요")
-        
+        #버그 : list_widget 초기화
         filter_conditions = {}
+        self.ui.download_format_touch_area.clicked.connect(self.set_download_format_all)
+        self.ui.download_touch_area.clicked.connect(self.download_all)
+        self.ui.exit_btn_2.clicked.connect(self.exit_sub_bar_all)
+        self.ui.cancel_touch_area.clicked.connect(self.exit_sub_bar_all)
         
-        if Check().dict:
+        # if Check().dict:
             
-            filter_conditions[OBJECT_ID] = LikeState().like_asset_list
+        #     filter_conditions[OBJECT_ID] = LikeState().like_asset_list
             
-        assets  = list(AssetService.get_all_assets(filter_conditions=filter_conditions, sort_by=None, limit=0, skip=0,user_query = None)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+        # assets  = list(AssetService.get_all_assets(filter_conditions=filter_conditions, sort_by=None, limit=0, skip=0,user_query = None)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
+        self.exemples = self.like_state.like_asset_list
+        self.download_list_asset=AssetService.get_assets_by_ids(self.exemples)
+        self.add_list_widget()
+
         self.ui.stackedWidget.show()
-        self.ui.stackedWidget.setCurrentIndex(1)
+        self.ui.stackedWidget.setCurrentIndex(2)
 
         self.logger.info(f"유저가 관심에셋 전체를 다운받았어요")
    
@@ -86,19 +91,16 @@ class DownloadManager:
         self.add_list_widget()
        
 
-    def exit_sub_bar(self):
+    def exit_sub_bar_all(self):
         self.ui.stackedWidget.hide()
         print("저 전으로 돌아갈 건데요")
 
     def exit_download_bar(self):
         self.ui.stackedWidget.setCurrentIndex(0)
 
-        
-
-
         self.logger.info(f"유저가 단일 에셋을 다운받았어요")
     
-    def set_download_format(self):
+    def set_download_format_all(self):
         if self.setDownloadFormat == False:
             self.setDownloadFormat = True #임포트
             self.ui.download_format_label.setPixmap(self.import_download_toggle_pixmap)
@@ -144,7 +146,7 @@ class DownloadManager:
 
 
             
-    def download(self):
+    def download_all(self):
         
         download_fix_list=self.get_checked_items(self.ui.download_listwidget)
         info=self.find_id(download_fix_list)
