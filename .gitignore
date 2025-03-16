@@ -4,3 +4,4 @@ __pycache__/
 *.usd
 *.usda
 *.usdc
+test.py
