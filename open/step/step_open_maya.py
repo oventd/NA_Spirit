@@ -9,7 +9,7 @@ sys.path.append("/home/rapa/NA_Spirit/flow")
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-from usd_verion_connector import UsdVersionConnector
+from usd_version_connector import UsdVersionConnector
 from maya_reference_usd_exporter import MayaReferenceUsdExporter
 from flow_utils import FlowUtils
 from entity_usd_connector import EntityUsdConnector
