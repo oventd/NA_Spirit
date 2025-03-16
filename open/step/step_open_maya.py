@@ -7,7 +7,7 @@ sys.path.append('/home/rapa/NA_Spirit/maya')
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-from export_reference import UsdAssetProcessor
+from export_reference import MayaReferenceUsdExporter
 
 class StepOpenMaya(ABC):
     def __init__(self):
@@ -73,9 +73,9 @@ class StepOpenMaya(ABC):
 
                 if is_referenced is True:
                     if all is True:
-                        UsdAssetProcessor(step, usd_export_path).run()
+                        MayaReferenceUsdExporter(step, usd_export_path).run()
                     elif all is not True:
-                        UsdAssetProcessor(step, usd_export_path, export_animated = False).run()
+                        MayaReferenceUsdExporter(step, usd_export_path, export_animated = False).run()
                 if is_referenced is False:
                     if all is True:
                         cmds.select(item)

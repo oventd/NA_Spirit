@@ -15,7 +15,7 @@ from sg_path_utils import SgPathUtils
 from published_version_usd_connector import PublishUsd2StepUsdConnector
 
 
-class UsdAssetProcessor:
+class MayaReferenceUsdExporter:
     """Maya 씬에서 데이터를 추출하고 USD를 생성 및 업데이트하는 클래스"""
 
     def __init__(self,step, usd_file_path,export_animated=True, export_static=True):
@@ -23,8 +23,10 @@ class UsdAssetProcessor:
         self.usd_file_path = usd_file_path
         self.stage = None
         self.assets_node = "Assets"
+        self.version  = SgPathUtils.get_version(self.usd_file_path)
         self.export_animated = export_animated
         self.export_static = export_static
+        self.root_curve_name = "root"
 
     def setup_usd(self):
         """USD 파일을 생성하거나 기존 파일을 불러옴"""
@@ -100,15 +102,15 @@ class UsdAssetProcessor:
         end_frame = int(cmds.playbackOptions(q=True, max=True))
         return start_frame, end_frame
 
-    def process_static_asset(self, category_scope_path, asset_name, usd_mod_file, root_transform):
+    def process_static_asset(self, category_scope_path, asset_name, usd_mod_root_file, root_transform):
         """정적 오브젝트를 처리하는 메서드"""
         print(f"{asset_name} is a static object. Creating Xform and adding reference.")
         asset_xform = UsdUtils.create_xform(self.stage, f"{category_scope_path}/{asset_name}")
         print(f"Created Xform: {asset_name}")
-        print(f"Adding reference to USD: {usd_mod_file}")
+        print(f"Adding reference to USD: {usd_mod_root_file}")
         
-        UsdUtils.add_reference(asset_xform, usd_mod_file)
-        print(f"Added reference: {usd_mod_file}")
+        UsdUtils.add_reference(asset_xform, usd_mod_root_file)
+        print(f"Added reference: {usd_mod_root_file}")
         
         transform_translate = (root_transform['tx'], root_transform['ty'], root_transform['tz'])
         transform_rotate = (root_transform['rx'], root_transform['ry'], root_transform['rz'])
@@ -116,10 +118,10 @@ class UsdAssetProcessor:
 
         UsdUtils.set_transform(asset_xform, translate=transform_translate, rotate=transform_rotate, scale=transform_scale)
         print("Transform applied.")
-
-    def create_anim_asset_dir(self, category, asset_name):
-        usd_dir = os.path.dirname(self.usd_file_path)
-        dir = f"{usd_dir}/{category}/{asset_name}"
+    @staticmethod
+    def create_anim_asset_dir(usd_file_path, category, asset_name):
+        usd_dir = os.path.dirname(usd_file_path)
+        dir = os.path.join(usd_dir,category,asset_name)
         os.makedirs(dir, exist_ok=True)
         return dir
     
@@ -128,7 +130,7 @@ class UsdAssetProcessor:
         
         # 애니메이션 오브젝트 선택
         cmds.select(asset)
-        export_path = f"{asset_usd_dir}/{asset_name}_{self.step}.usd"
+        export_path = os.path.join(asset_usd_dir,f"{asset_name}_{self.step},",self.version,".usd")
         
         # USD Export 옵션
         export_options = {
@@ -152,7 +154,7 @@ class UsdAssetProcessor:
         cmds.file(export_path, force=True, options=export_options_str, type="USD Export", preserveReferences=True, exportSelected=True)
         return export_path
 
-    def process_animated_asset(self, category_scope_path, asset_name, anim_usd_path, mod_usd_path):
+    def process_usd_animated_asset(self, category_scope_path, asset_name, anim_usd_path, mod_usd_path):
         """애니메이션 오브젝트를 처리하는 메서드"""
         # create anim asset xform
         asset_xform = UsdUtils.create_xform(self.stage, f"{category_scope_path}/{asset_name}")
@@ -200,26 +202,28 @@ class UsdAssetProcessor:
 
             usd_path = ref_path.replace("maya", "usd")
             usd_mod_path = SgPathUtils.set_step(usd_path, MDL)
-            usd_mod_file = os.path.splitext(usd_mod_path)[0].split(".")[0] + ".usd"
+            usd_mod_root_file = os.path.splitext(usd_mod_path)[0].split(".")[0] + ".usd"
 
-            if not os.path.exists(usd_mod_file):
-                raise ValueError(f"USD file not found: {usd_mod_file}")
+            if not os.path.exists(usd_mod_root_file):
+                raise ValueError(f"USD file not found: {usd_mod_root_file}")
 
-            root_transform_node = f"{asset.split(':')[0]}:root"
+            root_transform_node = f"{asset.split(':')[0]}:{self.root_curve_name}"
             root_transform = {attr: cmds.getAttr(f"{root_transform_node}.{attr}") for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']}
             print(f"Root Transform: {root_transform}")
 
             if asset in important_assets:
                 if self.export_animated == False:
                     continue
-                asset_usd_dir = self.create_anim_asset_dir(category, asset_name)
+                asset_usd_dir = self.create_anim_asset_dir(self.usd_file_path,category, asset_name)
                 anim_usd_path = self.export_anim_asset_usd(asset_usd_dir, asset, asset_name, self.find_scene_animation_range())
-                self.process_animated_asset(category_scope_path, asset_name, anim_usd_path,usd_mod_file)
+                anim_root_usd_path = PublishUsd2StepUsdConnector.connect(anim_usd_path)
+                self.process_usd_animated_asset(category_scope_path, asset_name, anim_usd_path,usd_mod_root_file)
+
                 
             else:
                 if self.export_static == False:
                     continue
-                self.process_static_asset(category_scope_path, asset_name, usd_mod_file, root_transform)
+                self.process_static_asset(category_scope_path, asset_name, usd_mod_root_file, root_transform)
 
     def run(self):
         """USD 처리 실행"""
@@ -230,5 +234,5 @@ class UsdAssetProcessor:
 
 if __name__ == "__main__":
     # 실행 코드
-    usd_processor = UsdAssetProcessor(LAY,"/home/rapa/NA_Spirit/test3.usd", export_animated=True, export_static=False)
+    usd_processor = MayaReferenceUsdExporter(LAY,"/home/rapa/NA_Spirit/test3.v001.usd", export_animated=True, export_static=False)
     usd_processor.run()

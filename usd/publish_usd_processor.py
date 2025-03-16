@@ -1,7 +1,7 @@
 import os
 import sys
 
-utils_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), "../../")) + '/utils'
+utils_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), "../../")) + "/utils"
 sys.path.append(utils_dir)
 
 from constant import *
@@ -10,54 +10,55 @@ from sg_path_utils import SgPathUtils
 
 
 class PublishUsdProcessor:
-    def __init__(self, entity_path: str):
-        self.entity_path = SgPathUtils.trim_entity_path(entity_path)
-        self.entity_name = os.path.basename(entity_path)
-        self.entity_usd_path = ""
+    def __init__(self, session_path: str):
+        self.session_path = session_path
+        self.entity_path = SgPathUtils.trim_entity_path(session_path)
+        self.entity_name = os.path.basename(self.entity_path)
+        self.entity_usd_path = os.path.join(self.entity_path, self.entity_name,".usd")
+    
+        self.step = SgPathUtils.get_step_from_path(session_path)
+        
+        self.open_setup(self)
 
-        self.entity_type = SgPathUtils.get_entity_type(entity_path)
+        self.entity_type = SgPathUtils.get_entity_type(self.entity_path)
         self.publish_dir = os.path.join(self.entity_path, "publish")
 
+        
+
         self.step_publish_data_dict = {
-            MODELING: ['geo'],
+            MODELING: ["geo"],
             RIGGING: [],
-            MATCHMOVE: ["camera", "terrain"],
-            LAYOUT: ["camera", "terrain"],
-            ANIMATING: ["camera", "terrain", "anim_cache"],
+            MATCHMOVE: ["camera", "Asset"],
+            LAYOUT: ["camera", "Asset"],
+            ANIMATING: ["camera", "anim_cache"],
             LIGHTING: ["light"],
         }
         self.step_usd_dict = {}
 
         # Step을 문자열로 선언하여 객체를 동적으로 불러올 수 있도록 변경
         self.step_class_mapping = {
-            MODELING: "ModelStepUsdProcessor",
-            RIGGING: "RigStepUsdProcessor",
-            MATCHMOVE: "MatchmoveStepUsdProcessor",
-            LAYOUT: "LayoutStepUsdProcessor",
-            ANIMATING: "AnimatingStepUsdProcessor",
-            LIGHTING: "LightingStepUsdProcessor"
+            MODELING: "Model",
+            RIGGING: "Rig",
+            MATCHMOVE: "Matchmove",
+            LAYOUT: "Layout",
+            ANIMATING: "Animating",
+            LIGHTING: "Light",
         }
 
     @staticmethod
-    def get_arg_dict(
-        geo=None,
-        char=None,
-        anim_cache=None,
-        terrain=None,
-        camera=None,
-        light=None
-    ):
+    def get_arg_dict(geo=None, char=None, anim_cache=None, terrain=None, camera=None, light=None):
         return {
             "geo": geo,
             "char": char,
             "anim_cache": anim_cache,
             "terrain": terrain,
             "camera": camera,
-            "light": light
+            "light": light,
         }
 
     def validate_args(self, step, provided_args):
-        if self.step_publish_data_dict.get(step) is None:
+        """ 단계별 필수 데이터를 검증하는 함수 """
+        if step not in self.step_publish_data_dict:
             raise ValueError(f"Invalid step: {step}")
 
         required_keys = self.step_publish_data_dict.get(step, [])
@@ -66,15 +67,15 @@ class PublishUsdProcessor:
         if un_provided_keys:
             raise ValueError(f"Required keys not provided: {un_provided_keys}")
 
-    def open_setup(self, step):
-        # Create entity USD
+    def open_setup(self):
+        """ 각 Step에 대한 USD 파일을 생성하는 함수 """
         self.entity_usd = os.path.join(self.entity_path, f"{self.entity_name}.usda")
         UsdUtils.create_usd_file(self.entity_usd)
 
-        # Create step USD
-        step_usd = os.path.join(self.publish_dir, step, f"{self.entity_name}_{step}.usda")
+        step_usd = os.path.join(self.publish_dir, self.step, f"{self.entity_name}_{self.step}.usda")
         UsdUtils.create_usd_file(step_usd)
-        self.step_usd_dict[step] = step_usd
+
+        self.step_usd_dict[self.step] = step_usd
 
     def process(self, step, provided_args):
         """ 클래스 이름을 문자열로 저장하고, getattr()을 사용해 동적으로 로드 """
@@ -84,76 +85,74 @@ class PublishUsdProcessor:
         if not class_name:
             raise ValueError(f"Unsupported step: {step}")
 
-        # getattr()을 사용하여 동적으로 클래스 가져오기
-        step_class = getattr(self, class_name, None)
+        # 올바르게 getattr을 호출해야 함 (self가 아니라 클래스에서 가져옴)
+        step_class = getattr(PublishUsdProcessor, class_name, None)
         if not step_class:
             raise ValueError(f"Step class {class_name} not found in {self.__class__.__name__}")
 
-        # 동적으로 클래스 인스턴스 생성 및 실행
+        # 동적으로 클래스 인스턴스 생성 후 실행
         processor = step_class(self)
         processor.process(**provided_args)
 
     # 내부 클래스들 정의
-    class ModelUsdProcessor:
+    class Model:
         def __init__(self, parent):
             self.parent = parent
 
         def process(self, geo=None, **kwargs):
             print(f"Processing Model step with geo: {geo}")
-            # Add reference
-            pass
+            if geo:
+                UsdUtils.add_sublayer(self.parent.entity_usd, geo)
 
-    class RigUsdProcessor:
+    class Rig:
         def __init__(self, parent):
             self.parent = parent
 
-        def process(self, **kwargs):
+        def process(self):
             print("Processing Rig step")
-            pass
 
-    class MatchmoveUsdProcessor:
+    class Matchmove:
         def __init__(self, parent):
             self.parent = parent
 
         def process(self, camera=None, terrain=None, **kwargs):
             print(f"Processing Matchmove step with camera: {camera}, terrain: {terrain}")
-            # Add camera sublayer
-            pass
+            if camera:
+                UsdUtils.add_sublayer(self.parent.entity_usd, camera)
+            if terrain:
+                UsdUtils.add_sublayer(self.parent.entity_usd, terrain)
 
-    class LayoutUsdProcessor:
+    class Layout:
         def __init__(self, parent):
             self.parent = parent
 
         def process(self, assets_path=None, camera=None, **kwargs):
-            if not camera:
-                print("No camera path provided, adding camera over sublayer")
             print(f"Processing Layout step with assets_path: {assets_path}, camera: {camera}")
-            # Add assets sublayer
-            pass
+            if camera:
+                UsdUtils.add_sublayer(self.parent.entity_usd, camera)
 
-    class AnimatingUsdProcessor:
+    class Animating:
         def __init__(self, parent):
             self.parent = parent
 
-        def process(self, cache=None, camera=None, **kwargs):
-            if not camera:
-                print("No camera path provided, adding camera over sublayer")
-            print(f"Processing Animating step with cache: {cache}, camera: {camera}")
-            # Add anim cache sublayer
-            pass
+        def process(self, anim_cache=None, camera=None, **kwargs):
+            print(f"Processing Animating step with anim_cache: {anim_cache}, camera: {camera}")
+            if camera:
+                UsdUtils.add_sublayer(self.parent.entity_usd, camera)
+            if anim_cache:
+                UsdUtils.add_sublayer(self.parent.entity_usd, anim_cache)
 
-    class LightingUsdProcessor:
+    class Light:
         def __init__(self, parent):
             self.parent = parent
 
         def process(self, light=None, **kwargs):
             print(f"Processing Lighting step with light: {light}")
-            # Add sublayer
-            pass
+            if light:
+                UsdUtils.add_sublayer(self.parent.entity_usd, light)
 
 
 if __name__ == "__main__":
-    root_path = "/nas/sam/show/applestore/assets/Character/Bille/RIG/work/maya/scene.v012.ma"
     root1_path = "/nas/sam/show/applestore/assets/Character/Bille"
 
     processor = PublishUsdProcessor(root1_path)
