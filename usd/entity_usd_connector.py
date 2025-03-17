@@ -117,7 +117,9 @@ class EntityUsdConnector:
                 if geo_path:
                     entity_root_prim_path = str(self.parent.entity_root_prim.GetPath())
                     geo_xform_path = os.path.join(entity_root_prim_path,"geo")
-                    geo_xform =UsdUtils.create_xform(self.parent.entity_usd_stage, geo_xform_path)
+                    geo_xform = UsdUtils.get_prim(self.parent.entity_usd_stage, geo_xform_path)
+                    if not geo_xform:
+                        geo_xform =UsdUtils.create_xform(self.parent.entity_usd_stage, geo_xform_path)
                     UsdUtils.add_reference(geo_xform, geo_path)
 
 
@@ -131,7 +133,9 @@ class EntityUsdConnector:
                 if material_path:
                     entity_root_prim_path = str(self.parent.entity_root_prim.GetPath())
                     material_xform_path = os.path.join(entity_root_prim_path,"mat")
-                    mat_xform =UsdUtils.create_xform(self.parent.entity_usd_stage, material_xform_path)
+                    mat_xform = UsdUtils.get_prim(self.parent.entity_usd_stage, material_xform_path)
+                    if not mat_xform:
+                        mat_xform =UsdUtils.create_xform(self.parent.entity_usd_stage, material_xform_path)
                     UsdUtils.add_reference(mat_xform, material_path)
 
     class Matchmove:
