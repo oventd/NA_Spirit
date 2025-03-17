@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1250</width>
-    <height>800</height>
+    <height>830</height>
    </rect>
   </property>
   <property name="palette">
@@ -1203,29 +1203,6 @@ color:#ffffff;
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="asset_type">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>500</y>
-        <width>339</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Pretendard</family>
-        <pointsize>9</pointsize>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color:#C7C7C7;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QLabel" name="info_name_2">
       <property name="geometry">
        <rect>
@@ -1252,8 +1229,8 @@ color:#ffffff;
      <widget class="QWidget" name="horizontalLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>19</x>
-        <y>553</y>
+        <x>20</x>
+        <y>530</y>
         <width>341</width>
         <height>31</height>
        </rect>
@@ -1335,17 +1312,33 @@ color:#ffffff;
       <property name="geometry">
        <rect>
         <x>29</x>
-        <y>608</y>
+        <y>577</y>
         <width>321</width>
-        <height>94</height>
+        <height>132</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
-        <number>8</number>
+        <number>2</number>
        </property>
        <item>
-        <widget class="QLabel" name="creator">
+        <widget class="QLabel" name="asset_type">
+         <property name="font">
+          <font>
+           <family>Pretendard Variable</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:#717171;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="resolution">
          <property name="font">
           <font>
            <family>Pretendard Variable</family>
@@ -1408,95 +1401,29 @@ color:#ffffff;
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QLabel" name="creator">
+         <property name="font">
+          <font>
+           <family>Pretendard Variable</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color:#717171;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
       </layout>
-     </widget>
-     <widget class="QComboBox" name="comboBox_3">
-      <property name="geometry">
-       <rect>
-        <x>141</x>
-        <y>748</y>
-        <width>145</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Pretendard</family>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QComboBox {
-    background: #080808;
- 	color:#ffffff;
-    border: 0.5px solid #282828;
-    border-radius: 10px;
-}
-
-QComboBox QAbstractItemView {
-    background-color:#181818; /* 배경 빨간색 */
-    color: white;
-    selection-background-color: #080808;
-    selection-color: white;
-    
-
-    border:0.5px solid #383838; /* 테두리도 배경과 같은 색으로 */
-
-}</string>
-      </property>
-      <property name="currentText">
-       <string>4096x4096 (281MB)</string>
-      </property>
-      <property name="sizeAdjustPolicy">
-       <enum>QComboBox::AdjustToContents</enum>
-      </property>
-      <item>
-       <property name="text">
-        <string>4096x4096 (281MB)</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>2048 x2048 (141MB)</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>1024 x1024 (70MB)</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>35</x>
-        <y>728</y>
-        <width>91</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Pretendard</family>
-        <pointsize>11</pointsize>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color:#ffffff;</string>
-      </property>
-      <property name="text">
-       <string>
-resolution     |</string>
-      </property>
      </widget>
      <widget class="QPushButton" name="download_btn">
       <property name="geometry">
        <rect>
-        <x>320</x>
-        <y>747</y>
+        <x>176</x>
+        <y>744</y>
         <width>20</width>
         <height>20</height>
        </rect>
@@ -1537,7 +1464,7 @@ resolution     |</string>
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>530</y>
+        <y>510</y>
         <width>390</width>
         <height>330</height>
        </rect>
@@ -1574,13 +1501,10 @@ resolution     |</string>
      <zorder>image_r_btn</zorder>
      <zorder>horizontalLayoutWidget</zorder>
      <zorder>description</zorder>
-     <zorder>asset_type</zorder>
      <zorder>info_name_2</zorder>
      <zorder>horizontalLayoutWidget_2</zorder>
      <zorder>verticalLayoutWidget</zorder>
      <zorder>label_5</zorder>
-     <zorder>comboBox_3</zorder>
-     <zorder>label_4</zorder>
      <zorder>download_btn</zorder>
      <zorder>exit_btn_3</zorder>
      <zorder>exit_btn</zorder>

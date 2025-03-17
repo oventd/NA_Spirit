@@ -319,11 +319,12 @@ class TableUiManager:
         ui.info_name.setText(asset[NAME])
         ui.info_name_2.setText(asset[NAME])
         ui.description.setText(asset[DESCRIPTION])
-        ui.asset_type.setText(asset[ASSET_TYPE])
-        ui.creator.setText(f"담당 직원 : {asset[CREATOR_NAME]} ( ID : {asset[CREATOR_ID]} )")
+        ui.asset_type.setText(f"에셋 타입 : {asset[ASSET_TYPE]}")
+        ui.resolution.setText(f"해상도 : {asset[RESOLUTION]}")
         ui.downloads.setText(f"다운로드 횟수 : {asset[DOWNLOADS]}회")
         ui.create_at.setText(f"최초 생성일 : {asset[CREATED_AT]}회")
         ui.update_up.setText(f"최종 수정일 : {asset[UPDATED_AT]}회")
+        ui.creator.setText(f"담당 직원 : {asset[CREATOR_NAME]} ( ID : {asset[CREATOR_ID]} )")
 
         #세부항목 태그
         common_style = "color: #ffffff; background-color: #282828; padding: 5px; border-radius: 12px;"
