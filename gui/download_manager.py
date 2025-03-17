@@ -55,7 +55,7 @@ class DownloadManager:
             self.ui.download_format_touch_area.clicked.connect(self.set_download_format_all)
             
             self.ui.exit_btn_2.clicked.connect(self.exit_sub_bar_all)
-            self.ui.cancel_touch_area.clicked.connect(self.exit_sub_bar_all)
+           
             self.ui.download_touch_area.clicked.connect(self.download_all)
 
             self.ui.download_listwidget.clear()

@@ -906,7 +906,7 @@ color:#ffffff;
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>870</x>
+      <x>869</x>
       <y>0</y>
       <width>380</width>
       <height>851</height>
@@ -1798,7 +1798,7 @@ color:#ffffff;
      <widget class="QListWidget" name="download_listwidget">
       <property name="geometry">
        <rect>
-        <x>203</x>
+        <x>207</x>
         <y>324</y>
         <width>140</width>
         <height>298</height>
@@ -1818,7 +1818,7 @@ color:#ffffff;</string>
      <widget class="QLabel" name="ready_download">
       <property name="geometry">
        <rect>
-        <x>232</x>
+        <x>233</x>
         <y>270</y>
         <width>91</width>
         <height>31</height>
@@ -1941,7 +1941,7 @@ color:#ffffff;</string>
      <widget class="QListWidget" name="haved_asset">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>37</x>
         <y>323</y>
         <width>140</width>
         <height>300</height>
@@ -1966,53 +1966,6 @@ color:#ffffff;
         <enum>Unchecked</enum>
        </property>
       </item>
-     </widget>
-     <widget class="QPushButton" name="cancel_touch_area">
-      <property name="geometry">
-       <rect>
-        <x>59</x>
-        <y>689</y>
-        <width>131</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton {
-    background: transparent;  /* 배경 투명 */
-    border: none;  /* 테두리 제거 */
-}</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_8">
-      <property name="geometry">
-       <rect>
-        <x>58</x>
-        <y>680</y>
-        <width>281</width>
-        <height>71</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Pretendard Variable</family>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color : #9CA0AC</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../../../../nas/spirit/asset_project/source/popup_source/down_btn.png</pixmap>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
      </widget>
      <widget class="QPushButton" name="exit_btn_2">
       <property name="geometry">
@@ -2050,10 +2003,10 @@ color:#ffffff;
      <widget class="QPushButton" name="download_touch_area">
       <property name="geometry">
        <rect>
-        <x>195</x>
-        <y>689</y>
-        <width>131</width>
-        <height>51</height>
+        <x>5</x>
+        <y>713</y>
+        <width>371</width>
+        <height>81</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -2085,7 +2038,7 @@ color:#ffffff;
      <widget class="QLabel" name="already_download">
       <property name="geometry">
        <rect>
-        <x>76</x>
+        <x>64</x>
         <y>265</y>
         <width>87</width>
         <height>41</height>
@@ -2098,6 +2051,25 @@ color:#ffffff;
        <pixmap>../../../../../nas/spirit/asset_project/source/popup_source/down_list.png</pixmap>
       </property>
      </widget>
+     <widget class="QLabel" name="download_btn_one_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>706</y>
+        <width>361</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../nas/spirit/asset_project/source/download_btn_one.png</pixmap>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
      <zorder>label_6</zorder>
      <zorder>download_listwidget</zorder>
      <zorder>ready_download</zorder>
@@ -2105,12 +2077,11 @@ color:#ffffff;
      <zorder>label_9</zorder>
      <zorder>label_7</zorder>
      <zorder>haved_asset</zorder>
-     <zorder>label_8</zorder>
      <zorder>exit_btn_2</zorder>
      <zorder>already_download</zorder>
-     <zorder>download_touch_area</zorder>
-     <zorder>cancel_touch_area</zorder>
      <zorder>download_format_touch_area</zorder>
+     <zorder>download_btn_one_2</zorder>
+     <zorder>download_touch_area</zorder>
     </widget>
    </widget>
    <widget class="QLabel" name="like_empty_notice">
