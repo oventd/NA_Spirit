@@ -122,12 +122,14 @@ class FlowUtils:
 
     @classmethod
     def get_cut_in_out(cls,SHOT_ID): 
-        current_steps = cls.sg.find(
+        result = cls.sg.find(
                 "Shot",
                 [["id", "is",SHOT_ID]],
                 ["sg_cut_in", "sg_cut_out"]
-            )
-        return current_steps
+            )[0]
+        return result["sg_cut_in"],result["sg_cut_out"]
+
+
 
     @classmethod
     def get_upstream_tasks(cls, task_id):
