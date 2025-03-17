@@ -12,12 +12,14 @@ class MayaUtils:
         """
         if not cmds.objExists(name):
             if parent:
-                cmds.group(em=True, name=name, parent=parent)
+                name = cmds.group(em=True, name=name, parent=parent)
             else:
-                cmds.group(em=True, name=name)
+                name = cmds.group(em=True, name=name)
             print(f"Group '{name}' was created.")
+            return name
         else:
             print(f"Group '{name}' already exists.")
+
 
     @staticmethod
     def create_camera(group_name=None, camera_name=None):
@@ -54,7 +56,7 @@ class MayaUtils:
         return camera_name
 
     @staticmethod
-    def reference_file(file_path, group_name):
+    def reference_file(file_path, group_name, name_space):
         """
         특정 파일이 존재하면 해당 파일을 Maya에 참조하는 함수.
         :param file_path: 참조할 파일의 경로
@@ -74,8 +76,7 @@ class MayaUtils:
                 
         if transform_nodes:
             top_node = transform_nodes[0]
-            rig_group = cmds.group(name=group_name, empty=True)
-            cmds.parent(top_node, rig_group)
+            cmds.parent(top_node, group_name)
 
         return transform_nodes
         

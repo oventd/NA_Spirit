@@ -20,16 +20,17 @@ class RiggingStep(StepOpenMaya):
     class Open:
         @staticmethod
         def setup(group_name="rig", task_id=None, file_format=".ma"):
-            MayaUtils.create_group(group_name)
+            group_name = MayaUtils.create_group(group_name)
         # @staticmethod
         # def reference_modeling(task_id=None, file_format="ma"):
             modeling_file = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
-            asset_name = os.path.basename(SgPathUtils.trim_entity_path(modeling_file))
+            asset_name, _ = SgPathUtils.trim_entity_path(modeling_file)
+            asset_name = os.path.basename(asset_name)
             step = SgPathUtils.get_step_from_path(modeling_file)
             name_space = f"{asset_name}_{step}"
             # MayaUtils.reference_file(modeling_file, "modeling")
             if modeling_file:
-                MayaUtils.reference_file(modeling_file, name_space) # 원래 저장될때 리네임 되는건가?
+                MayaUtils.reference_file(modeling_file, group_name, name_space) # 원래 저장될때 리네임 되는건가?
             else:
                 print(f"⚠ Warning: No published file found for Task ID {task_id} with format {file_format}")
    
