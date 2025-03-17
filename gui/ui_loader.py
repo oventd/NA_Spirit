@@ -27,4 +27,5 @@ class UILoader:
             self.ui = loader.load(ui_file)
             ui_file.close()
             self.ui.setStatusBar(None)
+            self.ui.setFixedSize(1240, 799)
         return self.ui
