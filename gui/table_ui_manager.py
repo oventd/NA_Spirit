@@ -78,7 +78,7 @@ class TableUiManager:
 # 버튼 이벤트 연결 (추가 인자 없이 호출)
             self.ui.download_touch_area.clicked.connect(download_manager.download_likged_assets_all)
             
-            self.ui.download_btn.clicked.connect(download_manager.download_assets_one)
+            self.ui.download_btn.clicked.connect(download_manager.download_likged_assets_all)
 
             self.logger = create_logger(UX_Like_ASSET_LOGGER_NAME, UX_Like_ASSET_LOGGER_DIR)
 
