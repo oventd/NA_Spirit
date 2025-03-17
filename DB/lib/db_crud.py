@@ -29,21 +29,35 @@ class DbCrud:
 
         self.logger = create_logger(logger_name, log_path)
 
-    # 데이터 삽입 (Create)
-    def insert_one(self, asset_data, update_data):
+    # Create (데이터 생성 또는 업데이트)
+    def upsert_data(self, filter_query, data_fields):
         """
-        새로운 자산 데이터를 컬렉션에 삽입합니다.
-        :param asset_data: 삽입할 자산 데이터 (사전 형태)
-        :param update_data: 수정 시간을 업데이트할 데이터 (사전 형태)
-        :return: 삽입된 자산의 ID (문자열 형태)
+        데이터가 없으면 새로 생성하고, 있으면 업데이트하는 범용 메서드.
+        :param filter_query: 찾을 조건 (dict)
+        :param data_fields: 삽입 또는 업데이트할 필드 (dict)
+        :return: 업데이트 또는 삽입된 문서의 ID
         """
-        # 자산 생성 시간과 수정 시간을 UTC로 추가 (시간대에 상관없는 시간 저장)
-        asset_data[CREATED_AT] = datetime.utcnow()  # 생성 시간 추가
-        update_data[UPDATED_AT] = datetime.utcnow()  # 수정 시간 추가
-        result = self.asset_collection.insert_one(asset_data)  # asset_data를 MongoDB 컬렉션에 삽입
-        self.logger.info(f"Inserted document ID: {result.inserted_id} | Asset Data: {asset_data}")
-        return str(result.inserted_id)
+        if not data_fields:
+            raise ValueError("data_fields는 반드시 제공되어야 합니다.")
 
+        update_data = {
+            "$set": {UPDATED_AT: datetime.utcnow()},  # 모든 업데이트에 적용
+            "$setOnInsert": {CREATED_AT: datetime.utcnow()}  # 새로 삽입될 경우 적용
+        }
+
+        update_data["$set"].update(data_fields)
+        update_data["$setOnInsert"].update(data_fields)
+        update_data["$setOnInsert"].update(filter_query)  # 필터 조건을 새 데이터에 포함
+
+        # 데이터가 없으면 삽입, 있으면 업데이트
+        result = self.asset_collection.update_one(filter_query, update_data, upsert=True)
+
+        if result.upserted_id:
+            print(f"새로운 데이터 생성됨: {result.upserted_id}")
+        else:
+            print(f"기존 데이터 업데이트 완료: {result.modified_count} 개 문서 수정됨")
+
+        return result
     """
     find()는 필터링 된 모든 문서를 가져온 후 limit를 적용하기에 효율성 저하
     aggregate()는 필터링 후 정렬하고, limit를 사용해서 메모리 사용을 줄인다.
@@ -107,53 +121,58 @@ class DbCrud:
         self.logger.debug(f"Generated Query Pipeline: {pipeline}")  # 디버깅을 위한 로깅
         print(pipeline)
         return pipeline
-
-    # 데이터 검색 (Find)
+    # Read(데이터 조회)
     def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=0, skip=0, fields=None):
-        pipeline = self.construct_query_pipeline(filter_conditions, sort_by, sort_order, limit, skip, fields)
-        result = list(self.asset_collection.aggregate(pipeline))
-        self.logger.info(f"Query executed with filter: {filter_conditions} | Found: {len(result)} documents")
-        return result
-
-    # 데이터 수정 (Update)
-    def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
-                    limit=0, skip=0, fields=None):
         """
-        특정 ObjectId 목록을 기반으로 데이터를 조회하고 정렬합니다.
-        :param filter_conditions: ObjectId 목록 (리스트 형태)
+        데이터를 조회하고, 필요한 경우 정렬 및 필터링을 수행합니다.
+        :param filter_conditions: 필터 조건 (dict 또는 ObjectId 리스트)
         :param sort_by: 정렬 기준 필드
-        :param sort_order: 정렬 순서
-        :param limit: 조회할 데이터 개수 제한
+        :param sort_order: 정렬 순서 (ASCENDING or DESCENDING)
+        :param limit: 조회할 데이터 개수
         :param skip: 건너뛸 데이터 개수
         :param fields: 반환할 필드 목록
         :return: 조회된 문서 리스트
         """
-        object_ids = []
-
+        query_filter = {}
         if filter_conditions:
-            if not isinstance(filter_conditions, list):
-                raise TypeError("filter_conditions must be a list of ObjectId strings")
-
-            for value in filter_conditions:
-                if isinstance(value, str):  # 문자열이면 ObjectId로 변환
-                    try:
-                        object_ids.append(ObjectId(value))
-                    except Exception:
-                        raise ValueError(f"Invalid ObjectId format: {value}")
-                elif isinstance(value, ObjectId):  # 이미 ObjectId이면 그대로 사용
-                    object_ids.append(value)
-                else:
-                    raise TypeError(f"Expected string or ObjectId, got {type(value)}")
-
-        if object_ids:
-            query_filter = {"_id": {"$in": object_ids}}
-        else:
-            query_filter = {}  # 빈 필터를 사용하여 모든 데이터를 가져올 수 있도록 처리
+            if isinstance(filter_conditions, list):
+                object_ids = []
+                for value in filter_conditions:
+                    if isinstance(value, str):  # 문자열이면 ObjectId로 변환
+                        try:
+                            object_ids.append(ObjectId(value))
+                        except Exception:
+                            raise ValueError(f"Invalid ObjectId format: {value}")
+                    elif isinstance(value, ObjectId):  # 이미 ObjectId이면 그대로 사용
+                        object_ids.append(value)
+                if object_ids:
+                    query_filter["_id"] = {"$in": object_ids}
+            elif isinstance(filter_conditions, dict):
+                query_filter.update(filter_conditions)
 
         pipeline = self.construct_query_pipeline(query_filter, sort_by, sort_order, limit, skip, fields)
-        result = list(self.asset_collection.aggregate(pipeline))
-        return result
 
+        result = list(self.asset_collection.aggregate(pipeline))
+        self.logger.info(f"Query executed with filter: {filter_conditions} | Found: {len(result)} documents")
+        
+        return result
+    
+    def find_one(self, object_id, fields=None):
+        """
+        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환
+        :param object_id: 자산의 고유 ID
+        :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
+        :return: 자산의 상세 정보 (object_id, asset_type, description, price 등)
+        """
+        projection = {field: 1 for field in fields} if fields else None
+
+        # 자산 ID로 쿼리
+        query_filter = {OBJECT_ID: ObjectId(object_id)}  # ObjectId로 변환
+        print(f"Query Filter (ID): {query_filter} | Projection Fields: {projection}")
+        
+        details = self.asset_collection.find_one(query_filter, projection)
+        self.logger.info(f"Retrieved document ID: {object_id} | Document Details: {details}")
+        return details
     
     def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
         """
@@ -180,46 +199,22 @@ class DbCrud:
         self.logger.info(f"Search executed with query: {user_query} | Found: {len(result)} documents")
         return result
 
-    def find_one(self, object_id, fields=None):
+    # Update(다운로드 수 증가)
+    def increment_count(self, object_id, field):
         """
-        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환
-        :param object_id: 자산의 고유 ID
-        :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
-        :return: 자산의 상세 정보 (object_id, asset_type, description, price 등)
+        자산의 다운로드 수를 증가시킵니다.
+        :param object_id: 다운로드 수를 증가시킬 자산의 ID
+        :return: 다운로드 수 증가 여부 (True/False)
         """
-        # 반환할 필드가 있는지 확인하고 프로젝션 준비
-        projection = {field: 1 for field in fields} if fields else None
-
-        # 자산 ID로 쿼리 필터 작성
-        query_filter = {OBJECT_ID: ObjectId(object_id)}  # ObjectId로 변환
-        print(f"[DEBUG] Query Filter (ID): {query_filter}")
-        print(f"[DEBUG] Projection Fields: {projection}")
-        
-        # 자산을 찾기 위한 쿼리 실행
-        details = self.asset_collection.find_one(query_filter, projection)
-        
-        print(f"[DEBUG] Retrieved Asset Details: {details}")
-        self.logger.info(f"Retrieved document ID: {object_id} | Document Details: {details}")
-        return details
-    
-    # 데이터 수정 (Update)
-    def update_one(self, object_id, update_data):
-        """
-        기존 자산 데이터를 수정합니다. 만약 자산이 없으면 새로 생성합니다.
-        :param object_id: 수정할 자산의 ID
-        :param update_data: 수정할 데이터 (사전 형태)
-        :return: 수정 성공 여부 (True/False)
-        """
-        update_data[UPDATED_AT] = datetime.utcnow()  # 수정 시간을 현재 시간으로 업데이트
         result = self.asset_collection.update_one(
             {OBJECT_ID: ObjectId(object_id)},
-            {"$set": update_data},
+            {"$inc": {field: 1}},
             upsert=False
         )
-        self.logger.info(f"Updated document ID: {object_id} | Modified: {result.acknowledged}")
-        return result.acknowledged
+        self.logger.info(f"Incremented download count for document ID: {object_id}")
+        return result.modified_count > 0  # 다운로드 수가 증가했으면 True 반환
 
-    # 데이터 삭제 (Delete)
+    # Delete(데이터 삭제)
     def delete_one(self, object_id):
         """
         자산을 삭제합니다.
@@ -230,22 +225,8 @@ class DbCrud:
         self.logger.info(f"Deleted document ID: {object_id} | Acknowledged: {result.acknowledged}")
         return result.acknowledged
 
-    # 다운로드 수 증가 (Increment Download Count)
-    def increment_count(self, object_id, field):
-        """
-        자산의 다운로드 수를 증가시킵니다.
-        :param object_id: 다운로드 수를 증가시킬 자산의 ID
-        :return: 다운로드 수 증가 여부 (True/False)
-        """
-        result = self.asset_collection.update_one(
-            {OBJECT_ID: ObjectId(object_id)},
-            {"$inc": {field: 1}},
-            upsert=True
-        )
-        self.logger.info(f"Incremented download count for document ID: {object_id}")
-        return result.modified_count > 0  # 다운로드 수가 증가했으면 True 반환
 
-
+# Spirit에서 구현되는 클래스(자식 클래스)
 class AssetDb(DbCrud):
     def __init__(self, log_path=None):
         super().__init__(ASSET_LOGGER_NAME, ASSET_LOGGER_DIR)  # 부모 클래스의 생성자 호출
@@ -261,38 +242,21 @@ class AssetDb(DbCrud):
             #     [(NAME, "text")]
             #     # weights={NAME: 10, DESCRIPTION: 1}  # 'name' 필드에 10, 'description' 필드에 1의 가중치 부여
             # )
-            self.logger.info("Indexes set up for AssetDb")
-       
-    def find(self, filter_conditions=None, sort_by=None, limit=0, skip=0, fields=None):
+            # 복합 인덱스 생성 (자식 클래스에서 한 번만 실행)
+            # self.asset_collection.create_index(
+            #     [("project_name", pymongo.ASCENDING), ("name", pymongo.ASCENDING)], 
+            #     unique=True)
+            # self.logger.info("Indexes set up for AssetDb")
+    # Create (에셋 생성 및 업데이트)
+    def upsert_asset(self, project_name, asset_name, data_fields):
         """
-        자산들을 조회하여 상세 정보를 반환 (필터링, 정렬, 제한, 건너뛰기 등 포함)
-        :param filter_conditions: 필터 조건 (기본값은 None)
-        :param sort_by: 정렬 기준 (기본값은 None)
-        :param limit: 조회할 데이터 수 (기본값은 40)
-        :param skip: 건너뛸 데이터 수 (기본값은 0)
-        :param fields: 반환할 필드 목록 (기본값은 None)
-        :return: 자산들의 상세 정보 리스트
+        에셋이 없은 경우 새로 생성하고, 있은 경우 업데이트.
+        :param project_name: 프로젝트 이름
+        :param name: 에셋 이름
+        :param update_fields: 업데이트할 필드 (선택 사항)
         """
-        details = super().find(filter_conditions, sort_by, limit, skip, fields)
-        return details
-    
-    def find_one(self, object_id, fields=None):
-        """
-        자산의 고유 ID를 기준으로 자산을 조회하여 상세 정보를 반환 (AssetDb에서만 사용)
-        :param object_id: 자산의 고유 ID
-        :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
-        :return: 자산의 상세 정보 (object_id, asset_type, description, price 등)
-        """
-        # 부모 클래스의 find_one 호출
-        details = super().find_one(object_id, fields)
-        return details
-    
-    def search(self, user_query=None, filter_conditions=None, limit=0, skip=0, fields=None, sort_by=None, sort_order=None):
-        result = super().search(user_query, filter_conditions, limit, skip, fields, sort_by, sort_order)
-        return result
-    
-    def find_and_sort(self, filter_conditions=None, sort_by=None, sort_order=None, 
-                    limit=0, skip=0, fields=None):
-        result = super().find_and_sort(filter_conditions, sort_by, sort_order, limit, skip, fields)
-        return result
-
+        if not project_name or not asset_name:
+            raise ValueError("필수 필드 'project_name'과 'name'이 제공되지 않았습니다.")
+        
+        filter_query = {"project_name": project_name, "name": asset_name}
+        return self.upsert_data(filter_query, data_fields)

@@ -105,7 +105,7 @@ class AssetService:
         #여기서 리스트를 받아 에셋으로 변환하고 해당 내용을 id: name 형식으로 변환하기 
 
         asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        dowmload_list_asset= asset_manager.find_and_sort(filter_conditions = ids_list)  # 자산 삭제
+        dowmload_list_asset= asset_manager.find(filter_conditions = ids_list)  # 자산 삭제
         
         asset_dict = {asset["name"] : str(asset["_id"]) for asset in dowmload_list_asset}
         return asset_dict
@@ -122,10 +122,23 @@ class AssetService:
         :param limit: 조회할 데이터 수 (기본값은 5)
         :param skip: 건너뛸 데이터 수 (기본값은 0, 첫 번째 페이지)
         :return: 조회된 자산 리스트
-        """
-        # asset_manager =   # Asset 클래스의 인스턴스를 생성
-        
+        """   
         return AssetDb().search(filter_conditions=filter_conditions, sort_by=sort_by, limit=limit, skip=skip,user_query = user_query)
+        
+    @staticmethod
+    def search_input(search_word, filter_conditions):
+        """
+        데이터를 검색합니다.
+        :param user_query: 검색어
+        :param fields: 검색 결과에서 가져올 필드 목록
+        :return: 검색 결과
+        """
+        return AssetDb().search(user_query=search_word, filter_conditions = filter_conditions)  # 자산 데이터 업데이트
+    
+    @staticmethod
+    def get_asset_by_id_all(filter_conditions, sort_by=None, limit=None, skip=None, user_quaery = None):
+        return AssetDb().search(user_quaery ,filter_conditions=filter_conditions, sort_by=sort_by, limit=limit, skip=skip)
+    
             
     @staticmethod
     def get_asset_by_id(asset_id):
@@ -133,40 +146,17 @@ class AssetService:
         특정 ID의 자산 데이터를 가져옴.
         - UI에서 사용자가 클릭한 자산의 ID를 전달받아 해당 데이터를 조회
         """
-        asset_manager = AssetDb()  # Asset 클래스의 인스턴스를 생성
-        print (asset_id)
-        return asset_manager.find_one(asset_id)
+        return AssetDb().find_one(asset_id)
     
     @staticmethod
-    def create_asset(asset_data):
+    def upsert_data(asset_data):
         """
-        새로운 자산 데이터를 생성하여 DB에 추가합니다.
+        새로운 자산 데이터를 새로 생성하고, 
+        있은 경우 업데이트하여 DB에 추가합니다.
         :param asset_data: 자산 데이터
         :return: 추가된 자산의 ID
         """
-        asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        return asset_manager.insert_one(asset_data)  # 자산 데이터를 DB에 삽입
-    
-    @staticmethod
-    def update_asset(asset_id, update_data):
-        """
-        자산 데이터를 업데이트합니다.
-        :param asset_id: 수정할 자산 ID
-        :param update_data: 수정할 데이터
-        :return: 업데이트 성공 여부
-        """
-        asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        return asset_manager.update_one(asset_id, update_data)  # 자산 데이터 업데이트
-    
-    @staticmethod
-    def delete_asset(asset_id):
-        """
-        자산 데이터를 삭제합니다.
-        :param asset_id: 삭제할 자산 ID
-        :return: 삭제 성공 여부
-        """
-        asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        return asset_manager.delete_one(asset_id)  # 자산 삭제
+        return AssetDb().upsert_asset(asset_data)  # 자산 데이터를 DB에 삽입
     
     @staticmethod
     def update_count(asset_id):
@@ -176,47 +166,13 @@ class AssetService:
         :param update_data: 수정할 데이터
         :return: 업데이트 성공 여부
         """
-        asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        return asset_manager.increment_count(asset_id)  # 자산 데이터 업데이트
+        return AssetDb().increment_count(asset_id)  # 자산 데이터 업데이트
     
     @staticmethod
-    def search_input(search_word, filter_conditions):
+    def delete_asset(asset_id):
         """
-        데이터를 검색합니다.
-        :param user_query: 검색어
-        :param fields: 검색 결과에서 가져올 필드 목록
-        :return: 검색 결과
+        자산 데이터를 삭제합니다.
+        :param asset_id: 삭제할 자산 ID
+        :return: 삭제 성공 여부
         """
-        # asset_manager =   # AssetDb 클래스의 인스턴스를 생성
-   
-        return AssetDb().search(user_query=search_word, filter_conditions = filter_conditions)  # 자산 데이터 업데이트
-    @staticmethod
-    def get_asset_by_id_all(filter_conditions, sort_by=None, limit=None, skip=None, user_quaery = None):
-        # asset_manager = AssetDb()
-        return AssetDb().search(user_quaery ,filter_conditions=filter_conditions, sort_by=sort_by, limit=limit, skip=skip)
-    
-    # @staticmethod
-    # def search_input(search_word, filter_conditions, limit, skip, sort_by, fields=None):
-    #     """
-    #     데이터를 검색합니다.
-    #     :param search_word: 검색어
-    #     :param filter_conditions: 필터 조건
-    #     :param limit: 조회할 최대 개수
-    #     :param skip: 건너뛸 개수
-    #     :param sort_by: 정렬 기준
-    #     :param fields: 반환할 필드 목록 (기본값은 None, 특정 필드만 반환)
-    #     :return: 검색 결과
-    #     """
-    #     asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        
-    #     # 디버깅 로그
-    #     print(f"[DEBUG] Searching with query: {search_word}")
-        
-    #     # 필드가 주어지지 않으면 None을 기본값으로 설정하고, 
-    #     # AssetDb.search에 모든 인자를 전달
-    #     return asset_manager.search(user_query=search_word, 
-    #                                 filter_conditions=filter_conditions, 
-    #                                 sort_by=sort_by, 
-    #                                 limit=limit, 
-    #                                 skip=skip,
-    #                                 fields=fields)
+        return AssetDb().delete_one(asset_id)  # 자산 삭제
