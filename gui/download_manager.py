@@ -46,8 +46,13 @@ class DownloadManager:
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
-            
-            self.ui.like_download_btn_area.clicked.connect(self.download_likged_assets_all)
+        
+            self.ui.download_format_touch_area.clicked.connect(self.set_download_format_all)
+            self.ui.download_touch_area.clicked.connect(self.download_all)
+            self.ui.exit_btn_2.clicked.connect(self.exit_sub_bar_all)
+            self.ui.cancel_touch_area.clicked.connect(self.exit_sub_bar_all)
+            self.ui.download_listwidget.clear()
+        
             self.ref_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/reference_toggle.png")
             self.import_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/import_toggle.png")
             self.ui.download_format_label.setPixmap(self.ref_download_toggle_pixmap)
@@ -62,13 +67,8 @@ class DownloadManager:
             self.logger = create_logger(UX_DOWNLOAD_LOGGER_NAME, UX_DOWNLOAD_LOGGER_DIR)
     
     def download_likged_assets_all(self):
+
         print("전체 다운로드 버튼이 눌렸어요")
-        self.ui.download_touch_area.clicked.disconnect()
-        
-        self.ui.download_format_touch_area.clicked.connect(self.set_download_format_all)
-        self.ui.download_touch_area.clicked.connect(self.download_all)
-        self.ui.exit_btn_2.clicked.connect(self.exit_sub_bar_all)
-        self.ui.cancel_touch_area.clicked.connect(self.exit_sub_bar_all)
         self.ui.download_listwidget.clear()
         
       
@@ -81,26 +81,32 @@ class DownloadManager:
 
         self.logger.info(f"유저가 {self.exemples}를 다운받았어요")
    
-    def download_assets_one(self):
-        print("단일 에셋의 다운로드 버튼이 눌렸어요")
-        self.ui.stackedWidget.setCurrentIndex(1)
-        
-        asset_one=asset = Asset().current
+    def download_likged_assets(self,obj_id):
+  
+        self.ui.download_listwidget.clear()
+        print("하나 다운로드 버튼이 눌렸어요")
 
-        print(f"다운로드하는 에셋 :{asset_one}")
+        self.ui.stackedWidget.show()
+        self.ui.stackedWidget.setCurrentIndex(2)
+        
        
-       
+        
+      
+        self.exemples = self.like_state.like_asset_list
+        self.download_list_asset=AssetService.get_assets_by_ids(self.exemples)
         self.add_list_widget()
-       
+
+
+        self.logger.info(f"유저가 단일 에셋을 다운받았어요")
+
+        
 
     def exit_sub_bar_all(self):
         self.ui.stackedWidget.hide()
-        print("저 전으로 돌아갈 건데요")
-
-    def exit_download_bar(self):
         self.ui.stackedWidget.setCurrentIndex(0)
 
-        self.logger.info(f"유저가 단일 에셋을 다운받았어요")
+        print("저 전으로 돌아갈 건데요")
+
     
     def set_download_format_all(self):
         if self.setDownloadFormat == False:
@@ -115,7 +121,7 @@ class DownloadManager:
 
         for item_text in self.download_list_asset:
             item = QListWidgetItem(item_text)  # 항목 생성
-            item.setCheckState(Qt.Unchecked)  # 체크박스를 체크된 상태로 설정
+            item.setCheckState(Qt.Checked)  # 체크박스를 체크된 상태로 설정
             self.ui.download_listwidget.addItem(item) 
         self.list_widget_stylesheet()
         
