@@ -29,6 +29,7 @@ from functools import partial
 class DownloadManager:
     
     _instance = None  # 싱글톤 인스턴스 저장
+    
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -45,6 +46,7 @@ class DownloadManager:
             self.download_list_asset ={}
             self.like_state = LikeState()
             # 싱글톤 인스턴스 생성
+           
         
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
@@ -54,6 +56,8 @@ class DownloadManager:
             
             self.ui.exit_btn_2.clicked.connect(self.exit_sub_bar_all)
             self.ui.cancel_touch_area.clicked.connect(self.exit_sub_bar_all)
+            self.ui.download_touch_area.clicked.connect(self.download_all)
+
             self.ui.download_listwidget.clear()
         
             self.ref_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/reference_toggle.png")
@@ -79,9 +83,13 @@ class DownloadManager:
         self.ui.stackedWidget.show()
         self.ui.stackedWidget.setCurrentIndex(2)
 
-        self.ui.download_touch_area.clicked.connect(self.download_all)
+      
 
-        self.logger.info(f"유저가 {self.exemples}를 다운받았어요")
+        for i in range(self.ui.download_listwidget.count()):
+            item = self.ui.download_listwidget.item(i)
+            print(f"아이템: {item.text()}, 체크 상태: {item.checkState()}")
+            download_fix_list=[self.ui.download_listwidget.item(i).text() for i in range(self.ui.download_listwidget.count()) if self.ui.download_listwidget.item(i).checkState() == Qt.Checked]
+            self.selected_ids_list = [self.download_list_asset[name] for name in download_fix_list if name in self.download_list_asset]
 
    
     def download_likged_assets(self):
@@ -97,10 +105,8 @@ class DownloadManager:
         download_name_id = {self.asset.current["name"]: str(self.asset.current["_id"])}
         self.add_list_widget(download_name_id)
 
-        print(id_list)  
-        self.ui.download_touch_area.clicked.connect(partial(self.download_all,id_list))
-        self.logger.info(f"유저가 단일 에셋을 다운받았어요")
-
+        self.selected_ids_list =id_list
+    
         
 
     def exit_sub_bar_all(self):
@@ -156,24 +162,14 @@ class DownloadManager:
 
 
             
-    def download_all(self,id_list=None):
-
-        if id_list is not None:
-            selected_ids_list = id_list
-        else:
-            for i in range(self.ui.download_listwidget.count()):
-                item = self.ui.download_listwidget.item(i)
-                print(f"아이템: {item.text()}, 체크 상태: {item.checkState()}")
-            download_fix_list=[self.ui.download_listwidget.item(i).text() for i in range(self.ui.download_listwidget.count()) if self.ui.download_listwidget.item(i).checkState() == Qt.Checked]
-            selected_ids_list = [self.download_list_asset[name] for name in download_fix_list if name in self.download_list_asset]
-
-            #다운로드 에셋에 다운로드 fix 리스트가 있다면 반환 및 리스트 벨류만 추가 
-
+    def download_all(self):
 
         if self.setDownloadFormat == False:
-            print(f"{selected_ids_list}이 레퍼런스로 다운로드되었습니다")
+            print(f"{self.selected_ids_list}이 레퍼런스로 다운로드되었습니다")
+            self.logger.info(f"유저가 {self.selected_ids_list}를 레퍼런스로 다운로드되었습니다")
         else:  
-            print(f"{selected_ids_list}에셋이 임포트로 다운되었습니다")
+            print(f"{self.selected_ids_list}에셋이 임포트로 다운되었습니다")
+            self.logger.info(f"유저가 {self.selected_ids_list}를 임포트로 다운로드되었습니다")
 
 
     
