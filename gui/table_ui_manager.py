@@ -299,6 +299,7 @@ class TableUiManager:
 
     def exit_sub_win(self):
         self.ui.stackedWidget.hide()
+        self.update_like_count()
 
     def set_detail_info(self, asset):
         Asset().current = asset
@@ -451,8 +452,9 @@ class TableUiManager:
                 self.ui.like_download_btn_area.show()
 
                 # ✅ 새로운 DynamicCircleLabel 추가
-                label = DynamicCircleLabel(str(len(LikeState().like_asset_list)))
-                self.ui.like_asset_number.addWidget(label)  #  새로운 라벨 추가
+                self.label = DynamicCircleLabel("")
+                self.ui.like_asset_number.addWidget(self.label)  #  새로운 라벨 추가
+                self.update_like_count()
                 
                 self.ui.like_download_btn.setPixmap(LikeState().like_download_image)
 
@@ -468,18 +470,24 @@ class TableUiManager:
                 self.update_table(sort_by=UPDATED_AT, limit=40, skip=0,fields=None)
                 #사용자 pc에 저장해두고 라이크 받을때 마다 오브젝트 id를 json에 저장해두고 
 
+    def update_like_count(self):
+        """✅ 기존 라벨을 유지하면서 숫자만 변경"""
+        like_count = len(LikeState().like_asset_list)
+        self.label.setText(str(like_count))  #  기존 라벨의 텍스트만 변경
+        self.label.update_size()  #  크기 업데이트 (동적으로 적용)
+
     def remove_widget_with_children(self,widget):
         """위젯과 그 내부 요소 삭제"""
         if widget is not None:
-            layout = widget.layout()  # ✅ 위젯에 레이아웃이 있는 경우 가져오기
+            layout = widget.layout()  #  위젯에 레이아웃이 있는 경우 가져오기
             if layout:
                 while layout.count():
                     item = layout.takeAt(0)
                     child_widget = item.widget()
                     if child_widget:
                         child_widget.deleteLater()  # ✅ 내부 요소 삭제
-            widget.setParent(None)  # ✅ 부모에서 제거
-            widget.deleteLater()  # ✅ 위젯 자체도 삭제
+            widget.setParent(None)  #  부모에서 제거
+            widget.deleteLater()  # 위젯 자체도 삭제
 
     def clear_layout(self, layout):
         """레이아웃 내부의 모든 요소 삭제"""
