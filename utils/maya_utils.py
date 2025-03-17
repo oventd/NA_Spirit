@@ -185,7 +185,7 @@ class MayaUtils:
             print(f"USD Proxy Node linked to: {usd_file}")
 
     @staticmethod
-    def file_export(file_path, export_options=None):
+    def file_export(file_path, export_options=None,frame_range=None):
         """
         파일을 지정된 포맷으로 저장하는 함수.
         :param file_path: 저장할 파일의 경로
@@ -193,7 +193,10 @@ class MayaUtils:
         :param export_options: 포맷에 해당하는 추가 옵션 (기본값: None)
         """
         _, ext = os.path.splitext(file_path)
-
+        if export_options is not None:
+            if frame_range:
+                export_options["startTime"]=frame_range[0]
+                export_options["endTime"]=frame_range[1]
         export_options_str = ";".join(f"{key}={value}" for key, value in export_options.items())
 
         if ext == ".mb":

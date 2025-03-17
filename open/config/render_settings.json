@@ -64,8 +64,5 @@
       "exportStagesAsRefs": 1,
       "excludeExportTypes": [],
       "legacyMaterialScope": 0
-  },
-  "export_usd_material": {
-    
   }
 }

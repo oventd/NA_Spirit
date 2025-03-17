@@ -47,9 +47,9 @@ class LightingStep(StepOpenMaya):
 
 
         @staticmethod
-        def publish(session_path: str ):
+        def publish(session_path: str,context ):
             """ 특정 그룹을 USD와 MB 파일로 export """
-            super().publish(session_path)
+            StepOpenMaya.Publish.publish(session_path,context)
 if __name__ == "__main__":
     env_usd = "/home/rapa/3D_usd/Kitchen_set/assets/WallOrange/WallOrange.usd"
 

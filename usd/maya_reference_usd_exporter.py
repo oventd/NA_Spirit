@@ -14,16 +14,16 @@ from usd_utils import UsdUtils
 from sg_path_utils import SgPathUtils
 from usd_version_connector import UsdVersionConnector
 from json_utils import JsonUtils
-
+import maya.cmds as cmds
 
 class MayaReferenceUsdExporter:
     """Maya 씬에서 데이터를 추출하고 USD를 생성 및 업데이트하는 클래스"""
 
-    def __init__(self,step, usd_file_path, export_animated=True, export_static=True, frame_range=None):
+    def __init__(self,step, usd_file_path, assets_node, export_animated=True, export_static=True, frame_range=None):
         self.step = step
         self.usd_file_path = usd_file_path
         self.stage = None
-        self.assets_node = "Assets"
+        self.assets_node = assets_node
         self.version  = SgPathUtils.get_version(self.usd_file_path)
         self.export_animated = export_animated
         self.export_static = export_static

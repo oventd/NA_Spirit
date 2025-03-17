@@ -6,11 +6,10 @@
         "maya": true
       }
     },
-    "MMV": {},
-    "match_move": {
+    "MMV": {
       "camera": {
         "all": true,
-        "isReferenced": false,
+        "isReferenced": true,
         "maya":true
       },
       "asset": {

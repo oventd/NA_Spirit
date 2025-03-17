@@ -54,7 +54,7 @@ class StepOpenMaya(ABC):
             pass
         
         @abstractmethod
-        def publish(session_path: str):
+        def publish(session_path: str,context):
             step = SgPathUtils.get_step_from_path(session_path)
             
             # 퍼블리시 설정 및 렌더 설정 가져오기
@@ -68,8 +68,11 @@ class StepOpenMaya(ABC):
             usd_export_path = StepOpenMaya.Publish.get_usd_export_path(session_path)
             usd_export_options = render_settings.get("export_usd_static_mesh", {})
 
-            # frame_range = FlowUtils.get_cut_in_out(session_path)
-            frame_range = (2, 10)
+            if StepOpenMaya.Publish.get_animated_transform_nodes():
+                animated = True
+                frame_range = FlowUtils.get_cut_in_out(context.entity["id"])
+            else:
+                animated = False
             
             published_usds = {}
             for item, options in publish_settings[step].items():
@@ -81,18 +84,23 @@ class StepOpenMaya(ABC):
                 maya = options.get("maya", False)
 
                 if is_referenced is True:
+                    
                     if all is True:
-                        MayaReferenceUsdExporter(step, usd_export_path,frame_range).run()
+                        MayaReferenceUsdExporter(step, usd_export_path,item, frame_range = frame_range).run()
                         root_usd_path = UsdVersionConnector.connect(usd_export_path)
                         published_usds[item] = [root_usd_path]
                     elif all is not True:
-                        MayaReferenceUsdExporter(step, usd_export_path, export_animated = False).run()
+                        MayaReferenceUsdExporter(step, usd_export_path, item, export_animated = False).run()
                         root_usd_path = UsdVersionConnector.connect(usd_export_path)
                         published_usds[item] = [root_usd_path]
                 if is_referenced is False:
                     if all is True:
+                    
                         cmds.select(item)
-                        MayaUtils.file_export(usd_export_path,usd_export_options)
+                        if animated is True:
+                            MayaUtils.file_export(usd_export_path,usd_export_options,frame_range=frame_range)
+                        elif animated is False:
+                            MayaUtils.file_export(usd_export_path,usd_export_options)
                         print(f"usd_export_path: {usd_export_path}")
                         root_usd_path = UsdVersionConnector.connect(usd_export_path)
                         print(f"root_usd_path: {root_usd_path}")
@@ -220,5 +228,15 @@ class StepOpenMaya(ABC):
             if not MayaUtils.file_export(path, file_format=file_format):
                 return False
             return True
+        @staticmethod
+        def get_animated_transform_nodes():
+            """애니메이션 커브에 연결된 트랜스폼 노드를 가져옴"""
+            anim_curves = cmds.ls(type="animCurve")
+            animated_nodes = set()
 
-    
+            for curve in anim_curves:
+                connected_nodes = cmds.listConnections(f"{curve}.output", source=False, destination=True)
+                if connected_nodes:
+                    animated_nodes.add(connected_nodes[0])
+
+            return list(animated_nodes)

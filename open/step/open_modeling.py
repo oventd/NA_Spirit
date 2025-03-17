@@ -39,9 +39,9 @@ class ModelingStep(StepOpenMaya):
             return True
 
         @staticmethod
-        def publish(session_path: str ):
+        def publish(session_path: str ,context):
             """ 특정 그룹을 USD와 MB 파일로 export """
-            StepOpenMaya.Publish.publish(session_path)
+            StepOpenMaya.Publish.publish(session_path,context)
 
 
 if __name__ == "__main__":
