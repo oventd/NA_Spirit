@@ -26,4 +26,5 @@ class UILoader:
             loader = QUiLoader()
             self.ui = loader.load(ui_file)
             ui_file.close()
+            self.ui.setStatusBar(None)
         return self.ui
