@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1250</width>
-    <height>780</height>
+    <height>795</height>
    </rect>
   </property>
   <property name="palette">
@@ -413,10 +413,10 @@
 </string>
     </property>
     <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAsNeeded</enum>
+     <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAsNeeded</enum>
+     <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
     <property name="sizeAdjustPolicy">
      <enum>QAbstractScrollArea::AdjustIgnored</enum>
@@ -1238,7 +1238,7 @@ color:#ffffff;
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>530</y>
+        <y>522</y>
         <width>341</width>
         <height>31</height>
        </rect>
@@ -1320,7 +1320,7 @@ color:#ffffff;
       <property name="geometry">
        <rect>
         <x>29</x>
-        <y>577</y>
+        <y>568</y>
         <width>321</width>
         <height>132</height>
        </rect>
@@ -1430,10 +1430,10 @@ color:#ffffff;
      <widget class="QPushButton" name="download_btn">
       <property name="geometry">
        <rect>
-        <x>176</x>
-        <y>744</y>
-        <width>20</width>
-        <height>20</height>
+        <x>6</x>
+        <y>718</y>
+        <width>371</width>
+        <height>81</height>
        </rect>
       </property>
       <property name="font">
@@ -1457,16 +1457,6 @@ color:#ffffff;
       <property name="text">
        <string/>
       </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>../../../../../../nas/spirit/asset_project/source/download.png</normaloff>../../../../../../nas/spirit/asset_project/source/download.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>24</width>
-        <height>24</height>
-       </size>
-      </property>
      </widget>
      <widget class="QLabel" name="label_2">
       <property name="geometry">
@@ -1484,20 +1474,20 @@ color:#ffffff;
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="label_5">
+     <widget class="QLabel" name="download_btn_one">
       <property name="geometry">
        <rect>
-        <x>-10</x>
-        <y>727</y>
-        <width>392</width>
-        <height>330</height>
+        <x>30</x>
+        <y>725</y>
+        <width>320</width>
+        <height>52</height>
        </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color:#000000;</string>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../nas/spirit/asset_project/source/download_btn_one.png</pixmap>
       </property>
      </widget>
      <zorder>label_3</zorder>
@@ -1512,12 +1502,12 @@ color:#ffffff;
      <zorder>info_name_2</zorder>
      <zorder>horizontalLayoutWidget_2</zorder>
      <zorder>verticalLayoutWidget</zorder>
-     <zorder>label_5</zorder>
-     <zorder>download_btn</zorder>
      <zorder>exit_btn_3</zorder>
      <zorder>exit_btn</zorder>
      <zorder>like_btn</zorder>
      <zorder>stackedWidget_2</zorder>
+     <zorder>download_btn_one</zorder>
+     <zorder>download_btn</zorder>
     </widget>
     <widget class="QWidget" name="page_5">
      <widget class="QLabel" name="label_10">
