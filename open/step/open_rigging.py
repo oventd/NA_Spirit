@@ -60,9 +60,9 @@ class RiggingStep(StepOpenMaya):
             #     print(f"Validation failed: terrain '{group_name}' does not exist.")
 
         @staticmethod
-        def publish():
-            print("Publishing rigging step")
-            pass
+        def publish(*args):
+            print("No Work for Publishing rigging step")
+            
 
 if __name__ == "__main__":
     rigging = RiggingStep()
