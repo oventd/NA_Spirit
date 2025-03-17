@@ -19,8 +19,8 @@ class ModelingStep(StepOpenMaya):
         def setup(geo_group_name="geo", task_id=None, file_format=None):
             """ 모델링 작업을 위한 기본 그룹 생성 """
             MayaUtils.create_group(geo_group_name)
-            MayaUtils.create_group("Low", parent = "geo")
-            MayaUtils.create_group("High", parent = "geo")
+            MayaUtils.create_group("Low", parent = geo_group_name)
+            MayaUtils.create_group("High", parent = geo_group_name)
 
     class Publish:
         @staticmethod

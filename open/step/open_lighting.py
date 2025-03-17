@@ -16,27 +16,27 @@ class LightingStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(env_usd, task_id=None, file_format=None):
+        def setup(group_name="light", task_id=None, file_format=None):
             print("Opening lighting step")
 
             # 라이트 그룹 생성
-            MayaUtils.create_group("light")
+            group_name = MayaUtils.create_group(group_name)
 
-            # USD 로드
-            MayaUtils.create_usd_proxy("lighting")
+            # # USD 로드
+            # MayaUtils.create_usd_proxy("lighting") 
 
-            # env USD 파일이 존재하는지 확인 후 레퍼런스
-            if not os.path.exists(env_usd):
-                cmds.warning(f"Environment USD file not found: {env_usd}")
-            else:
-                MayaUtils.reference_file(env_usd, "environment")
+            # # env USD 파일이 존재하는지 확인 후 레퍼런스
+            # if not os.path.exists(env_usd):
+            #     cmds.warning(f"Environment USD file not found: {env_usd}")
+            # else:
+            #     MayaUtils.reference_file(env_usd, "environment")
 
-            # USD Layer Editor 실행 전 플러그인 확인
-            if not cmds.pluginInfo("mayaUsdPlugin", query=True, loaded=True):
-                cmds.loadPlugin("mayaUsdPlugin")
+            # # USD Layer Editor 실행 전 플러그인 확인
+            # if not cmds.pluginInfo("mayaUsdPlugin", query=True, loaded=True):
+            #     cmds.loadPlugin("mayaUsdPlugin")
 
-            cmds.mayaUsdLayerEditorWindow()
-            print("Opened USD Layer Editor")
+            # cmds.mayaUsdLayerEditorWindow()
+            # print("Opened USD Layer Editor")
 
     class Publish:
         @staticmethod
@@ -45,11 +45,11 @@ class LightingStep(StepOpenMaya):
             # 여기에 검증 로직 추가 가능
             pass
 
-
         @staticmethod
         def publish(session_path: str,context ):
             """ 특정 그룹을 USD와 MB 파일로 export """
             StepOpenMaya.Publish.publish(session_path,context)
+            
 if __name__ == "__main__":
     env_usd = "/home/rapa/3D_usd/Kitchen_set/assets/WallOrange/WallOrange.usd"
 

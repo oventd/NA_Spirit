@@ -7,6 +7,8 @@ from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
+sys.path.append('/home/rapa/NA_Spirit/flow')
+from flow_utils import FlowUtils
 
 class LayoutStep(StepOpenMaya):
     def __init__(self):
@@ -15,18 +17,40 @@ class LayoutStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(terrain_group_name="terrain", camera_group_name="camera", rig_group_name = "rig", task_id=None, file_format=None):
-            MayaUtils.create_group(rig_group_name)
-            MayaUtils.create_group(terrain_group_name)
-            MayaUtils.create_group(camera_group_name)
+        def setup(terrain_group_name="terrain", camera_group_name="camera", rig_group_name="rig", 
+                matchmove_camera="matchmove_camera", matchmove_env="matchmove_env", task_id=None, file_format=None):
+            
+            terrain_group_name = MayaUtils.create_group(terrain_group_name)  # "terrain"
+            camera_group_name = MayaUtils.create_group(camera_group_name)  # "camera"
+            rig_group_name = MayaUtils.create_group(rig_group_name)  # "rig"
+            matchmove_camera = MayaUtils.create_group(matchmove_camera)  # "matchmove_camera"
+            matchmove_env = MayaUtils.create_group(matchmove_env)  # "matchmove_env"
 
-            MayaUtils.reference_file("","rig")
-            MayaUtils.reference_file("","terrain")
-            MayaUtils.reference_file("","camera")
+            def reference(group_name, task_id, file_format):
+                """
+                주어진 그룹을 생성하고, 해당 그룹에 필요한 파일을 참조하는 함수.
+                """
+                file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
 
-            # 매치무브 카메라
-            MayaUtils.reference_file("", "matchmove_camera")
-            MayaUtils.reference_file("", "matchmove_env")
+                if not file_path or not os.path.exists(file_path):
+                    cmds.warning(f"[WARNING] No valid upstream file found for {group_name} ({file_path})")
+                    return None
+
+                asset_name, _ = SgPathUtils.trim_entity_path(file_path)
+                asset_name = os.path.basename(asset_name)
+                step = SgPathUtils.get_step_from_path(file_path)
+                name_space = f"{asset_name}_{step}"
+
+                MayaUtils.reference_file(file_path, group_name, name_space)
+                return group_name
+            
+            # reference에 전달
+            reference(terrain_group_name, task_id, file_format)
+            reference(camera_group_name, task_id, file_format)
+            reference(rig_group_name, task_id, file_format)
+
+            reference(matchmove_camera, task_id, file_format)
+            reference(matchmove_env, task_id, file_format)
 
     class Publish:
         @staticmethod
@@ -48,26 +72,7 @@ class LayoutStep(StepOpenMaya):
             if not MayaUtils.validate_hierarchy(camera_group_name):
                 print(f"Validation failed: Camera group '{camera_group_name}' does not exist.")  
                 return False  
-
-            # # rig 그룹이 존재하는지 체크
-            # if MayaUtils.validate_hierarchy(rig_group_name, exception_group=exception_group):
-            #     print(f"Validation passed: Rig group '{rig_group_name}' exists.")
-            # else:
-            #     print(f"Validation failed: Rig group '{rig_group_name}' does not exist.")  
-
-            # # terrain 그룹이 존재하는지 체크
-            # if MayaUtils.validate_hierarchy(terrain_group_name):
-            #     print(f"Validation passed: terrain '{terrain_group_name}' exists.")
-            # else:
-            #     print(f"Validation failed: terrain '{terrain_group_name}' does not exist.")  
-
-            # # camera 그룹이 존재하는지 체크
-            # if MayaUtils.validate_hierarchy(camera_group_name):
-            #     print(f"Validation passed: Camera group '{camera_group_name}' exists.")
-            # else:
-            #     print(f"Validation failed: Camera group '{camera_group_name}' does not exist.") 
         
-
         @staticmethod
         def publish(session_path: str,context ):
             """ 특정 그룹을 USD와 MB 파일로 export """

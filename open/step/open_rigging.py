@@ -9,6 +9,7 @@ sys.path.append('/home/rapa/NA_Spirit/maya')
 sys.path.append('/home/rapa/NA_Spirit/flow')
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
+sys.path.append('/home/rapa/NA_Spirit/flow')
 from flow_utils import FlowUtils
 
 """각 스텝에 맞는 match move 파일을 불러올 클래스입니다."""
@@ -21,18 +22,16 @@ class RiggingStep(StepOpenMaya):
         @staticmethod
         def setup(group_name="rig", task_id=None, file_format=".ma"):
             group_name = MayaUtils.create_group(group_name)
-        # @staticmethod
-        # def reference_modeling(task_id=None, file_format="ma"):
-            modeling_file = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
-            asset_name, _ = SgPathUtils.trim_entity_path(modeling_file)
+            file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
+            asset_name, _ = SgPathUtils.trim_entity_path(file_path)
             asset_name = os.path.basename(asset_name)
-            step = SgPathUtils.get_step_from_path(modeling_file)
+            step = SgPathUtils.get_step_from_path(file_path)
             name_space = f"{asset_name}_{step}"
-            # MayaUtils.reference_file(modeling_file, "modeling")
-            if modeling_file:
-                MayaUtils.reference_file(modeling_file, group_name, name_space) # 원래 저장될때 리네임 되는건가?
+
+            if file_path:
+                MayaUtils.reference_file(file_path, group_name, name_space)
             else:
-                print(f"⚠ Warning: No published file found for Task ID {task_id} with format {file_format}")
+                print(f"Warning: No published file found for Task ID {task_id} with format {file_format}")
    
     class Publish:
         @staticmethod

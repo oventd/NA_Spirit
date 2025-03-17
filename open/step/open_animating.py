@@ -7,6 +7,8 @@ from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
+sys.path.append('/home/rapa/NA_Spirit/flow')
+from flow_utils import FlowUtils
 
 class AnimatingStep(StepOpenMaya):
     def __init__(self):
@@ -16,31 +18,38 @@ class AnimatingStep(StepOpenMaya):
     class Open:
         @staticmethod
         def setup(rig_group_name = "rig", terrain_group_name="terrain", camera_group_name="camera", task_id=None, file_format=None):
-            #리그 그룹
-            MayaUtils.create_group(rig_group_name)
-            MayaUtils.create_group(terrain_group_name)
-            MayaUtils.create_group(camera_group_name)
-
-        @staticmethod
-        def reference_rig():
-            rig_file =""
-            MayaUtils.reference_file(rig_file, "rig")
-        
-        @staticmethod
-        def reference_terrain():
-            terrain_file =""
-            MayaUtils.reference_file(terrain_file, "terrain")
-
-        @staticmethod
-        def reference_camera():
-            camera_file = ""  # 경로 설정
-            camera_objects = MayaUtils.reference_file(camera_file, "camera")
             
-            if camera_objects:  # 카메라 오브젝트가 있을 때만
-                MayaUtils.lock_transform([camera_objects])
+            rig_group_name = MayaUtils.create_group(rig_group_name)
+            terrain_group_name = MayaUtils.create_group(terrain_group_name)
+            camera_group_name = MayaUtils.create_group(camera_group_name)
+            if camera_group_name:  # 카메라 오브젝트가 있을 때만
+                MayaUtils.lock_transform([camera_group_name])
             else:
                 print("No camera objects found to lock.")
 
+            def reference(group_name, task_id, file_format):
+                """
+                주어진 그룹을 생성하고, 해당 그룹에 필요한 파일을 참조하는 함수.
+                """
+                file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
+
+                if not file_path or not os.path.exists(file_path):
+                    cmds.warning(f"[WARNING] No valid upstream file found for {group_name} ({file_path})")
+                    return None
+
+                asset_name, _ = SgPathUtils.trim_entity_path(file_path)
+                asset_name = os.path.basename(asset_name)
+                step = SgPathUtils.get_step_from_path(file_path)
+                name_space = f"{asset_name}_{step}"
+
+                MayaUtils.reference_file(file_path, group_name, name_space)
+                return group_name
+
+            #reference에 전달
+            reference(rig_group_name, task_id, file_format)     
+            reference(terrain_group_name, task_id, file_format)
+            reference(camera_group_name, task_id, file_format)       
+            
     class Publish:       
         @staticmethod 
         def validate(rig_group_name = "rig"):

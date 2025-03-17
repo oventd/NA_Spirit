@@ -70,7 +70,7 @@ class MayaUtils:
         ref_nodes = cmds.file(file_path, reference=True, namespace=name_space, returnNewNodes=True)
 
         transform_nodes = []
-        for node in ref_nodes:  # 변수명을 충돌하지 않게 변경
+        for node in ref_nodes:
             if cmds.objectType(node) == "transform":
                 transform_nodes.append(node)
                 

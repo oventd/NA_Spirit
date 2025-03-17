@@ -50,7 +50,6 @@ class StepOpenMaya(ABC):
         
         @abstractmethod
         def validate(self):
-            
             pass
         
         @abstractmethod
