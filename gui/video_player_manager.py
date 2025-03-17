@@ -47,7 +47,9 @@ class VideoPlayer(QLabel):
             qimg = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
 
             # QPixmap으로 변환하여 QLabel에 설정
-            pixmap = QPixmap.fromImage(qimg)
+            pixmap = QPixmap.fromImage(qimg).scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+            
             self.setPixmap(pixmap)
 
         else:
