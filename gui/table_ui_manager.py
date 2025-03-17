@@ -32,6 +32,7 @@ from assetmanager import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
+         
 # from add_video_player import *
 
 from emitter_class import EmitterParent
@@ -87,6 +88,7 @@ class TableUiManager:
 
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.asset_dict = {}
+            self.like_state = LikeState()
 
     def search_input(self, search_word):
         self.search_word = search_word
@@ -299,12 +301,14 @@ class TableUiManager:
 
     def exit_sub_win(self):
         self.ui.stackedWidget.hide()
+        self.ui.depth_label.hide()
         self.update_like_count()
 
     def set_detail_info(self, asset):
         Asset().current = asset
         ui=self.ui
         ui.stackedWidget.show()
+        ui.depth_label.show()
         detail_thum_urls=[]
         
         try:
@@ -376,10 +380,13 @@ class TableUiManager:
 
             
     def toggle_like_icon(self):
+       
+            
         """하트 버튼을 누르는 시그널로 실행
         아이콘 변경 & 딕셔너리에 좋아요한 asset 정보 저장 """
+        
 
-        like_state = LikeState()
+       
         asset = Asset().current
         asset_object_id = str(asset[OBJECT_ID])
   
@@ -388,12 +395,12 @@ class TableUiManager:
     
         current_icon = self.ui.like_btn.icon()
      
-        if current_icon.cacheKey() == like_state.like_icon_empty.cacheKey():  #빈하트 상태일때 
-            self.ui.like_btn.setIcon(like_state.like_icon)
+        if current_icon.cacheKey() == self.like_state.like_icon_empty.cacheKey():  #빈하트 상태일때 
+            self.ui.like_btn.setIcon(self.like_state.like_icon)
             print("여기에요여기~~~"+asset_object_id)
-            like_state.like_asset_list.append(asset_object_id)
+            self.like_state.like_asset_list.append(asset_object_id)
             self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에 추가했습니다\n해당 에셋 정보 : {asset}")
-            DictManager().save_dict_to_json(like_state.like_asset_list)
+            DictManager().save_dict_to_json(self.like_state.like_asset_list)
             
   
             
@@ -413,13 +420,13 @@ class TableUiManager:
                 
         else:  # 채워진 하트 상태일 때 (좋아요 취소)
             print("하트 지워짐")
-            self.ui.like_btn.setIcon(like_state.like_icon_empty)  # 빈 하트로 변경
-            if asset_object_id in like_state.like_asset_list:
-                index = like_state.like_asset_list.index(asset_object_id)
-                remove_asset=like_state.like_asset_list.pop(index)  # 리스트에서 제거
+            self.ui.like_btn.setIcon(self.like_state.like_icon_empty)  # 빈 하트로 변경
+            if asset_object_id in self.like_state.like_asset_list:
+                index = self.like_state.like_asset_list.index(asset_object_id)
+                remove_asset=self.like_state.like_asset_list.pop(index)  # 리스트에서 제거
                 self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에서 삭제했습니다\n해당 에셋 정보 : {remove_asset}")
                 print(f"유저가 {asset[NAME]} 에셋을 관심리스트에서 삭제했습니다\n해당 에셋 정보 : {remove_asset}")
-                DictManager.save_dict_to_json(like_state.like_asset_list)
+                DictManager().save_dict_to_json(self.like_state.like_asset_list)
 
             if LikeState().state == True:
                 print("저 서브바가 열려있을때만 닫혀요")
@@ -430,12 +437,12 @@ class TableUiManager:
           
                 
                 
-        like_state.set_like_icon(asset_object_id, self.ui.like_btn)
+        self.like_state.set_like_icon(asset_object_id, self.ui.like_btn)
 
     def toggle_change(self): 
         """토글 버튼 변경 이벤트 - 내부 위젯도 삭제"""
 
-        # ✅ 기존 위젯 삭제 (내부 요소 포함)
+        #  기존 위젯 삭제 (내부 요소 포함)
         self.clear_layout(self.ui.like_asset_number)
 
         if LikeState().state == False:
@@ -452,7 +459,7 @@ class TableUiManager:
                 self.ui.like_download_btn.show()
                 self.ui.like_download_btn_area.show()
 
-                # ✅ 새로운 DynamicCircleLabel 추가
+                # 새로운 DynamicCircleLabel 추가
                 self.label = DynamicCircleLabel("")
                 self.ui.like_asset_number.addWidget(self.label)  #  새로운 라벨 추가
                 self.update_like_count()
@@ -472,7 +479,7 @@ class TableUiManager:
                 #사용자 pc에 저장해두고 라이크 받을때 마다 오브젝트 id를 json에 저장해두고 
 
     def update_like_count(self):
-        """✅ 기존 라벨을 유지하면서 숫자만 변경"""
+        """ 기존 라벨을 유지하면서 숫자만 변경"""
         like_count = len(LikeState().like_asset_list)
         self.label.setText(str(like_count))  #  기존 라벨의 텍스트만 변경
         self.label.update_size()  #  크기 업데이트 (동적으로 적용)

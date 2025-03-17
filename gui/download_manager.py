@@ -81,6 +81,7 @@ class DownloadManager:
         self.add_list_widget(self.download_list_asset)
 
         self.ui.stackedWidget.show()
+        self.ui.depth_label.show()
         self.ui.stackedWidget.setCurrentIndex(2)
 
       
@@ -98,6 +99,7 @@ class DownloadManager:
         print("하나 다운로드 버튼이 눌렸어요")
 
         self.ui.stackedWidget.show()
+        self.ui.depth_label.show()
         self.ui.stackedWidget.setCurrentIndex(2)
         
        
@@ -111,6 +113,7 @@ class DownloadManager:
 
     def exit_sub_bar_all(self):
         self.ui.stackedWidget.hide()
+        self.ui.depth_label.hide()
         self.ui.stackedWidget.setCurrentIndex(0)
 
         print("저 전으로 돌아갈 건데요")

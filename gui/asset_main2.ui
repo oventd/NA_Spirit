@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1250</width>
-    <height>781</height>
+    <height>780</height>
    </rect>
   </property>
   <property name="palette">
@@ -2201,6 +2201,24 @@ color:#ffffff;
     </property>
     <layout class="QHBoxLayout" name="like_asset_number"/>
    </widget>
+   <widget class="QLabel" name="depth_label">
+    <property name="geometry">
+     <rect>
+      <x>2</x>
+      <y>-42</y>
+      <width>1281</width>
+      <height>831</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+    background-color: rgba(0, 0, 0,160); /* 0~255 기준으로 51은 80% */
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
    <zorder>label</zorder>
    <zorder>comboBox</zorder>
    <zorder>like_download_btn</zorder>
@@ -2212,8 +2230,9 @@ color:#ffffff;
    <zorder>search</zorder>
    <zorder>like_empty_notice</zorder>
    <zorder>horizontalWidget_3</zorder>
-   <zorder>stackedWidget</zorder>
    <zorder>like_download_btn_area</zorder>
+   <zorder>depth_label</zorder>
+   <zorder>stackedWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

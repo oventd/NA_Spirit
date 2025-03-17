@@ -38,13 +38,6 @@ class DictManager:
         except Exception as e:
             print(f"liked_asset 로드 실패: {e}")
             return {}
-    @classmethod
-    def setting_table(cls):
-        asset_id =list(DictManager.load_dict_from_json())
-        for asset in asset_id:
-            asset_info=AssetService.get_asset_by_id(asset)
-            print(asset_info)
+
             
 
-
-DictManager.setting_table()

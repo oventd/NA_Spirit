@@ -123,6 +123,7 @@ class DefaultUiManager:
 
         #사이드 바 기본 설정 
         self.ui.stackedWidget.hide()
+        self.ui.depth_label.hide()
     
         # 사이드 바 안에 이미지 롤링 배너 안 stackedwidget에 속한 위젯 지우기
         self.ui.stackedWidget_2.removeWidget(self.ui.page)
