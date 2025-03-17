@@ -64,7 +64,7 @@ class DownloadPopup(QWidget):
 
         self.ui.download_listwidget.setStyleSheet("""
             QListWidget {
-                background-color: #101011;  /* 리스트의 배경을 투명하게 설정 */
+                background-color: #555555;  /* 리스트의 배경을 투명하게 설정 */
                 color:#ffffff;
             }
 

@@ -141,7 +141,7 @@ class DownloadManager:
 
         self.ui.download_listwidget.setStyleSheet("""
             QListWidget {
-                background-color: #101011;  /* 리스트의 배경을 투명하게 설정 */
+                background-color: #222222;  /* 리스트의 배경을 투명하게 설정 */
                 color:#ffffff;
             }
 
@@ -154,7 +154,7 @@ class DownloadManager:
 
             QListWidget::item:unchecked::indicator {
              
-                border: 0.5px solid #ffffff;  /* 체크박스의 테두리 색상 */
+                border: 0.4px solid #202020;  /* 체크박스의 테두리 색상 */
                 border-radius: 50%;  /* 체크박스를 원형으로 설정 */
                 width: 16px;  /* 체크박스 크기 설정 */
                 height: 24px;
