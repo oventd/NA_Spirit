@@ -10,9 +10,9 @@ from sg_path_utils import SgPathUtils
 class UsdVersionConnector:
 
     @staticmethod
-    def get_root_path(published_version):
-        dir_path = os.path.dirname(published_version)
-        base_name = os.path.basename(published_version)
+    def get_root_path(publish_file_path):
+        dir_path = os.path.dirname(publish_file_path)
+        base_name = os.path.basename(publish_file_path)
         
         name, ext = os.path.splitext(base_name)
         file_name, version = name.split(".") # 파일명과 버전 분리
@@ -22,8 +22,8 @@ class UsdVersionConnector:
     
     @staticmethod
     def connect(publish_file_path):
-        root_path = UsdVersionConnector.get_root_path(published_version)
-        version = SgPathUtils.get_version(published_version)
+        root_path = UsdVersionConnector.get_root_path(publish_file_path)
+        version = SgPathUtils.get_version(publish_file_path)
 
         if not os.path.exists(root_path):
             UsdUtils.create_usd_file(root_path)
@@ -37,15 +37,15 @@ class UsdVersionConnector:
         if not root_scope:
             root_scope = UsdUtils.create_scope(stage, root_prim_path)
 
-        UsdUtils.add_refernce_to_variant_set(root_scope,"version", {version: publish_file_path}, set_default = True)
-
+        UsdUtils.add_reference_to_variant_set(root_scope,"version", {version: publish_file_path}, set_default = True)
+        
         return root_path
 
     
 if __name__ == "__main__":
-    published_version = "/nas/spirit/spirit/assets/Prop/apple/MDL/publish/maya/scene.v001.usd"
+    publish_file_path = "/nas/spirit/spirit/assets/Prop/apple/MDL/publish/maya/scene.v001.usd"
 
-    root_path = UsdVersionConnector.get_root_path(published_version)
+    root_path = UsdVersionConnector.get_root_path(publish_file_path)
     print(root_path)
 
-    print(UsdVersionConnector.connect(published_version))
+    print(UsdVersionConnector.connect(publish_file_path))

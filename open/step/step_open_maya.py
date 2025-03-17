@@ -13,6 +13,7 @@ from usd_version_connector import UsdVersionConnector
 from maya_reference_usd_exporter import MayaReferenceUsdExporter
 from flow_utils import FlowUtils
 from entity_usd_connector import EntityUsdConnector
+from constant import *
 
 class StepOpenMaya(ABC):
     def __init__(self):
@@ -55,7 +56,6 @@ class StepOpenMaya(ABC):
         @abstractmethod
         def publish(session_path: str):
             step = SgPathUtils.get_step_from_path(session_path)
-            category = SgPathUtils.get_category_from_path(session_path)
             
             # 퍼블리시 설정 및 렌더 설정 가져오기
             publish_settings = StepOpenMaya.Publish.get_publish_settings()
@@ -93,7 +93,9 @@ class StepOpenMaya(ABC):
                     if all is True:
                         cmds.select(item)
                         MayaUtils.file_export(usd_export_path,usd_export_options)
+                        print(f"usd_export_path: {usd_export_path}")
                         root_usd_path = UsdVersionConnector.connect(usd_export_path)
+                        print(f"root_usd_path: {root_usd_path}")
                         published_usds[item] = [root_usd_path]
                     # elif all is not True:
                     #     children = cmds.listRelatives(item, type='transform')
@@ -103,8 +105,8 @@ class StepOpenMaya(ABC):
                     #         MayaUtils.file_export(usd_export_path,usd_export_options)
                     #         child_usds.append
             
-
-            EntityUsdConnector(session_path).connect(step, published_usds)
+            print(f"published_usds: {published_usds}")
+            EntityUsdConnector(session_path).connect(published_usds)
             return 
                                             
                          

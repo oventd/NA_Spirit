@@ -18,12 +18,10 @@ from constant import *
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 class OpenManager:
-    def __init__(self, context, session_path:str = None) -> None:
+    def __init__(self, context):
         self.context = context
         self.step = STEP_SHORT_DICT[context.step["name"]]
         dcc_config_path = "/home/rapa/NA_Spirit/open/config/open_step.json"
-        if session_path:
-            self.session_path = session_path
         self.dcc_opens_dict = load_classes_from_json(dcc_config_path)
         self.validate_input()
 
@@ -45,6 +43,6 @@ class OpenManager:
     def validate(self):
         self.open_class.Publish.validate()
     
-    def publish(self):
-        self.open_class.Publish.publish(self.session_path)
+    def publish(self,session_path:str):
+        self.open_class.Publish().publish(session_path)
         
