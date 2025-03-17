@@ -26,7 +26,7 @@ class RiggingStep(StepOpenMaya):
             modeling_file = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
             # MayaUtils.reference_file(modeling_file, "modeling")
             if modeling_file:
-                MayaUtils.reference_file(modeling_file, "modeling")
+                MayaUtils.reference_file(modeling_file, group_name) # 원래 저장될때 리네임 되는건가?
             else:
                 print(f"⚠ Warning: No published file found for Task ID {task_id} with format {file_format}")
    
@@ -83,3 +83,19 @@ if __name__ == "__main__":
 
 if __name__ == "__main__":
     rigging = RiggingStep()
+
+
+
+
+
+ref_nodes = cmds.file("/nas/spirit/project/spirit/assets/Character/Mat/MDL/publish/usd/scene.usd", reference=True, namespace="myAsset", returnNewNodes=True)
+print(ref_nodes)
+transform_nodes =[]
+for ref_node in ref_nodes:
+    if cmds.objectType(ref_node) in ["transform"]:
+        transform_nodes.append(ref_node)
+        
+top_node = transform_nodes[0]
+
+rig_group = cmds.group(name="rig", empty=True)
+cmds.parent(top_node, rig_group)

@@ -60,25 +60,28 @@ class MayaUtils:
         :param file_path: 참조할 파일의 경로
         :param group_name: 참조할 그룹의 이름
         """
-        if os.path.exists(file_path):
-            cmds.file(file_path, reference=True)
-            print(f"The {group_name} file '{file_path}' was referenced.")
-            
-            # 그룹 내의 모든 오브젝트를 찾기
-            # cmds.ls()는 부모를 기준으로 하여 오브젝트를 반환
-            objects = cmds.ls(group=group_name, long=True)  # 이 줄을 제거하고 다음과 같이 수정
-            if not objects:
-                # 'parent' 플래그를 사용하여 오브젝트 찾기
-                objects = cmds.listRelatives(group_name, children=True, type="transform")
-            
-            if objects:
-                return objects  # 객체 이름들의 리스트를 리턴
-            else:
-                print(f"No objects found in the group '{group_name}'.")
-                return []
-        else:
-            print(f"The {group_name} file '{file_path}' was not found.")
+        if not os.path.exists(file_path):
+            print(f"[ERROR] The {group_name} file '{file_path}' was not found.")
             return []
+
+        # 파일 참조 (Maya에서 실행)
+        ref_node = cmds.file(file_path, reference=True, returnNewNodes=True)
+        ref_nodes = cmds.referenceQuery(file_path, nodes=True)
+        print(f"[INFO] The {group_name} file '{file_path}' was referenced.")
+
+        if not ref_nodes:
+            print(f"[WARNING] No reference nodes found for file '{file_path}'.")
+            return []
+        
+    # 그룹이 존재하는지 확인
+        if not cmds.objExists(group_name):
+            print(f"[ERROR] Group '{group_name}' does not exist in the scene.")
+            cmds.group(empty=True, name=group_name)
+
+        for node in ref_nodes:
+            if cmds.objectType(node) in ["transform", "mesh", "joint"]:  # 필요한 타입만 이동
+                cmds.parent(node, group_name)
+        return 
         
     @staticmethod
     def lock_transform(object_names):
