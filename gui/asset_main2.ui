@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1250</width>
-    <height>795</height>
+    <height>804</height>
    </rect>
   </property>
   <property name="palette">
@@ -390,7 +390,7 @@
       <x>280</x>
       <y>130</y>
       <width>971</width>
-      <height>651</height>
+      <height>681</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -1238,7 +1238,7 @@ color:#ffffff;
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>522</y>
+        <y>526</y>
         <width>341</width>
         <height>31</height>
        </rect>
@@ -1329,7 +1329,7 @@ color:#ffffff;
       <property name="geometry">
        <rect>
         <x>29</x>
-        <y>568</y>
+        <y>575</y>
         <width>321</width>
         <height>132</height>
        </rect>
@@ -1440,7 +1440,7 @@ color:#ffffff;
       <property name="geometry">
        <rect>
         <x>6</x>
-        <y>718</y>
+        <y>730</y>
         <width>371</width>
         <height>81</height>
        </rect>
@@ -1487,7 +1487,7 @@ color:#ffffff;
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>725</y>
+        <y>730</y>
         <width>320</width>
         <height>52</height>
        </rect>
@@ -2206,7 +2206,7 @@ color:#ffffff;
       <x>2</x>
       <y>-42</y>
       <width>1281</width>
-      <height>831</height>
+      <height>851</height>
      </rect>
     </property>
     <property name="styleSheet">
