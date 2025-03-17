@@ -9,7 +9,7 @@
     "MMV": {
       "camera": {
         "all": true,
-        "isReferenced": true,
+        "isReferenced": false,
         "maya":true
       },
       "asset": {
