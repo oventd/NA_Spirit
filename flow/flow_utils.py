@@ -1,32 +1,28 @@
 from shotgun_api3 import Shotgun
 import os
+import sys
+sys.path.append('/home/rapa/NA_Spirit/utils')
+from constant import SERVER_PATH, SCRIPT_NAME, API_KEY
 
 class FlowUtils:
-
-    
-    SERVER_PATH = 'https://5thacademy.shotgrid.autodesk.com'
-    SCRIPT_NAME = 'nayeon_key'
-    API_KEY = 'h0mvmfnhuochunhzpgR~zlpur'
 
     sg = Shotgun(SERVER_PATH, SCRIPT_NAME, API_KEY)
     
     @classmethod
-    def upload_undistorted(cls,shot_id, height, width):    
+    def upload_undistorted(cls,shot_id, width, height):    
     
 
         # 업데이트할 데이터
         data = {
-            'sg_undistorted_height': f"{height}",
-            'sg_undistorted_width': f"{width}"
+            'sg_undistorted_width': f"{width}",
+            'sg_undistorted_height': f"{height}"
         }
 
         # Shot 엔터티의 특정 필드 업데이트
         updated_shot = cls.sg.update('Shot', shot_id, data)
 
         # 결과 출력
-        print(f"Updated Shot ID: {updated_shot['id']}, sg_undistorted_height: {updated_shot.get('sg_undistorted_height')}, sg_undistorted_width: {updated_shot.get('sg_undistorted_width')}")
-
-
+        print(f"Updated Shot ID: {updated_shot['id']}, sg_undistorted_width: {updated_shot.get('sg_undistorted_width')}, sg_undistorted_height: {updated_shot.get('sg_undistorted_height')}")
 
 
     @classmethod
@@ -126,12 +122,14 @@ class FlowUtils:
 
     @classmethod
     def get_cut_in_out(cls,SHOT_ID): 
-        current_steps = cls.sg.find(
+        result = cls.sg.find(
                 "Shot",
                 [["id", "is",SHOT_ID]],
                 ["sg_cut_in", "sg_cut_out"]
-            )
-        return current_steps
+            )[0]
+        return result["sg_cut_in"],result["sg_cut_out"]
+
+
 
     @classmethod
     def get_upstream_tasks(cls, task_id):

@@ -82,6 +82,18 @@ ANM = 'ANM' # Animation
 LGT = 'LGT' # Light
 CMP = 'CMP' # Compositing
 
+
+#Shotgrid Project 상수
+SERVER_PATH = 'https://5thacademy.shotgrid.autodesk.com'
+SCRIPT_NAME = 'nayeon_key'
+API_KEY = 'h0mvmfnhuochunhzpgR~zlpur'
+
+
+#Shotgrid Project 상수
+SERVER_PATH = 'https://5thacademy.shotgrid.autodesk.com'
+SCRIPT_NAME = 'nayeon_key'
+API_KEY = 'h0mvmfnhuochunhzpgR~zlpur'
+
 STEP_SHORT_DICT = {
     MODELING: MDL,
     RIGGING: RIG,
