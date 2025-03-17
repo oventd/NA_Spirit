@@ -45,7 +45,6 @@ class DownloadManager:
             self.exemples = []
             self.download_list_asset ={}
             self.like_state = LikeState()
-            # 싱글톤 인스턴스 생성
            
         
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
