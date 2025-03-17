@@ -65,23 +65,19 @@ class MayaUtils:
             return []
 
         # 파일 참조 (Maya에서 실행)
-        ref_node = cmds.file(file_path, reference=True, returnNewNodes=True)
-        ref_nodes = cmds.referenceQuery(file_path, nodes=True)
-        print(f"[INFO] The {group_name} file '{file_path}' was referenced.")
+        ref_nodes = cmds.file(file_path, reference=True, namespace=name_space, returnNewNodes=True)
 
-        if not ref_nodes:
-            print(f"[WARNING] No reference nodes found for file '{file_path}'.")
-            return []
-        
-    # 그룹이 존재하는지 확인
-        if not cmds.objExists(group_name):
-            print(f"[ERROR] Group '{group_name}' does not exist in the scene.")
-            cmds.group(empty=True, name=group_name)
+        transform_nodes = []
+        for node in ref_nodes:  # 변수명을 충돌하지 않게 변경
+            if cmds.objectType(node) == "transform":
+                transform_nodes.append(node)
+                
+        if transform_nodes:
+            top_node = transform_nodes[0]
+            rig_group = cmds.group(name=group_name, empty=True)
+            cmds.parent(top_node, rig_group)
 
-        for node in ref_nodes:
-            if cmds.objectType(node) in ["transform", "mesh", "joint"]:  # 필요한 타입만 이동
-                cmds.parent(node, group_name)
-        return 
+        return transform_nodes
         
     @staticmethod
     def lock_transform(object_names):
