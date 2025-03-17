@@ -63,7 +63,8 @@ class DownloadManager:
     
     def download_likged_assets_all(self):
         print("전체 다운로드 버튼이 눌렸어요")
-  
+        self.ui.download_touch_area.clicked.disconnect()
+        
         self.ui.download_format_touch_area.clicked.connect(self.set_download_format_all)
         self.ui.download_touch_area.clicked.connect(self.download_all)
         self.ui.exit_btn_2.clicked.connect(self.exit_sub_bar_all)
@@ -148,29 +149,21 @@ class DownloadManager:
 
             
     def download_all(self):
-        
-        download_fix_list=self.get_checked_items(self.ui.download_listwidget)
-        info=self.find_id(download_fix_list)
-        print(info)
+        for i in range(self.ui.download_listwidget.count()):
+            item = self.ui.download_listwidget.item(i)
+            print(f"아이템: {item.text()}, 체크 상태: {item.checkState()}")
+        download_fix_list=[self.ui.download_listwidget.item(i).text() for i in range(self.ui.download_listwidget.count()) if self.ui.download_listwidget.item(i).checkState() == Qt.Checked]
+        selected_ids_list = [self.download_list_asset[name] for name in download_fix_list if name in self.download_list_asset]
+
+        #다운로드 에셋에 다운로드 fix 리스트가 있다면 반환 및 리스트 벨류만 추가 
+
+
         if self.setDownloadFormat == False:
-            print(f"{download_fix_list}이 레퍼런스로 다운로드되었습니다")
+            print(f"{selected_ids_list}이 레퍼런스로 다운로드되었습니다")
         else:  
-            print(f"{download_fix_list}에셋이 임포트로 다운되었습니다")
+            print(f"{selected_ids_list}에셋이 임포트로 다운되었습니다")
 
-    def find_id(self, download_list_name):
-        download_dict = {}
-        for name in download_list_name:
-            for item in self.exemples:  # dict 대신 item 사용
-                if name in item:  # 키 비교
-                    id_value = item[name]  # 올바른 값 가져오기
-                    download_dict[id_value] = name  # id를 키로 저장
-        return download_dict  # 루프가 끝난 후 반환
-
-
-    def get_checked_items(self, list_widget):
-        return [list_widget.item(i).text() for i in range(list_widget.count()) if list_widget.item(i).checkState() == Qt.Checked]
-
-
+    
 
     def on_button_click(self):
         # 버튼 클릭 시 입력된 값을 MainWindow로 전달하는 시그널 발생
