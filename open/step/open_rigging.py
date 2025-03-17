@@ -85,17 +85,20 @@ if __name__ == "__main__":
     rigging = RiggingStep()
 
 
+    file_path = "/nas/spirit/project/spirit/assets/Character/Mat/MDL/publish/usd/scene.usd"
+    asset_name = os.path.basename(SgPathUtils.trim_entity_path(file_path))
+    step = SgPathUtils.get_step_from_path(file_path)
+    name_space = f"{asset_name}_{step}"
+    print(name_space)
 
+    ref_nodes = cmds.file("/nas/spirit/project/spirit/assets/Character/Mat/MDL/publish/usd/scene.usd", reference=True, namespace=name_space, returnNewNodes=True)
+    print(ref_nodes)
+    transform_nodes =[]
+    for ref_node in ref_nodes:
+        if cmds.objectType(ref_node) in ["transform"]:
+            transform_nodes.append(ref_node)
+            
+    top_node = transform_nodes[0]
 
-
-ref_nodes = cmds.file("/nas/spirit/project/spirit/assets/Character/Mat/MDL/publish/usd/scene.usd", reference=True, namespace="myAsset", returnNewNodes=True)
-print(ref_nodes)
-transform_nodes =[]
-for ref_node in ref_nodes:
-    if cmds.objectType(ref_node) in ["transform"]:
-        transform_nodes.append(ref_node)
-        
-top_node = transform_nodes[0]
-
-rig_group = cmds.group(name="rig", empty=True)
-cmds.parent(top_node, rig_group)
+    rig_group = cmds.group(name="rig", empty=True)
+    cmds.parent(top_node, rig_group)
