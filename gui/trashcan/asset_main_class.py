@@ -172,15 +172,15 @@ class MainUi(QMainWindow):
         #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
         if option == "오래된 순":
             print(f"오래된 순의 필터임 :{self.check_dict}")
-            self.update_table(self.check_dict,UPDATED_AT, 40, 0,None)
+            self.update_table(self.check_dict,UPDATED_AT, 0, 0,None)
 
         elif option =="다운로드 순":
             print("다운로드된 순서를 정렬할게요")
-            self.update_table(self.check_dict,DOWNLOADS, 40, 0,None)
+            self.update_table(self.check_dict,DOWNLOADS, 0, 0,None)
 
         else:
             print("최신 순서를 정렬할게요")
-            self.update_table(self.check_dict,CREATED_AT, 40, 0, None)
+            self.update_table(self.check_dict,CREATED_AT, 0, 0, None)
 
     def toggle_change(self): 
 
@@ -212,7 +212,7 @@ class MainUi(QMainWindow):
                 self.like_active = False
                 self.ui.like_empty_notice.hide()
                 self.ui.tableWidget.clear()
-                self.update_table(self.check_dict,UPDATED_AT, 40, 0,None)
+                self.update_table(self.check_dict,UPDATED_AT, 0, 0,None)
                 #사용자 pc에 저장해두고 라이크 받을때 마다 오브젝트 id를 json에 저장해두고 
 
 
