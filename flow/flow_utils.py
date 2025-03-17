@@ -10,6 +10,24 @@ class FlowUtils:
 
     sg = Shotgun(SERVER_PATH, SCRIPT_NAME, API_KEY)
     
+    @classmethod
+    def upload_undistorted(cls,shot_id, height, width):    
+    
+
+        # 업데이트할 데이터
+        data = {
+            'sg_undistorted_height': f"{height}",
+            'sg_undistorted_width': f"{width}"
+        }
+
+        # Shot 엔터티의 특정 필드 업데이트
+        updated_shot = cls.sg.update('Shot', shot_id, data)
+
+        # 결과 출력
+        print(f"Updated Shot ID: {updated_shot['id']}, sg_undistorted_height: {updated_shot.get('sg_undistorted_height')}, sg_undistorted_width: {updated_shot.get('sg_undistorted_width')}")
+
+
+
 
     @classmethod
     def get_project_id_by_name(cls, project_name):  # 정상 작동
@@ -294,7 +312,9 @@ class FlowUtils:
 
 if __name__ == "__main__":
     #아래 코드는 예시에용 업스트림 같은 파일 형식의 파일의 path를 가져오는 예시
-    upstream_file_path=FlowUtils.get_upstream_file_for_currnet_file(6183,".ma")
-    print(upstream_file_path)
+    # upstream_file_path=FlowUtils.get_upstream_file_for_currnet_file(6183,".ma")
+    # print(upstream_file_path)
+
+    FlowUtils.upload_undistorted(1240, 1932, 1090)
 
 
