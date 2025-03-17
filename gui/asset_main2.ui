@@ -544,6 +544,11 @@ color:#A2A2A2;</string>
       <height>31</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Pretendard Variable</family>
+     </font>
+    </property>
     <property name="styleSheet">
      <string notr="true">QComboBox {
     background: #000000;
@@ -565,6 +570,9 @@ QComboBox QAbstractItemView {
     </property>
     <property name="currentText">
      <string>최신순</string>
+    </property>
+    <property name="frame">
+     <bool>true</bool>
     </property>
     <item>
      <property name="text">
@@ -651,7 +659,7 @@ color:#ffffff;
      </property>
      <property name="font">
       <font>
-       <family>Pretendard</family>
+       <family>Pretendard Light</family>
       </font>
      </property>
      <property name="flags">
@@ -663,7 +671,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -674,7 +682,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -685,7 +693,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -696,7 +704,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -708,7 +716,7 @@ color:#ffffff;
      </property>
      <property name="font">
       <font>
-       <family>Pretendard Variable</family>
+       <family>Pretendard Light</family>
       </font>
      </property>
      <property name="flags">
@@ -720,7 +728,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -731,7 +739,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -742,7 +750,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -753,7 +761,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -764,7 +772,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -775,7 +783,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -786,7 +794,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -798,7 +806,7 @@ color:#ffffff;
      </property>
      <property name="font">
       <font>
-       <family>Pretendard Variable</family>
+       <family>Pretendard Light</family>
       </font>
      </property>
      <property name="flags">
@@ -810,7 +818,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -821,7 +829,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -832,7 +840,7 @@ color:#ffffff;
       </property>
       <property name="font">
        <font>
-        <family>Pretendard Variable</family>
+        <family>Pretendard Thin</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -885,7 +893,7 @@ color:#ffffff;
     </property>
     <property name="font">
      <font>
-      <family>Pretendard</family>
+      <family>Pretendard Variable</family>
      </font>
     </property>
     <property name="layoutDirection">

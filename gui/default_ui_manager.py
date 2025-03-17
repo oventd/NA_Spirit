@@ -82,7 +82,24 @@ class DefaultUiManager:
         self.ui.like_download_btn.hide()
         self.ui.like_download_btn_area.hide()
         self.sub_bar = False
+        self.ui.comboBox.setStyleSheet("""
+            QComboBox {
+                background-color: #121212;
+                color: white;
+                border: 1px solid #303030;
+                border-radius: 8px; 
+            }
+                        
         
+
+            QComboBox QAbstractItemView {
+                background-color: black;  /* ✅ 드롭다운 배경을 검은색으로 설정 */
+                color: #707070;  /* ✅ 글씨 색을 흰색으로 설정 */
+                selection-background-color: gray;  /* ✅ 선택된 항목의 배경을 회색으로 설정 */
+                selection-color: white;  /* ✅ 선택된 항목의 글씨 색 */
+                border: 1px solid #303030;;
+            }
+        """)
         self.user_num()
         
         TreeUiManager.tree_widget()
