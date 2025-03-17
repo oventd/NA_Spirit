@@ -47,6 +47,7 @@ from json_manager import DictManager
 from bson import ObjectId
 from ui_loader import UILoader   
 
+
 class TableUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -73,12 +74,14 @@ class TableUiManager:
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
             self.ui.search.textEdited.connect(self.search_input)
             download_manager=DownloadManager()
+            self.asset_manager = Asset()
+
             
 
 # 버튼 이벤트 연결 (추가 인자 없이 호출)
             self.ui.like_download_btn_area.clicked.connect(download_manager.download_likged_assets_all)
             
-            self.ui.download_btn.clicked.connect(partial(download_manager.download_likged_assets,))
+            self.ui.download_btn.clicked.connect(download_manager.download_likged_assets)
 
             self.logger = create_logger(UX_Like_ASSET_LOGGER_NAME, UX_Like_ASSET_LOGGER_DIR)
 
@@ -201,7 +204,7 @@ class TableUiManager:
             
         assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip,search_word)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
         # print(f"여기에 테이블위젯 구정하는 assets 들어있어요 <<>>>>>>{assets}")
-
+        
         self.ui.tableWidget.clear()
         self.make_table(assets)
 

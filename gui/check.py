@@ -1,4 +1,3 @@
-
 class Check:
     _instance = None  # 싱글톤 인스턴스 저장
 
@@ -10,21 +9,22 @@ class Check:
     def __init__(self):
         if hasattr(self, "_initialized"):  # 중복 초기화를 방지
             return
-        self._dict = {}
-        self._checked_items = []
-        self._initialized = True
+        self._dict = {}  # 내부에서 사용할 딕셔너리
+        self._checked_items = []  # 내부에서 사용할 리스트
+        self._initialized = True  # 초기화 완료 체크
+
     @property
     def dict(self):
-        return self._dict  # _state 값을 반환
+        return self._dict  # self._dict 반환 (정상)
 
     @dict.setter
     def dict(self, value):
-        self._dict = value  # _state 값을 변경
+        self._dict = value  # self._dict 값 변경 (정상)
 
     @property
     def checked_items(self):
-        return self._dict  # _state 값을 반환
+        return self._checked_items  #버그 수정! 올바르게 self._checked_items 반환
 
     @checked_items.setter
     def checked_items(self, value):
-        self._checked_items = value  # _state 값을 변경
+        self._checked_items = value  #  self._checked_items 값 변경 (정상)
