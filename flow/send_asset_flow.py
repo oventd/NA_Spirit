@@ -9,10 +9,9 @@ from constant import SERVER_PATH, SCRIPT_NAME, API_KEY
 
 VALID_ASSET_TYPES = {
 
-    "Architecture": "Model",
-    "3D Model" :    "Model",
+    "Architecture": "Prop",
+    "Vehicle" :    "Prop",
 
-#없는 애들은 prop으로 설정
 }
 
 

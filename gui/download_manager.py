@@ -161,27 +161,36 @@ class DownloadManager:
 
             
     def download_all(self):
-        
-     
+        """
+        체크된 아이템을 기준으로 다운로드 또는 임포트 수행
+        """
+
+        # 체크된 아이템 리스트 추출
+        download_fix_list = []
         for i in range(self.ui.download_listwidget.count()):
             item = self.ui.download_listwidget.item(i)
-            print(f"아이템: {item.text()}, 체크 상태: {item.checkState()}")
-        download_fix_list=[self.ui.download_listwidget.item(i).text() for i in range(self.ui.download_listwidget.count()) if self.ui.download_listwidget.item(i).checkState() == Qt.Checked]
+            if item.checkState() == Qt.Checked:
+                download_fix_list.append(item.text())
+
+        # 체크된 아이템에 대응하는 ID 리스트 추출
         selected_ids_list = [self.download_list_asset[name] for name in download_fix_list if name in self.download_list_asset]
 
-        #다운로드 에셋에 다운로드 fix 리스트가 있다면 반환 및 리스트 벨류만 추가 
-        print(f"다운로드 픽스 리스트{download_fix_list}")
-        print(f"셀렉트 아이디 리스트{selected_ids_list}")
+        # 리스트 출력
+        print(f"다운로드 픽스 리스트: {download_fix_list}")
+        print(f"셀렉트 아이디 리스트: {selected_ids_list}")
 
-        if self.setDownloadFormat == False:
-            print(f"{selected_ids_list}이 레퍼런스로 다운로드되었습니다")
-           
-        else:  
-            print(f"{selected_ids_list}에셋이 임포트로 다운되었습니다")
-            self.sender.redata_for_flow(selected_ids_list) 
+        # 아무것도 체크되지 않았으면 함수 종료
+        if not selected_ids_list:
+            print("체크된 항목이 없어 다운로드를 수행하지 않습니다.")
+            return
 
-
-    
+        # 다운로드 방식에 따라 다르게 처리
+        if not self.setDownloadFormat:
+            print(f"{selected_ids_list}이(가) 레퍼런스로 다운로드되었습니다")
+        else:
+            print(f"{selected_ids_list} 에셋이 임포트로 다운로드되었습니다")
+            self.sender.redata_for_flow(selected_ids_list)
+        
 
     def on_button_click(self):
         # 버튼 클릭 시 입력된 값을 MainWindow로 전달하는 시그널 발생
