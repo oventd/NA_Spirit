@@ -4,11 +4,12 @@ import sys
 import shutil
 
 sys.path.append('/home/rapa/NA_Spirit/utils')
+sys.path.append('/home/rapa/NA_Spirit/DB/lib')
 
 
 from sg_path_utils import SgPathUtils
 from flow_utils import FlowUtils
-# from db_crud import AssetDb
+from db_crud import AssetDb
 
 
 class ShotGridAssetManager:
@@ -51,23 +52,14 @@ class ShotGridAssetManager:
 
         asset_info = {
             "name": asset_name,
-            "description": "",
             "asset_type": "3D Model",
             "category": category,
             "style": "realistic",
-            "resolution": "",
-            "file_format": "",
-            "size": "",
-            "license_type": "",
             "creator_id": self.context.user["id"],
             "creator_name": self.context.user["name"],
-            "downloads": "",
-            "created_at": "",
-            "updated_at": "",
             "preview_url": self.thumbnail_url if self.thumbnail_url else "",  # 썸네일 URL 추가
-            "image_url": "",
             "source_url": self.destination_path,
-            "video_url": "",
+            "video_url": "to be added",
             "project_name": self.context.project["name"]
         }
 
@@ -123,7 +115,7 @@ class ShotGridAssetManager:
         특정 에셋의 썸네일 URL을 가져오는 메서드.
         """
         try:
-            asset_id = FlowUtils.get_asset_id(self.context.project["name"], asset_name)
+            asset_id = FlowUtils.get_asset_id(self.context.project["id"], asset_name)
            
             # FlowUtils에서 썸네일 다운로드
             FlowUtils.get_thumnail(asset_id, thumbnail_url)
@@ -149,11 +141,11 @@ class ShotGridAssetManager:
 
         self.copy_folder(asset_dir, self.destination_path)
 
-        # try:
-        #     # AssetDb().upsert_data(asset_info)
-        #     print(f"에셋 정보:\n{asset_info}")
-        # except Exception as e:
-        #     print(f"데이터베이스 업로드 실패: {e}")
+        try:
+            AssetDb().upsert_asset(asset_info)
+            print(f"에셋 정보:\n{asset_info}")
+        except Exception as e:
+            print(f"데이터베이스 업로드 실패: {e}")
 
 
 # 사용 예시
