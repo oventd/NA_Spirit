@@ -21,7 +21,7 @@ class LoadManager:
         self._root_path = root_path
         self.types = ["assets", "sequences"]
         self.default_file = "scene"
-        print(dcc_config_path)
+        dcc_config_path = "/home/rapa/NA_Spirit/load/manager/work_file_creators.json"
         self.dcc_creators = load_classes_from_json(dcc_config_path)
 
     @property
@@ -179,7 +179,7 @@ class LoadManager:
 if __name__ == "__main__":
 
     # 예: dcc_config.json 파일의 경로를 지정합니다.
-    dcc_config_path = "/home/rapa/NA_Spirit/load/manager/work_file_creators.json"
+
     lm = LoadManager("/nas/sam/show/test", dcc_config_path)
     library_asset_path = "/home/rapa/Kitchen_set/assets/Chair/Chair.usd"
     entity_info = {
