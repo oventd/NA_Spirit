@@ -4,7 +4,7 @@ from bson import ObjectId  # MongoDB에서 사용하는 ObjectId를 처리하는
 import pymongo  # MongoDB 작업을 위한 라이브러리
 
 # MongoDB 연결
-client = pymongo.MongoClient("mongodb://localhost:27017")  # 로컬 MongoDB 서버에 연결
+client = pymongo.MongoClient("mongodb://192.168.5.10:27017")  # 로컬 MongoDB 서버에 연결
 db = client["spiritDatabase"]  # 사용할 데이터베이스 'filter_test'에 연결
 asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 
@@ -275,21 +275,25 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 # delete_refactory_data()
 
 def cart_refactory_data():
-    # asset_collection에서 "Texture" 타입의 자산을 가져오기
-    for asset in enumerate(asset_collection.find({"category": "Props"})):
+    category = "Prop"
 
-        category = "Prop"
-
-        update_data = {
-            "$set": {
-                "categories": category
-            }
+    update_data = {
+        "$set": {
+            "category": category  # ✅ 기존 category 값을 업데이트
         }
-        asset_collection.update_one(
-            update_data
-        )
+    }
+
+    result = asset_collection.update_many(
+        {"category": "Props"},  # ✅ "Props"인 문서 찾기
+        update_data
+    )
+
+    print(f"업데이트된 문서 수: {result.modified_count}")  # ✅ 변경된 문서 개수 출력
 
 cart_refactory_data()
+
+
+
         
 
 

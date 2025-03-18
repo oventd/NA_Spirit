@@ -74,6 +74,12 @@ class DbCrud:
         pipeline = []
         projection = {}
 
+        default_sort_orders = {
+            CREATED_AT: (UPDATED_AT, pymongo.DESCENDING),  # 최신순
+            UPDATED_AT: (UPDATED_AT, pymongo.ASCENDING),  # 오래된순
+            DOWNLOADS: (DOWNLOADS, pymongo.DESCENDING),    # 다운로드 많은 순
+        }                   
+
         if limit:
             pipeline.append({"$limit": limit})
         if skip:
@@ -85,11 +91,7 @@ class DbCrud:
                     query_filter[key] = {"$in": value}
                 else:
                     query_filter[key] = value
-
-        if user_query is not None:
-            query_filter["$text"] = {"$search": user_query}
-            projection["score"]= {"$meta": "textScore"}
-            
+          
         if fields:
             for field in fields:
                 if field.startswith("$"):  # 필드명이 `$`로 시작하면 오류 발생 가능성 있음
@@ -99,29 +101,28 @@ class DbCrud:
             pipeline.append({"$project": projection})       
 
         pipeline.insert(0,{"$match": query_filter})
-
         
         # 검색 기능 sort_by
         sort_conditions = {}
+
         if user_query is not None:
-            sort_conditions["score"] = -1  # 검색 점수 기준 정렬
-            default_sort_search = {
-                CREATED_AT: (UPDATED_AT, pymongo.DESCENDING),  # 최신순
-                UPDATED_AT: (UPDATED_AT, pymongo.ASCENDING),  # 오래된순
-                DOWNLOADS: (DOWNLOADS, pymongo.DESCENDING),    # 다운로드 많은 순
-            }
-            sort_by, sort_order = default_sort_search.get(sort_by, (sort_by, pymongo.ASCENDING))
-            if sort_by:  # 정렬 기준이 있을 경우 추가
-                sort_conditions[sort_by] = sort_order
-            pipeline.append({"$sort": sort_conditions})  # 정렬 적용
+            query_filter["$text"] = {"$search": user_query}
+            projection["score"]= {"$meta": "textScore"}
             
+        if user_query is not None:
+            query_filter["$text"] = {"$search": user_query}  # 텍스트 검색 조건 설정
+            projection["score"] = {"$meta": "textScore"}  # 검색 점수 포함 (이미 추가됨)
+
+            sort_conditions = {"textScore": -1}  # 검색 점수 우선 정렬
+
+            if sort_by in default_sort_orders:
+                sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, pymongo.ASCENDING))
+                sort_conditions[sort_by] = sort_order
+
+            pipeline.append({"$sort": sort_conditions})  # 정렬 적용
+
         # 이외기능의 sort_by
         elif sort_by:
-            default_sort_orders = {
-                CREATED_AT: (UPDATED_AT, pymongo.DESCENDING),  # 최신순
-                UPDATED_AT: (UPDATED_AT, pymongo.ASCENDING),  # 오래된순
-                DOWNLOADS: (DOWNLOADS, pymongo.DESCENDING),    # 다운로드 많은 순
-            }
             sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, pymongo.ASCENDING))  # 기본값 오름차순
             pipeline.append({"$sort": {sort_by: sort_order}})
             print(f"기본 정렬 기준 적용: {sort_by}, {sort_order}")
@@ -129,7 +130,7 @@ class DbCrud:
         self.logger.debug(f"Generated Query Pipeline: {pipeline}")  # 디버깅을 위한 로깅
         print(pipeline)
         return pipeline
-    
+
     # Read(데이터 조회)
     def find(self, filter_conditions=None, sort_by=None, sort_order=None, limit=0, skip=0, fields=None):
         """
