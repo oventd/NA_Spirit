@@ -18,6 +18,8 @@ def get_usd_preview_surface_assignments():
             if cmds.nodeType(material) == "usdPreviewSurface":
                 # 해당 머티리얼이 적용된 지오메트리 찾기
                 objects = cmds.sets(sg, query=True) or []
+                
+                # 기존에 같은 쉐이더가 있으면 리스트에 추가 (덮어쓰기 방지)
                 if material in usd_preview_dict:
                     usd_preview_dict[material].extend(objects)
                 else:
