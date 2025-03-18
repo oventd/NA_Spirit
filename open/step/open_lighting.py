@@ -14,11 +14,9 @@ class LightingStep(StepOpenMaya):
         print("Opening lighting step")
         self.env_usd = env_usd
 
-    class Open:
+    class Open(StepOpenMaya.Open):
         @staticmethod
         def setup(group_name="light", task_id=None, file_format=None):
-            print("Opening lighting step")
-
             # 라이트 그룹 생성
             group_name = MayaUtils.create_group(group_name)
 
@@ -38,7 +36,11 @@ class LightingStep(StepOpenMaya):
             # cmds.mayaUsdLayerEditorWindow()
             # print("Opened USD Layer Editor")
 
-    class Publish:
+        @staticmethod    
+        def reference(self):
+            pass
+
+    class Publish(StepOpenMaya.Publish):
         @staticmethod
         def validate():
             print("Validating Lighting setup...")
@@ -49,7 +51,7 @@ class LightingStep(StepOpenMaya):
         def publish(session_path: str,context ):
             """ 특정 그룹을 USD와 MB 파일로 export """
             StepOpenMaya.Publish.publish(session_path,context)
-            
+
 if __name__ == "__main__":
     env_usd = "/home/rapa/3D_usd/Kitchen_set/assets/WallOrange/WallOrange.usd"
 

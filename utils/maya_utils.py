@@ -56,7 +56,7 @@ class MayaUtils:
         return camera_name
 
     @staticmethod
-    def reference_file(file_path, group_name, name_space):
+    def reference_file(file_path, group_name, name_space, use_namespace=True):
         """
         특정 파일이 존재하면 해당 파일을 Maya에 참조하는 함수.
         :param file_path: 참조할 파일의 경로
@@ -65,9 +65,11 @@ class MayaUtils:
         if not os.path.exists(file_path):
             print(f"[ERROR] The {group_name} file '{file_path}' was not found.")
             return []
+        
+        namespace_arg = name_space if use_namespace else ""
 
         # 파일 참조 (Maya에서 실행)
-        ref_nodes = cmds.file(file_path, reference=True, namespace=name_space, returnNewNodes=True)
+        ref_nodes = cmds.file(file_path, reference=True, namespace=namespace_arg, returnNewNodes=True)
 
         transform_nodes = []
         for node in ref_nodes:

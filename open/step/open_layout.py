@@ -15,41 +15,36 @@ class LayoutStep(StepOpenMaya):
         super().__init__()
         print ("layout initialized")
 
-    class Open:
+    class Open(StepOpenMaya.Open):
         @staticmethod
-        def setup(asset_group_name="asset", camera_group_name="camera", rig_group_name="rig", 
-                matchmove_camera="matchmove_camera", matchmove_env="matchmove_env", task_id=None, file_format=None):
+        def setup(asset_group_name="asset", camera_group_name="camera", task_id=None, file_format=".ma"):
             
             asset_group_name = MayaUtils.create_group(asset_group_name)  # "asset"
             camera_group_name = MayaUtils.create_group(camera_group_name)  # "camera"
 
-            def reference(group_name, task_id, file_format):
-                """
-                주어진 그룹을 생성하고, 해당 그룹에 필요한 파일을 참조하는 함수.
-                """
-                file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
+            LayoutStep.Open.reference(asset_group_name, task_id, file_format)
+            LayoutStep.Open.reference(camera_group_name, task_id, file_format)
 
-                if not file_path or not os.path.exists(file_path):
-                    cmds.warning(f"[WARNING] No valid upstream file found for {group_name} ({file_path})")
-                    return None
+        @staticmethod 
+        def reference(group_name, task_id=None, file_format=".ma", use_namespace=False):
+            """
+            주어진 그룹을 생성하고, 해당 그룹에 필요한 파일을 참조하는 함수.
+            """
+            file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
 
-                asset_name, _ = SgPathUtils.trim_entity_path(file_path)
-                asset_name = os.path.basename(asset_name)
-                step = SgPathUtils.get_step_from_path(file_path)
-                name_space = f"{asset_name}_{step}"
+            if not file_path or not os.path.exists(file_path):
+                cmds.warning(f"[WARNING] No valid upstream file found for {group_name} ({file_path})")
+                return None
 
-                MayaUtils.reference_file(file_path, group_name, name_space)
-                return group_name
-            
-            # reference에 전달
-            reference(asset_group_name, task_id, file_format)
-            reference(camera_group_name, task_id, file_format)
-            reference(rig_group_name, task_id, file_format)
+            asset_name, _ = SgPathUtils.trim_entity_path(file_path)
+            asset_name = os.path.basename(asset_name)
+            step = SgPathUtils.get_step_from_path(file_path)
+            name_space = f"{asset_name}_{step}"
 
-            reference(matchmove_camera, task_id, file_format)
-            reference(matchmove_env, task_id, file_format)
+            MayaUtils.reference_file(file_path, group_name, name_space, use_namespace=use_namespace)
+            return group_name
 
-    class Publish:
+    class Publish(StepOpenMaya.Publish):
         @staticmethod
         def validate(rig_group_name = "rig", asset_group_name="asset", camera_group_name="camera"):
             

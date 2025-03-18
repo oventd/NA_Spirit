@@ -14,13 +14,16 @@ class ModelingStep(StepOpenMaya):
         super().__init__()
         print ("Opening modeling step")
 
-    class Open:
+    class Open(StepOpenMaya.Open):
         @staticmethod
         def setup(geo_group_name="geo", task_id=None, file_format=None):
             """ 모델링 작업을 위한 기본 그룹 생성 """
             MayaUtils.create_group(geo_group_name)
+        
+        def reference(self):
+            pass
 
-    class Publish:
+    class Publish(StepOpenMaya.Publish):
         @staticmethod
         def validate(geo_group_name="geo", child_list = ["Low", "High"]):
             """ 모델링 퍼블리시를 위한 기본 검증 """

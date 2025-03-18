@@ -12,13 +12,17 @@ class MatchMoveStep(StepOpenMaya):
         super().__init__()
         print("Opening match move step")
 
-    class Open:
+    class Open(StepOpenMaya.Open):
         @staticmethod
         def setup(group_name="asset", camera_group_name="camera", camera_name="main_cam", task_id=None, file_format=None):
             MayaUtils.create_group(group_name)
             camera_name = MayaUtils.create_camera(group_name=camera_group_name, camera_name=camera_name)
-   
-    class Publish:
+        
+        @staticmethod 
+        def reference(self):
+            pass
+        
+    class Publish(StepOpenMaya.Publish):
         @staticmethod
         def validate(group_name="asset", camera_group_name="camera", camera_name="main_cam"):
             """그룹 및 카메라 검증"""

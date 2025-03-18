@@ -24,6 +24,10 @@ class StepOpenMaya(ABC):
         @abstractmethod
         def setup(self):
             pass
+        
+        @abstractmethod
+        def reference(self):
+            pass
 
     # Publish 클래스: 퍼블리시 관련 기능을 다룬다.    
     class Publish(ABC):

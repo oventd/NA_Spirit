@@ -18,29 +18,32 @@ class RiggingStep(StepOpenMaya):
         super().__init__()
         print("Opening rigging step")
 
-    class Open:
+    class Open(StepOpenMaya.Open):
         @staticmethod
-        def setup(group_name="rig", task_id=None, file_format=".ma"):
+        def setup(group_name="rig"):
             group_name = MayaUtils.create_group(group_name)
+            return group_name
+
+        @staticmethod
+        def reference(group_name="rig", task_id=None, file_format=".ma", use_namespace=True):
             file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
+
             asset_name, _ = SgPathUtils.trim_entity_path(file_path)
             asset_name = os.path.basename(asset_name)
             step = SgPathUtils.get_step_from_path(file_path)
             name_space = f"{asset_name}_{step}"
 
-            if file_path:
-                MayaUtils.reference_file(file_path, group_name, name_space)
-            else:
-                print(f"Warning: No published file found for Task ID {task_id} with format {file_format}")
+            MayaUtils.reference_file(file_path, group_name, name_space, use_namespace=use_namespace)
+            return group_name
    
-    class Publish:
+    class Publish(StepOpenMaya.Publish):
         @staticmethod
         def validate(group_name="rig"):
             """그룹 및 카메라 검증"""
 
             # 환경 그룹 검증
             if not MayaUtils.validate_hierarchy(group_name):
-                print(f"Validation failed: terrain '{group_name}' does not exist.")
+                print(f"Validation failed: rig '{group_name}' does not exist.")
                 return False
             
             print("Validation passed: 모든 조건을 충족합니다.")
