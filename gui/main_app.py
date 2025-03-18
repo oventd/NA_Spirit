@@ -47,7 +47,7 @@ from ui_loader import UILoader
 class MainUi(QMainWindow):
     _instance = None  # 싱글톤 인스턴스 저장
 
-    clicked = Signal()
+    clicked = Signal()  #체크/여기에 해당 시그널 객체가 필요한가? 
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -62,11 +62,13 @@ class MainUi(QMainWindow):
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
-                        
+            #체크/아래 리스트 정리해라        
             self.media_players = []  # 각 동영상 플레이어(QMediaPlayer) 리스트
             self.video_widgets = []  # 각 동영상을 표시할 `QVideoWidget` 리스트
             self.labels = []
-            self.asset_manager = AssetManager()
+            ########
+            #여기 assetmanager << 삭제하지
+            self.asset_manager = AssetManager()  #>>자 출발
             self.table_ui_manager = TableUiManager()
             self.default_ui_manager = DefaultUiManager()
             self.tree_ui_manager = TreeUiManager()
