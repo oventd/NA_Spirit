@@ -29,8 +29,8 @@ def integrate_shader_data(json_path, output_path):
 
 # 메인 실행 함수
 def main():
-    """LookdevX 퍼블리시된 JSON을 불러와 기존 데이터에 병합하는 메인 함수"""
-    LOCAL_PATH = r"D:\real\char_ref"  # 로컬 경로
+    """LookdevX 퍼블리시된 JSON을 불러와 기존이미 데이터에 병합하는 메인 함수"""
+    LOCAL_PATH = r"home/rapa/char_ref"  # 로컬 경로
     JSON_FILE = os.path.join(LOCAL_PATH, "shader_data.json")  # LookdevX에서 퍼블리시된 JSON
     OUTPUT_JSON = os.path.join(LOCAL_PATH, "shader_data_integrated.json")  # 병합할 JSON 저장 경로
 
