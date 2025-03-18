@@ -109,6 +109,17 @@ class AssetService:
         
         asset_dict = {asset["name"] : str(asset["_id"]) for asset in dowmload_list_asset}
         return asset_dict
+    
+    @staticmethod
+    def get_assets_by_ids_all_return(ids_list):
+        #여기서 리스트를 받아 에셋으로 변환하고 해당 내용을 id: name 형식으로 변환하기 
+
+        asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
+        dowmload_list_asset= asset_manager.find(filter_conditions = ids_list)  # 자산 삭제
+        
+       
+        return dowmload_list_asset
+                
                 
 
     @staticmethod
