@@ -24,6 +24,7 @@ class TurnAroundPlayblastGenerator(playblast_generator.PlayblastGenerator):
             }
         # 기본 프레임레인지 : 1 ~ 120
         self.set_frame_range(1, 120)
+        self._path = ""
 
     def get_offset_pos(self):
         # 턴어라운드 카메라의 초기 위치를 가져오는 메서드
@@ -93,10 +94,8 @@ class TurnAroundPlayblastGenerator(playblast_generator.PlayblastGenerator):
         return: 생성된 mov 파일의 path
         """
         # path 설정
-        if not path:
-            if not self._path:
-                raise ValueError("path is not set")
-            path = self._path
+        if path:
+            self.set_path(path)
         # 프레임레인지 설정
         if start_frame:
             self._playblast_options['startTime'] = start_frame
@@ -112,26 +111,32 @@ class TurnAroundPlayblastGenerator(playblast_generator.PlayblastGenerator):
         # 턴어라운드 카메라를 persp 뷰에 설정
         self.set_persp_camera(self.__turnaround_cam)
 
+    def run(self):
+
         # 프레임레인지 설정
         first_frame = self._playblast_options['startTime']
         last_frame = self._playblast_options['endTime']-1
 
         # Playblast 생성
-        self.playblast(path, first_frame, last_frame)
+        self.playblast(self._path, first_frame, last_frame)
 
         # 턴어라운드 카메라 삭제
         self.delete_camera()
 
-        return path
+        return self._path
 
 
-# if __name__ == "__main__":
-#     import sys
-#     path = '/nas/sam/git'
-#     sys.path.append(path)
+if __name__ == "__main__":
+    import sys
+    path = '/home/rapa/NA_Spirit/maya/turnaround'
+    sys.path.append(path)
+    
 
-#     import turnaround_playblast_generator
-
-#     tap = turnaround_playblast_generator.TurnAroundPlayblastGenerator()
-#     path = "/home/rapa/비디오/test.mov"
-#     tap.create_turnaround_playblast(path=path)
+    import turnaround_playblast_generator
+    import imp
+    imp.reload(turnaround_playblast_generator)
+    tap = turnaround_playblast_generator.TurnAroundPlayblastGenerator()
+    
+    path = "/home/rapa/비디오/test.mov"
+    tap.create_turnaround_playblast(path=path)
+    tap.run()

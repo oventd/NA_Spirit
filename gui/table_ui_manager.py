@@ -27,8 +27,8 @@ for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
 
-from assetmanager import AssetService  # AssetService 임포트
-from assetmanager import ClickableLabel
+from asset_service import AssetService  # AssetService 임포트
+from asset_service import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
@@ -71,6 +71,10 @@ class TableUiManager:
             self.ui.exit_btn.clicked.connect(self.exit_sub_win)
             self.ui.image_l_btn.clicked.connect(partial (SubWin.prev_slide, self.ui.stackedWidget_2))
             self.ui.image_r_btn.clicked.connect(partial (SubWin.next_slide, self.ui.stackedWidget_2))
+
+            
+            
+
             self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
             self.ui.search.textEdited.connect(self.search_input)
@@ -113,15 +117,15 @@ class TableUiManager:
             if item.widget():
                 item.widget().deleteLater()
 
-        #  기존 stackedWidget_2 내부의 QLabel 삭제
+        # ✅ 기존 stackedWidget_2 내부의 QLabel 삭제
         for label in self.ui.stackedWidget_2.findChildren(QLabel):
             label.deleteLater()
 
-        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
         for video_widget in self.ui.stackedWidget_2.findChildren(QVideoWidget):
             video_widget.deleteLater()
 
-        #  비디오 플레이어 리스트도 정리
+        # ✅ 비디오 플레이어 리스트도 정리
         self.video_widgets = []
         self.video_players = []
 
@@ -140,20 +144,20 @@ class TableUiManager:
         ui = self.ui  # UI 객체 참조
         print(f"여기 리스트 랜의 갯수를 알려줍니당 {list_len}")
 
-        # 기존 image_widget_s 내부의 위젯 삭제
+        # ✅ 기존 image_widget_s 내부의 위젯 삭제
         while ui.image_widget_s.count() > 0:
             item = ui.image_widget_s.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
 
-        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
         for widget in ui.stackedWidget_2.findChildren(QVideoWidget):
             widget.deleteLater()
 
         self.make_video_labels = []  # 리스트 초기화
         self.video_players = []  # QMediaPlayer 객체 리스트
 
-        # 새로운 QVideoWidget 추가
+        # ✅ 새로운 QVideoWidget 추가
         for _ in range(list_len):  
             video_widget = QVideoWidget(ui.stackedWidget_2)  # 부모 설정
             video_widget.setGeometry(0, 0, 380, 291)  #  위치 (0, 53) 크기 (380x291) 설정
@@ -162,13 +166,13 @@ class TableUiManager:
             player = QMediaPlayer()
             player.setVideoOutput(video_widget)
 
-            #  UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
+            # ✅ UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
 
-            #  리스트에 저장
+            # ✅ 리스트에 저장
             self.make_video_labels.append(video_widget)
             self.video_players.append(player)
 
-        print(" 비디오 위젯 생성 완료")
+        print("✅ 비디오 위젯 생성 완료")
 
 
 
@@ -232,13 +236,11 @@ class TableUiManager:
             col_index = index % max_columns   # 나머지를 통해 몇번째 열에 있는지 정의
             self.add_thumbnail(row_index, col_index, asset)
 
-               
-
     def add_thumbnail(self, row, col, asset):
         ui = self.ui
-        thumbnail_path = asset[PREVIEW_URL]
-        asset_name = asset[NAME] 
-        aseet_type = asset[ASSET_TYPE]
+        thumbnail_path = asset["preview_url"]
+        asset_name = asset["name"] 
+        aseet_type = asset["asset_type"]
 
         widget = QWidget()  # 셀 안에 넣을 위젯 생성
         layout = QVBoxLayout()  # 세로 정렬을 위한 레이아웃 생성

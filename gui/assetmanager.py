@@ -1,14 +1,4 @@
-import sys, os
-current_file_path = os.path.abspath(__file__)
-
-# 'NA_Spirit' 폴더의 최상위 경로 찾기
-na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
-
-# 모든 하위 폴더를 sys.path에 추가
-for root, dirs, files in os.walk(na_spirit_dir):
-    if '__pycache__' not in root:  # __pycache__ 폴더는 제외
-        sys.path.append(root)
-
+from asset_service import AssetService
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
 from db_crud import AssetDb  # 수정된 db_crud에서 Asset 클래스를 import

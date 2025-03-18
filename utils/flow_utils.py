@@ -313,6 +313,8 @@ if __name__ == "__main__":
     # upstream_file_path=FlowUtils.get_upstream_file_for_currnet_file(6183,".ma")
     # print(upstream_file_path)
 
-    FlowUtils.upload_undistorted(1240, 1932, 1090)
+    
+    a = FlowUtils.get_cut_in_out(1273)
+    print(a[0], a[1])
 
 

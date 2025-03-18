@@ -932,6 +932,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -981,6 +982,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1012,6 +1014,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1117,6 +1120,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1154,6 +1158,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1704,6 +1709,7 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
+        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>

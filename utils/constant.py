@@ -74,19 +74,19 @@ LIGHTING = 'Light'
 COMPOSITING = 'Comp'
 
 
-# Open step 상수
+# Open step 상수 --- 바뀨기
 STEP_PATH = '/home/rapa/NA_Spirit/open/step'
 UTILS_PATH = '/home/rapa/NA_Spirit/utils'
-RIG = "rig"
-GEO = "geo"
-ENV = "env"
-LOW = "Low"
-HIGH = "High"
-ANIM_CAM = "anim_cam"
-CAMERA1 = "camera1"
-TERRAIN ="terrain"
-CAMERA = "camera"
-CHAR = "char"
+# RIGG = "rig"
+# GEO = "geo"
+# ENV = "env"
+# LOW = "Low"
+# HIGH = "High"
+# ANIM_CAM = "anim_cam"
+# CAMERA1 = "camera1"
+# TERRAIN ="terrain"
+# CAMERA = "camera"
+# CHAR = "char"
 
 # Shotgrid Pipeline Step Shot 상수
 MDL = 'MDL' # Model

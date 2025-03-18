@@ -334,6 +334,146 @@ cart_refactory_data()
 #     print("3D Model 타입 자산의 preview_url, presetting_url, detail_url을 업데이트했습니다.")
 # generate_asset_data()
 
+# 업데이트할 .mp4 파일 목록
+mp4_files = [
+7 Chair.usd    2 Mixer.usd             9 SaltShaker.usd     StoolWooden.usd
+Cheerio.usd  1 PaperBagCrumpled.usd  12 SoapDispenser.usd  6 TeaKettle.usd
+3 Jar.usd      8 Pot.usd               11 SpiceShaker.usd    4 WoodenDryingRack.usd
+
+]
+/nas/spirit/DB/usd
+# .mp4 확장자를 제거한 이름 매핑 (언더바를 공백으로 변환)
+mp4_mapping = {file_name.replace("_", " ").replace(".mp4", ""): file_name for file_name in mp4_files}
+
+def update_3d_model_urls():
+    # "3D Model" 타입의 자산 조회
+    for asset in asset_collection.find({"asset_type": "3D Model"}):
+        asset_name = asset.get("source_url", "")
+        if asset_name in mp4_mapping:  # 이름이 매핑에 존재하면 업데이트
+            
+            update_data = {
+                "$set": {
+                    "source_url": turnaround_url  # URL 업데이트
+                }
+            }
+
+            asset_collection.update_one({"_id": asset["_id"]}, update_data)
+            print(f"Updated '{asset_name}' with turnaround_url: {turnaround_url}")
+
+    print("3D Model 타입 자산의 turnaround_url 업데이트 완료.")
+
+# 함수 실행
+update_3d_model_urls()
+
+"""인덱스 생성 및 수정 중"""
+def update_3d_model_urls():
+    for asset in asset_collection.find({"asset_type": "3D Model"}):
+        turnaround_url = asset.get("turnaround_url")
+        rig_url = asset.get("rig_url")
+
+        # image_url 리스트 생성 (None 값 제외)
+        image_urls = [url for url in [turnaround_url, rig_url] if url]
+
+        update_data = {
+            "$set": {
+                "image_url": image_urls,  # 통합된 URL 리스트
+                "source_url": None  # 필요에 따라 적절한 값 설정
+            },
+            "$unset": {
+                "turnaround_url": "",  # 기존 필드 삭제 
+                "rig_url": ""
+            }
+        }
+
+        asset_collection.update_one({"_id": asset["_id"]}, update_data)
+        print(f"Updated asset {asset['_id']} with image_url: {image_urls}")
+
+
+    print("3D Model 타입 자산의 image_url 업데이트 완료.")
+update_3d_model_urls()
+
+
+"""Texture 인덱스 생성 및 수정 중"""
+def update_texture_urls():
+    for asset in asset_collection.find({"asset_type": "Texture"}):
+        detail_url = asset.get("detail_url")
+        presetting_url1 = asset.get("presetting_url1")
+        presetting_url2 = asset.get("presetting_url2")
+        presetting_url3 = asset.get("presetting_url3")
+
+        # image_url 리스트 생성 (None 값 제외)
+        image_urls = [url for url in [detail_url, presetting_url1, presetting_url2, presetting_url3] if url]
+
+        update_data = {
+            "$set": {
+                "image_url": image_urls,  # 통합된 URL 리스트
+                "source_url": None  # 필요에 따라 적절한 값 설정
+            },
+            "$unset": {
+                "detail_url": "",  # 기존 필드 삭제 
+                "presetting_url1": "",
+                "presetting_url2": "",
+                "presetting_url3": ""
+            }
+        }
+
+        asset_collection.update_one({"_id": asset["_id"]}, update_data)
+        print(f"Updated asset {asset['_id']} with image_url: {image_urls}")
+
+
+    print("3D Model 타입 자산의 image_url 업데이트 완료.")
+update_texture_urls()
+
+"""HDRI 인덱스 생성 및 수정 중"""
+def update_hdri_urls():
+    for asset in asset_collection.find({"asset_type": "HDRI"}):
+        applyhdri_url = asset.get("applyhdri_url")
+        hdri_url = asset.get("hdri_url")
+
+        # image_url 리스트 생성 (None 값 제외)
+        image_urls = [url for url in [applyhdri_url, hdri_url] if url]
+
+        update_data = {
+            "$set": {
+                "image_url": image_urls,  # 통합된 URL 리스트
+                "source_url": None  # 필요에 따라 적절한 값 설정
+            },
+            "$unset": {
+                "applyhdri_url": "",  # 기존 필드 삭제 
+                "hdri_url": ""
+            }
+        }
+
+        asset_collection.update_one({"_id": asset["_id"]}, update_data)
+        print(f"Updated asset {asset['_id']} with image_url: {image_urls}")
+
+
+    print("3D Model 타입 자산의 image_url 업데이트 완료.")
+update_hdri_urls()
+
+"""Material 인덱스 생성 및 수정 중"""
+def update_material_urls():
+    for asset in asset_collection.find({"asset_type": "Material"}):
+        material_urls = asset.get("material_urls")
+
+        # 업데이트할 데이터 정의
+        update_data = {
+            "$set": {
+                "image_url": material_urls,  # material_urls을 그대로 image_url로 변경
+                "source_url": None  # 필요에 따라 적절한 값 설정
+            },
+            "$unset": {
+                "material_urls": ""  # 기존 material_urls 필드 삭제
+            }
+        }
+
+        asset_collection.update_one({"_id": asset["_id"]}, update_data)
+        print(f"Updated asset {asset['_id']} with image_url: {material_urls}")
+
+    print("Material 타입 자산의 image_url 업데이트 완료.")
+
+# 실행
+update_material_urls()
 
 
 """모든 인덱스 삭제"""

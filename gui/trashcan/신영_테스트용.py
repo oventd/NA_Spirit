@@ -11,7 +11,7 @@ na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
 for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
-from assetmanager import AssetService  # AssetService 임포트
+from asset_service import AssetService  # AssetService 임포트
 from db_model import CustomTableModel  # 절대 경로로 db_model 임포트
 
 class MainWindow(QtWidgets.QMainWindow):

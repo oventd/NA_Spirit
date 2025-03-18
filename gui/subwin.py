@@ -27,8 +27,8 @@ for root, dirs, files in os.walk(na_spirit_dir):
         sys.path.append(root)
 
 
-from assetmanager import AssetService  # AssetService 임포트
-from assetmanager import ClickableLabel
+from asset_service import AssetService  # AssetService 임포트
+from asset_service import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *

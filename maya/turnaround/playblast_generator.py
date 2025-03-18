@@ -10,20 +10,20 @@ class PlayblastGenerator:
         self._playblast_options = {
             'startTime':0,
             'endTime':0,
-            'format': 'qt',
-            'filename': "",
-            'forceOverwrite': True,
-            'sequenceTime': 0,
-            'clearCache': True,
-            'viewer': False,
-            'showOrnaments': False,
-            'offScreen': True,
-            'fp': 4,  # Frame padding
-            'percent': 100,
-            'compression': 'none',
-            'quality': 100,
-            'widthHeight': (1280, 720),
+            "format": "qt",
+            "filename": "",
+            "sequenceTime": False,
+            "clearCache": True,
+            "viewer": True,
+            "showOrnaments": True,
+            "framePadding": 4,
+            "percent": 50,
+            "compression": "png",
+            "quality": 70,
+            "exposure": 0,
+            "gamma": 1
         }        
+        
     
     def get_path(self):
         # playblast path 가져오기
