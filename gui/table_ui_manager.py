@@ -195,7 +195,7 @@ class TableUiManager:
     def update_table(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
         ui = self.ui
 
-        ui.like_empty_notice.hide()
+        ui.like_empty_notice.hide()  ########주의
         search_word = self.search_word
         if self.search_word is not None:
             if len(self.search_word) < 3:
@@ -205,7 +205,7 @@ class TableUiManager:
             filter_conditions[OBJECT_ID] = LikeState().like_filter_condition[OBJECT_ID]
         if Check().dict:
             for key, value in Check().dict.items():
-                filter_conditions[key] = value
+                filter_conditions[key] = value      ##### 쿼리를 만드는 부분
 
         # if filter_conditions == list:
         #     AssetService.get_asset_by_id_all(filter_conditions, sort_by, limit, skip, search_word)

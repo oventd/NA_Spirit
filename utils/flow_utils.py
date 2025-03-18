@@ -121,10 +121,10 @@ class FlowUtils:
 
 
     @classmethod
-    def get_cut_in_out(cls,SHOT_ID): 
+    def get_cut_in_out(cls,shot_id): 
         result = cls.sg.find(
                 "Shot",
-                [["id", "is",SHOT_ID]],
+                [["id", "is",shot_id]],
                 ["sg_cut_in", "sg_cut_out"]
             )[0]
         return result["sg_cut_in"],result["sg_cut_out"]
