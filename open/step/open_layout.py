@@ -7,7 +7,6 @@ from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-sys.path.append('/home/rapa/NA_Spirit/flow')
 from flow_utils import FlowUtils
 
 class LayoutStep(StepOpenMaya):

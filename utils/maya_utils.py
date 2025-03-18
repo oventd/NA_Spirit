@@ -66,7 +66,9 @@ class MayaUtils:
             print(f"[ERROR] The {group_name} file '{file_path}' was not found.")
             return []
         
-        namespace_arg = name_space if use_namespace else ""
+        # namespace_arg = name_space if use_namespace else ":"
+        namespace_arg = name_space if (use_namespace and name_space) else ":"
+
 
         # 파일 참조 (Maya에서 실행)
         ref_nodes = cmds.file(file_path, reference=True, namespace=namespace_arg, returnNewNodes=True)
@@ -80,8 +82,24 @@ class MayaUtils:
             top_node = transform_nodes[0]
             cmds.parent(top_node, group_name)
 
+        if not use_namespace:
+            MayaUtils.remove_all_namespaces()
+
         return transform_nodes
-        
+    
+    @staticmethod
+    def remove_all_namespaces():
+        """ 씬 내 모든 네임스페이스를 제거하는 함수. """
+        namespaces = cmds.namespaceInfo(lon=True) or []
+        for ns in namespaces:
+            if ns not in ["UI", "shared"]:  # 기본 네임스페이스 제외
+                try:
+                    cmds.namespace(moveNamespace=[ns, ":"], force=True)  # 병합
+                    cmds.namespace(removeNamespace=ns)  # 삭제
+                    print(f"네임스페이스 '{ns}' 제거 완료.")
+                except Exception as e:
+                    print(f"[ERROR] 네임스페이스 '{ns}' 제거 실패: {e}")  
+
     @staticmethod
     def lock_transform(object_names):
         """주어진 오브젝트들의 트랜스폼 속성을 락 설정"""

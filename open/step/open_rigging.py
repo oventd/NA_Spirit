@@ -9,7 +9,6 @@ sys.path.append('/home/rapa/NA_Spirit/maya')
 sys.path.append('/home/rapa/NA_Spirit/flow')
 from maya_utils import MayaUtils
 from sg_path_utils import SgPathUtils
-sys.path.append('/home/rapa/NA_Spirit/flow')
 from flow_utils import FlowUtils
 
 """각 스텝에 맞는 match move 파일을 불러올 클래스입니다."""
