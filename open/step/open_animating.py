@@ -27,10 +27,10 @@ class AnimatingStep(StepOpenMaya):
             AnimatingStep.Open.reference(asset_group_name, task_id, file_format)
             AnimatingStep.Open.reference(camera_group_name, task_id, file_format)   
 
-            if camera_group_name:  # 카메라 오브젝트가 있을 때만
-                MayaUtils.lock_transform([camera_group_name])
-            else:
-                print("No camera objects found to lock.")
+            # if camera_group_name:  # 카메라 오브젝트가 있을 때만
+            #     MayaUtils.lock_transform([camera_group_name])
+            # else:
+            #     print("No camera objects found to lock.")
 
         @staticmethod 
         def reference(group_name, task_id=None, file_format=".ma",use_namespace=False):

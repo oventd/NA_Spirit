@@ -16,16 +16,13 @@ class LayoutStep(StepOpenMaya):
 
     class Open(StepOpenMaya.Open):
         @staticmethod
-        def setup(asset_group_name="asset", camera_group_name="camera", task_id=None, file_format=".ma"):
+        def setup(task_id, file_format):
+            file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
+
+            cmds.file(file_path, reference=True, namespace=":", returnNewNodes=True)
             
-            asset_group_name = MayaUtils.create_group(asset_group_name)  # "asset"
-            camera_group_name = MayaUtils.create_group(camera_group_name)  # "camera"
-
-            LayoutStep.Open.reference(asset_group_name, task_id, file_format)
-            LayoutStep.Open.reference(camera_group_name, task_id, file_format)
-
         @staticmethod 
-        def reference(group_name, task_id=None, file_format=".ma", use_namespace=False):
+        def reference(group_name = "asset", task_id=None, file_format=".ma", use_namespace=False):
             """
             주어진 그룹을 생성하고, 해당 그룹에 필요한 파일을 참조하는 함수.
             """
