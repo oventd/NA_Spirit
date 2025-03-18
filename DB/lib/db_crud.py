@@ -280,15 +280,26 @@ class AssetDb(DbCrud):
             # self.logger.info("Indexes set up for AssetDb")
 
     # Create (에셋 생성 및 업데이트)
-    def upsert_asset(self, project_name, asset_name, update_fields):
+    def upsert_asset(self, asset_data):
         """
         에셋이 없은 경우 새로 생성하고, 있은 경우 업데이트.
         :param project_name: 프로젝트 이름
         :param name: 에셋 이름
         :param update_fields: 업데이트할 필드 (선택 사항)
         """
+        project_name = asset_data.get("project_name")
+        asset_name = asset_data.get("name")
+
         if not project_name or not asset_name:
-            raise ValueError("필수 필드 'project_name'과 'name'이 제공되지 않았습니다~~!")
+            raise ValueError("필수 필드 'project_name'과 'name'이 제공되지 않았습니다~~!")      
+        
+        update_fields = {}
+        for key, value in asset_data.items():
+            if key not in ["project_name", "name"]:
+                update_fields[key] = value      
+
+        if not update_fields:
+            raise ValueError("필수 필드 없음~~!")
         
         filter_conditions = {"project_name": project_name, "name": asset_name}
         return self.upsert_data(filter_conditions, update_fields)
