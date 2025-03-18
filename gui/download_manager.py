@@ -25,6 +25,7 @@ from assetmanager import AssetService
 from functools import partial
 
 
+from send_asset_flow import SendAssetFlow
 
 class DownloadManager:
     
@@ -45,6 +46,7 @@ class DownloadManager:
             self.exemples = []
             self.download_list_asset ={}
             self.like_state = LikeState()
+            self.sender=SendAssetFlow()
            
         
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
@@ -86,21 +88,21 @@ class DownloadManager:
       
 
        
-    def download_likged_assets(self):
+    # def download_likged_assets(self):
   
-        self.ui.download_listwidget.clear()
-        print("하나 다운로드 버튼이 눌렸어요")
+    #     self.ui.download_listwidget.clear()
+    #     print("하나 다운로드 버튼이 눌렸어요")
 
-        self.ui.stackedWidget.show()
-        self.ui.depth_label.show()
-        self.ui.stackedWidget.setCurrentIndex(1)
+    #     self.ui.stackedWidget.show()
+    #     self.ui.depth_label.show()
+    #     self.ui.stackedWidget.setCurrentIndex(1)
         
        
-        id_list = [str(self.asset.current['_id'])]
-        download_name_id = {self.asset.current["name"]: str(self.asset.current["_id"])}
-        self.add_list_widget(download_name_id)
+    #     id_list = [str(self.asset.current['_id'])]
+    #     download_name_id = {self.asset.current["name"]: str(self.asset.current["_id"])}
+    #     self.add_list_widget(download_name_id)
 
-        self.selected_ids_list =id_list
+    #     self.selected_ids_list =id_list
     
         
 
@@ -174,8 +176,10 @@ class DownloadManager:
 
         if self.setDownloadFormat == False:
             print(f"{selected_ids_list}이 레퍼런스로 다운로드되었습니다")
+           
         else:  
             print(f"{selected_ids_list}에셋이 임포트로 다운되었습니다")
+            # self.sender.redata_for_flow(selected_ids_list) 
 
 
     
