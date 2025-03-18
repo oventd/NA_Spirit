@@ -29,15 +29,23 @@ class DbCrud:
         self.logger = create_logger(logger_name, log_path)
 
     # Create (데이터 생성 또는 업데이트)
-    def upsert_data(self, filter_conditions, update_fields=None):
+    def upsert_data(self, filter_conditions, update_fields):
         """
         데이터가 없으면 새로 생성하고, 있으면 업데이트하는 메서드.
         :param filter_conditions: 찾을 조건 (dict)
         :param update_fields: 삽입 또는 업데이트할 필드 (dict)
         :return: 업데이트 또는 삽입된 문서의 ID
         """
-        if not update_fields:
-            raise ValueError("data_fields는 기본으로 제공되어야 합니다.")
+        # if not update_fields:
+        #     raise ValueError("data_fields는 기본으로 제공되어야 합니다.")
+
+        filter_conditions = {}
+        for key, value in update_fields.items():
+            filter_conditions[key] = key
+            update_data[key] = value
+            
+
+
 
         update_data = {
             "$set": {UPDATED_AT: datetime.utcnow()},  # 모든 업데이트에 적용
@@ -296,4 +304,6 @@ class AssetDb(DbCrud):
 
 if __name__ == "__main__":
     db = DbCrud()
+    data = {'name': 'wood', 'description': '', 'asset_type': '3D Model', 'category': 'Prop', 'style': 'realistic', 'resolution': '', 'file_format': '', 'size': '', 'license_type': '', 'creator_id': 127, 'creator_name': '형민 박', 'downloads': '', 'created_at': '', 'updated_at': '', 'preview_url': '/nas/spirit/DB/thum/3d_assets/wood.png', 'image_url': '', 'source_url': '/nas/spirit/DB/source/wood', 'video_url': '', 'project_name': 'Spirit'}
+    DbCrud().upsert_data(data)
     

@@ -8,7 +8,7 @@ sys.path.append('/home/rapa/NA_Spirit/utils')
 
 from sg_path_utils import SgPathUtils
 from flow_utils import FlowUtils
-# from db_crud import AssetDb
+from db_crud import AssetDb
 
 
 class ShotGridAssetManager:
@@ -123,7 +123,8 @@ class ShotGridAssetManager:
         특정 에셋의 썸네일 URL을 가져오는 메서드.
         """
         try:
-            asset_id = FlowUtils.get_asset_id(self.context.project["name"], asset_name)
+            asset_id = FlowUtils.get_asset_id(self.context.project["id"], asset_name)
+            print(f"에셋 ID: {asset_id}")
            
             # FlowUtils에서 썸네일 다운로드
             FlowUtils.get_thumnail(asset_id, thumbnail_url)
@@ -143,17 +144,17 @@ class ShotGridAssetManager:
             print(f"에셋 '{asset_name}'을 찾을 수 없습니다.")
             return
         self.thumbnail_url = os.path.join(self.db_thub_path, f"{asset_name}.png")
-        temp_path = "/home/rapa/temp.png"
-        self.get_thumbnail_url(asset_name, temp_path)
+        # temp_path = "/home/rapa/temp.png"
+        self.get_thumbnail_url(asset_name, self.thumbnail_url)
         asset_info = self.get_asset_info(asset_dir)
 
         self.copy_folder(asset_dir, self.destination_path)
 
-        # try:
-        #     # AssetDb().upsert_data(asset_info)
-        #     print(f"에셋 정보:\n{asset_info}")
-        # except Exception as e:
-        #     print(f"데이터베이스 업로드 실패: {e}")
+        try:
+            AssetDb().upsert_data(asset_info)
+            print(f"에셋 정보:\n{asset_info}")
+        except Exception as e:
+            print(f"데이터베이스 업로드 실패: {e}")
 
 
 # 사용 예시
