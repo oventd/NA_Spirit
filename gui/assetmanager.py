@@ -2,8 +2,6 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
 from db_crud import AssetDb  # 수정된 db_crud에서 Asset 클래스를 import
 from constant import *
-from bson import ObjectId
-
 from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import Signal, Qt
 from ui_loader import UILoader
@@ -16,11 +14,11 @@ class AssetManager:
         self.ui = ui_loader.load_ui()
         self.ui.show()
 
-        
+    #나연아 ~~~~ #체크좀해
     def load_assets(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
         """자산 데이터를 테이블에 로드"""
         assets = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip))
-        self.display_assets(assets)
+        self.display_assets(assets)  #체크/테이블의 업데이트 테이블 사용해보기
     
     def display_assets(self, assets):
         """자산을 UI 테이블에 표시"""

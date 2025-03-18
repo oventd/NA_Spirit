@@ -64,17 +64,12 @@ class TableUiManager:
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
-
             self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.search_word =None
             self.ui.exit_btn.clicked.connect(self.exit_sub_win)
             self.ui.image_l_btn.clicked.connect(partial (SubWin.prev_slide, self.ui.stackedWidget_2))
             self.ui.image_r_btn.clicked.connect(partial (SubWin.next_slide, self.ui.stackedWidget_2))
-
-            
-            
-
             self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
             self.ui.search.textEdited.connect(self.search_input)
@@ -82,16 +77,9 @@ class TableUiManager:
             self.asset_manager = Asset()
             self.like_state = LikeState()
             self.like_state.like_asset_list = DictManager.load_dict_from_json()
-
-            
-
-# 버튼 이벤트 연결 (추가 인자 없이 호출)
             self.ui.like_download_btn_area.clicked.connect(download_manager.download_likged_assets_all)
-            
             self.ui.download_btn.clicked.connect(download_manager.download_likged_assets)
-
             self.logger = create_logger(UX_Like_ASSET_LOGGER_NAME, UX_Like_ASSET_LOGGER_DIR)
-
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.asset_dict = {}
             self.like_state = LikeState()
@@ -193,7 +181,7 @@ class TableUiManager:
         
     
     def update_table(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
-        ui = self.ui
+        ui = self.ui ## 체크 (변경하기)
 
         ui.like_empty_notice.hide()  ########주의
         search_word = self.search_word
