@@ -569,3 +569,244 @@ update_material_urls()
 # print(updated_material["material_urls"])  # 이 부분에서 배열로 저장된 값이 출력될 것입니다.
 
 # update_material()
+
+
+from pymongo import MongoClient
+import random
+from datetime import datetime, timedelta
+
+# MongoDB 연결
+client = MongoClient("mongodb://localhost:27017/")  # 여기에 본인의 MongoDB 주소 입력
+db = client["spiritDatabase"]  # 데이터베이스 이름
+asset_collection = db["test"]  # 컬렉션 이름
+
+# 정의된 리스트들
+asset_types = ["Material", "Texture", "HDRI"]
+categories = ["Environment", "Character", "Props", "Vehicle", "Weapon", "Architecture", "Others"]
+styles = ["Realistic", "Stylized", "Procedural"]
+resolutions = ["512x512", "1024x1024", "2048x2048", "4096x4096"]
+polygon_counts = ["Low-poly", "Medium-poly", "High-poly"]
+license_types = ["Paid", "Free"]
+creator_names = ["John Doe", "Alice Smith", "Bob Johnson", "Eva White", "Charlie Brown", 
+                 "David Lee", "Mia Garcia", "Liam Scott", "Sophia King", "James Turner"]
+project = ["kitchen", "dream", "avengers", "squidgame"]
+
+# 파일 포맷
+file_formats_by_type = {
+        "Material": ["SBSAR", "SBS"], # 쉐이더임. texture의 모임임 USD로 저장할거임
+        "Texture": ["EXR", "JPG", "PNG"],  # EXR 파일 형식도 Texture에 포함
+        "HDRI": ["HDRI", "EXR"]  # HDRI 자산 타입은 HDRI, EXR을 모두 가질 수 있음
+}
+
+# 기존 에셋 데이터
+material_assets = [
+    {
+        "name": "almond",
+        "description": "A high-quality 3D texture of almond nuts with a smooth and detailed surface, perfect for realistic material design in digital environments.",
+        "preview_url": "/nas/spirit/DB/thum/material/almond.png"
+    },
+    {
+        "name": "diagonal",
+        "description": "A sleek, diagonal striped texture with alternating light and dark shades, ideal for dynamic material design in 3D models.",
+        "preview_url": "/nas/spirit/DB/thum/material/diagonal.png"
+    },
+    {
+        "name": "peeling",
+        "description": "A detailed texture showing the peeling of a surface, revealing layered wear and aging, ideal for realistic material simulation.",
+        "preview_url": "/nas/spirit/DB/thum/material/peeling.png"
+    },
+    {
+        "name": "tree-barkb",
+        "description": "A detailed texture of rough, natural tree bark with intricate grooves and surface details, perfect for realistic nature environments.",
+        "preview_url": "/nas/spirit/DB/thum/material/tree-barkb.png"
+    },
+    {
+        "name": "christmas-wrapping",
+        "description": "A festive Christmas wrapping paper texture with decorative holiday elements, ideal for seasonal 3D scenes.",
+        "preview_url": "/nas/spirit/DB/thum/material/christmas-wrapping.png"
+    },
+    {
+        "name": "fabric-weave",
+        "description": "A rich fabric weave pattern texture, perfect for modeling clothing or soft surfaces in digital art.",
+        "preview_url": "/nas/spirit/DB/thum/material/fabric-weave.png"
+    },
+    {
+        "name": "rockface",
+        "description": "A rugged rock face texture with detailed cracks and surface variations, ideal for rocky terrain or outdoor environments in 3D art.",
+        "preview_url": "/nas/spirit/DB/thum/material/rockface.png"
+    },
+    {
+        "name": "cloudy-veined",
+        "description": "A marble-like texture with cloudy veins running through it, providing a luxurious look for 3D material design.",
+        "preview_url": "/nas/spirit/DB/thum/material/cloudy-veined.png"
+    },
+    {
+        "name": "fleshy_granite",
+        "description": "A unique granite texture with fleshy undertones, perfect for realistic rocky surfaces and stone materials.",
+        "preview_url": "/nas/spirit/DB/thum/material/fleshy_granite.png"
+    },
+    {
+        "name": "rocky",
+        "description": "A highly detailed rocky texture with varied surfaces and cracks, ideal for creating rugged environments in 3D art.",
+        "preview_url": "/nas/spirit/DB/thum/material/rocky.png"
+    },
+    {
+        "name": "cloudy",
+        "description": "A soft, cloudy texture that gives a smooth, ethereal feel, suitable for backgrounds or delicate material applications.",
+        "preview_url": "/nas/spirit/DB/thum/material/cloudy.png"
+    },
+    {
+        "name": "limestone",
+        "description": "A realistic limestone texture with intricate natural patterns, ideal for creating realistic stone surfaces in 3D scenes.",
+        "preview_url": "/nas/spirit/DB/thum/material/limestone.png"
+    },
+    {
+        "name": "rusty-metal",
+        "description": "A weathered, rusty metal texture with strong surface details, perfect for industrial and grunge-themed 3D environments.",
+        "preview_url": "/nas/spirit/DB/thum/material/rusty-metal.png"
+    }
+]
+
+
+texture_assets = [
+    {
+        "name": "pineapple",
+        "description": "A 3D model of a pineapple with a textured surface and green leaves.",
+        "preview_url": "/nas/spirit/DB/thum/3d_assets/thum013.png"
+    },
+    {
+        "name": "ceiling_light",
+        "description": "A modern ceiling light fixture with a sleek circular design.",
+        "preview_url": "/nas/spirit/DB/thum/3d_assets/thum014.png"
+    }
+]
+
+hdri_assets = [
+    {
+        "name": "bambanani_sunset",
+        "description": "A stunning sunset HDRI texture depicting warm, vibrant sunset colors over a landscape, perfect for scenic 3D renders.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/bambanani_sunset.png"
+    },
+    {
+        "name": "marry_hall",
+        "description": "An elegant HDRI texture of a wedding hall with soft lighting and a luxurious ambiance, ideal for indoor event renders.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/marry_hall.png"
+    },
+    {
+        "name": "qwantani",
+        "description": "A serene HDRI of a vast open field with gentle lighting, suitable for outdoor and nature scene renders.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/qwantani.png"
+    },
+    {
+        "name": "blue_studio",
+        "description": "A professional HDRI of a blue-toned studio environment with soft lighting, perfect for product or character renders.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/blue_studio.png"
+    },
+    {
+        "name": "moon_lab",
+        "description": "A futuristic HDRI of a moonlit laboratory, combining cold blue lighting with a high-tech atmosphere, ideal for sci-fi scenes.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/moon_lab.png"
+    },
+    {
+        "name": "qwantani_morning",
+        "description": "A beautiful morning HDRI texture with soft light filtering over a peaceful open landscape, perfect for natural lighting in 3D renders.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/qwantani_morning.png"
+    },
+    {
+        "name": "brown",
+        "description": "A simple yet rich brown-toned HDRI texture, ideal for creating warm, cozy indoor environments.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/brown.png"
+    },
+    {
+        "name": "moonless_golf",
+        "description": "A dark HDRI of a golf course under a moonless sky, great for moody or night-time renders.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/moonless_golf.png"
+    },
+    {
+        "name": "studio_small",
+        "description": "An HDRI of a small studio space with focused lighting, perfect for compact product or character renders.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/studio_small.png"
+    },
+    {
+        "name": "christmas_hdri",
+        "description": "A festive Christmas-themed HDRI with soft, warm lighting and holiday decor, ideal for creating seasonal 3D scenes.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/christmas_hdri.png"
+    },
+    {
+        "name": "moonrise",
+        "description": "A mesmerizing moonrise HDRI with bright moonlight casting shadows over a quiet landscape, perfect for night-time outdoor renders.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/moonrise.png"
+    },
+    {
+        "name": "warm_restaurant",
+        "description": "An HDRI of a warm, cozy restaurant with soft lighting, ideal for creating inviting indoor dining scenes.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/warm_restaurant.png"
+    },
+    {
+        "name": "christmas_photo",
+        "description": "A high-quality HDRI with Christmas-themed lighting and decorations, perfect for seasonal indoor 3D environments.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/christmas_photo.png"
+    },
+    {
+        "name": "mud_road_puresky",
+        "description": "A natural HDRI featuring a muddy road leading to an open sky, suitable for realistic outdoor and countryside scenes.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/mud_road_puresky.png"
+    },
+    {
+        "name": "horn-koppe",
+        "description": "A high-definition HDRI texture of a rugged terrain with dramatic lighting, perfect for mountain or desert environments.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/horn-koppe.png"
+    },
+    {
+        "name": "neon_photostudio",
+        "description": "A vibrant neon-lit photostudio HDRI, ideal for dramatic lighting in modern, urban 3D scene renders.",
+        "preview_url": "/nas/spirit/DB/thum/hdri/neon_photostudio.png"
+    }
+]
+
+
+# 에셋 데이터 변환 및 중복 검증
+for asset_list, asset_type in zip([material_assets, texture_assets, hdri_assets], ["Material", "Texture", "HDRI"]):
+    for asset in asset_list:
+        asset_name = asset["name"]
+        
+        # 데이터베이스에서 동일한 name을 가진 문서가 있는지 확인
+        existing_asset = asset_collection.find_one({"name": asset_name})
+        
+        if existing_asset:
+            print(f"❌ Skipping: Asset '{asset_name}' already exists in the database.")
+            continue  # 이미 존재하면 추가하지 않음
+
+        license_type = random.choice(license_types)
+        days_ago = random.choice([1, 7, 14, 30, 60])
+        created_at = datetime.utcnow() - timedelta(days=days_ago)
+
+        asset_data = {
+            "asset_id": f"{random.randint(1, 1000):03d}",
+            "name": asset_name,
+            "description": asset["description"],
+            "asset_type": asset_type,
+            "category": random.choice(categories),
+            "style": random.choice(styles),
+            "resolution": random.choice(resolutions),
+            "file_format": random.choice(file_formats_by_type[asset_type]),
+            "size": f"{random.randint(1, 500)}MB",
+            "license_type": license_type,
+            "creator_id": f"{random.randint(1000, 9999)}",
+            "creator_name": random.choice(creator_names),
+            "downloads": random.randint(50, 1000),
+            "created_at": created_at,
+            "updated_at": created_at,
+            "preview_url": asset["preview_url"],
+            "image_url": None,
+            "project_name": random.choice(project),
+            "source_url": None,
+            "video_url": None
+        }
+
+        if license_type == "Paid":
+            asset_data["price"] = random.randint(1, 100)
+
+        # 데이터베이스에 삽입
+        asset_collection.insert_one(asset_data)
+        print(f"✅ Inserted: Asset '{asset_name}' successfully added.")
