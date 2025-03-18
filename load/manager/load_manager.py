@@ -17,20 +17,21 @@ from sg_path_utils import SgPathUtils
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 class LoadManager:
-    def __init__(self, root_path: str, dcc_config_path: str) -> None:
-        self._root_path = root_path
+    def __init__(self, session_path: str) -> None:
+        self.root_path, _ = SgPathUtils.trim_entity_path(session_path)
+        self.root_path = "/".join(self.root_path.split("/")[:-3])
         self.types = ["assets", "sequences"]
         self.default_file = "scene"
-        print(dcc_config_path)
+        dcc_config_path = "/home/rapa/NA_Spirit/load/manager/work_file_creators.json"
         self.dcc_creators = load_classes_from_json(dcc_config_path)
 
     @property
     def root_path(self) -> str:
-        return self._root_path
+        return self.root_path
 
     @root_path.setter
     def root_path(self, value: str) -> None:
-        self._root_path = value
+        self.root_path = value
 
     def validate_inputs(self, entity_type: str, dcc: str) -> None:
         """
@@ -108,10 +109,10 @@ class LoadManager:
         """
         publish와 work 디렉토리를 생성합니다.
         """
-        publish_dir = SgPathUtils.make_entity_file_path(self._root_path, entity_type, category, entity, step, version="publish", dcc="cache")
+        publish_dir = SgPathUtils.make_entity_file_path(self.root_path, entity_type, category, entity, step, version="publish", dcc="cache")
         os.makedirs(publish_dir, exist_ok=True)
         
-        work_dir = SgPathUtils.make_entity_file_path(self._root_path, entity_type, category, entity, step, version="work", dcc=dcc)
+        work_dir = SgPathUtils.make_entity_file_path(self.root_path, entity_type, category, entity, step, version="work", dcc=dcc)
         os.makedirs(work_dir, exist_ok=True)
         
         return publish_dir, work_dir
@@ -163,8 +164,8 @@ class LoadManager:
         step = entity_info.get("step")
         dcc = entity_info.get("dcc")
         
-        step_path = SgPathUtils.make_entity_file_path(self._root_path, entity_type, category, entity, step)
-        asset_path = SgPathUtils.make_entity_file_path(self._root_path, entity_type, category, entity)
+        step_path = SgPathUtils.make_entity_file_path(self.root_path, entity_type, category, entity, step)
+        asset_path = SgPathUtils.make_entity_file_path(self.root_path, entity_type, category, entity)
 
         if not os.path.exists(step_path):
             logging.warning(f"Entity not found: {entity_info}")
@@ -177,19 +178,19 @@ class LoadManager:
         logging.info(f"Entity removed: {entity_info}")
 
 if __name__ == "__main__":
-
     # 예: dcc_config.json 파일의 경로를 지정합니다.
-    dcc_config_path = "/home/rapa/NA_Spirit/load/manager/work_file_creators.json"
-    lm = LoadManager("/nas/sam/show/test", dcc_config_path)
-    library_asset_path = "/home/rapa/Kitchen_set/assets/Chair/Chair.usd"
-    entity_info = {
-        "entity_type": "assets",
-        "category": "Prop",
-        "entity": "Chair",
-        "step": "MDL",
-        "dcc": "maya",
-        "work_ext": ".ma",
-        "publish_ext": ".usd"
-    }
-    lm.add_entity(library_asset_path, entity_info)
-    lm.remove_entity(entity_info)
+    session_path = "/nas/spirit/project/spirit/assets/Prop/mini_tree/MDL/work/maya/mini_tree_MDL.v001.ma"
+
+    # lm = LoadManager(session_path)
+    # library_asset_path = "/home/rapa/Kitchen_set/assets/Chair/Chair.usd"
+    # entity_info = {
+    #     "entity_type": "assets",
+    #     "category": "Prop",
+    #     "entity": "Chair",
+    #     "step": "MDL",
+    #     "dcc": "maya",
+    #     "work_ext": ".ma",
+    #     "publish_ext": ".usd"
+    # }
+    # lm.add_entity(library_asset_path, entity_info)
+    # lm.remove_entity(entity_info)
