@@ -4,8 +4,8 @@ from bson import ObjectId  # MongoDB에서 사용하는 ObjectId를 처리하는
 import pymongo  # MongoDB 작업을 위한 라이브러리
 
 # MongoDB 연결
-client = pymongo.MongoClient("mongodb://spirt:1234@localhost:27017/")  # 로컬 MongoDB 서버에 연결
-db = client["filter_test"]  # 사용할 데이터베이스 'filter_test'에 연결
+client = pymongo.MongoClient("mongodb://localhost:27017")  # 로컬 MongoDB 서버에 연결
+db = client["spiritDatabase"]  # 사용할 데이터베이스 'filter_test'에 연결
 asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 
 """랜덤 데이터 생성 ㅎ"""
@@ -273,6 +273,26 @@ asset_collection = db["test"]  # 'test'라는 컬렉션에 연결
 
 #             print(f"{asset['name']} 자산에서 preview_url, presetting_url, detail_url을 삭제했습니다.")
 # delete_refactory_data()
+
+def cart_refactory_data():
+    # asset_collection에서 "Texture" 타입의 자산을 가져오기
+    for asset in enumerate(asset_collection.find({"category": "Props"})):
+
+        category = "Prop"
+
+        update_data = {
+            "$set": {
+                "categories": category
+            }
+        }
+        asset_collection.update_one(
+            update_data
+        )
+
+cart_refactory_data()
+        
+
+
 
 """이미지 경로 변경"""
 # def generate_asset_data():
