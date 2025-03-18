@@ -29,7 +29,7 @@ class MayaReferenceUsdExporter:
         self.export_static = export_static
         self.root_curve_name = "root"
         self.frame_range = frame_range
-        self.export_setting_path = "/home/rapa2/NA_Spirit/open/config/render_settings.json"
+        self.export_setting_path = "/home/rapa/NA_Spirit/open/config/render_settings.json"
 
     def setup_usd(self):
         """USD 파일을 생성하거나 기존 파일을 불러옴"""
@@ -134,11 +134,25 @@ class MayaReferenceUsdExporter:
         
         # 애니메이션 오브젝트 선택
         cmds.select(asset)
-        export_path = os.path.join(asset_usd_dir,f"{asset_name}_{self.step},",self.version,".usd")
+        export_path = os.path.join(asset_usd_dir,f"{asset_name}.{self.version}.usd")
 
         # USD Export 옵션
         export_options = JsonUtils.read_json(self.export_setting_path)["export_usd_animated_mesh"]
-
+        # export_options = {
+        #     "filterTypes": "nurbsCurve",
+        #     "animation": 1,
+        #     "startTime": self.frame_range[0],
+        #     "endTime": self.frame_range[1],
+        #     "defaultUSDFormat": "usdc",
+        #     "rootPrim": "",
+        #     "rootPrimType": "scope",
+        #     "defaultPrim": "Assets",
+        #     "exportMaterials": 0,
+        #     "mergeTransformAndShape": 1,
+        #     "includeEmptyTransforms": 1
+        # }
+        export_options["startTime"] = self.frame_range[0]
+        export_options["endTime"] = self.frame_range[1]
         # 딕셔너리를 문자열 옵션으로 변환
         export_options_str = ";".join(f"{key}={value}" for key, value in export_options.items())
 
@@ -148,10 +162,7 @@ class MayaReferenceUsdExporter:
                   options=export_options_str,
                   type="USD Export",
                   preserveReferences=True,
-                  exportSelected=True,
-                  animation=True,
-                  startTime = self.frame_range[0],
-                  endTime = self.frame_range[1])  
+                  exportSelected=True)  
         return export_path
 
     def process_usd_animated_asset(self, category_scope_path, asset_name, anim_usd_path, mod_usd_path):
@@ -179,7 +190,7 @@ class MayaReferenceUsdExporter:
         assets_scope_path = UsdUtils.get_prim_path(assets_scope)
 
         animated_nodes = self.get_animated_transform_nodes()
-        important_assets = [self.get_parent_hierarchy(node)[-3] for node in animated_nodes if len(self.get_parent_hierarchy(node)) >= 3]
+        anim_assets = [self.get_parent_hierarchy(node)[-3] for node in animated_nodes if len(self.get_parent_hierarchy(node)) >= 3]
         
         for category in category_nodes:
             category_scope = UsdUtils.create_scope(self.stage, f"{assets_scope_path}/{category}")
@@ -187,21 +198,23 @@ class MayaReferenceUsdExporter:
             asset_nodes = cmds.listRelatives(category, children=True) or []
 
         for asset in asset_nodes:
-            if asset in important_assets:
+            if asset in anim_assets:
                 if self.export_animated == False:
                     continue
-            if asset not in important_assets:
+            if asset not in anim_assets:
                 if self.export_static == False:
                     continue
             
             print(f"Processing animated asset: {asset}")
-
+            
             asset_name = asset.split(":")[0]
+            print(f"{asset}, {asset_name}")
             ref_node = cmds.referenceQuery(asset, referenceNode=True)
             ref_path = cmds.referenceQuery(ref_node, filename=True)
 
             usd_path = ref_path.replace("maya", "usd")
             usd_mod_path = SgPathUtils.set_step(usd_path, MDL)
+            print(usd_mod_path)
             usd_mod_root_file = os.path.splitext(usd_mod_path)[0].split(".")[0] + ".usd"
 
             if not os.path.exists(usd_mod_root_file):
@@ -211,11 +224,14 @@ class MayaReferenceUsdExporter:
             root_transform = {attr: cmds.getAttr(f"{root_transform_node}.{attr}") for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']}
             print(f"Root Transform: {root_transform}")
 
-            if asset in important_assets:
+            if asset in anim_assets:
                 if self.export_animated == False:
                     continue
+                print("self. usd_file_path :",self.usd_file_path)
+                print(asset_name)
                 asset_usd_dir = self.create_anim_asset_dir(self.usd_file_path,category, asset_name)
-                anim_usd_path = self.export_anim_asset_usd(asset_usd_dir, asset, asset_name, self.find_scene_animation_range())
+                anim_usd_path = self.export_anim_asset_usd(asset_usd_dir, asset, asset_name, self.frame_range)
+                print(f"Exporting: {self.frame_range} to {anim_usd_path}")
                 anim_root_usd_path = UsdVersionConnector.connect(anim_usd_path)
                 self.process_usd_animated_asset(category_scope_path, asset_name, anim_root_usd_path,usd_mod_root_file)
                 
@@ -227,11 +243,12 @@ class MayaReferenceUsdExporter:
     def run(self):
         """USD 처리 실행"""
         self.setup_usd()
-        self.print_references()
+        # self.print_references()
         self.process_assets()
         return self.usd_file_path
 
 if __name__ == "__main__":
     # 실행 코드
-    usd_processor = MayaReferenceUsdExporter(LAY,"/home/rapa/NA_Spirit/test3.v001.usd", export_animated=True, export_static=False)
-    usd_processor.run()
+    export_setting_path = "/home/rapa2/NA_Spirit/open/config/render_settings.json"
+    export_options = JsonUtils.read_json(export_setting_path)
+    print(export_options)

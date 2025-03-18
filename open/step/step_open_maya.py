@@ -4,7 +4,6 @@ import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/utils')
 sys.path.append('/home/rapa/NA_Spirit/usd')
-sys.path.append("/home/rapa2/NA_Spirit/")
 sys.path.append("/home/rapa/NA_Spirit/flow")
 from json_utils import JsonUtils
 from maya_utils import MayaUtils
@@ -74,6 +73,7 @@ class StepOpenMaya(ABC):
             if StepOpenMaya.Publish.get_animated_transform_nodes():
                 animated = True
                 frame_range = FlowUtils.get_cut_in_out(context.entity["id"])
+                print("frame_range : ", frame_range)
             else:
                 animated = False
             
@@ -89,11 +89,11 @@ class StepOpenMaya(ABC):
                 if is_referenced is True:
                     
                     if all is True:
-                        MayaReferenceUsdExporter(step, usd_export_path,item, frame_range = frame_range).run()
+                        MayaReferenceUsdExporter(step, usd_export_path,item, export_animated = False,export_static = True,frame_range = frame_range).run()
                         root_usd_path = UsdVersionConnector.connect(usd_export_path)
                         published_usds[item] = [root_usd_path]
-                    elif all is not True:
-                        MayaReferenceUsdExporter(step, usd_export_path, item, export_animated = False).run()
+                    elif all is False:
+                        MayaReferenceUsdExporter(step, usd_export_path, item, export_animated = True ,export_static = False,frame_range = frame_range).run()
                         root_usd_path = UsdVersionConnector.connect(usd_export_path)
                         published_usds[item] = [root_usd_path]
                 if is_referenced is False:

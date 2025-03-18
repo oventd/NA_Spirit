@@ -28,7 +28,7 @@ class EntityUsdConnector:
             LOOKDEV: ["material"],
             MATCHMOVE: ["camera"],
             LAYOUT: ["asset"],
-            ANIMATING: ["anim_cache"],
+            ANIMATING: ["asset"],
             LIGHTING: ["light"],
         }
         # self.step_usd_dict = {}
@@ -71,14 +71,12 @@ class EntityUsdConnector:
         if os.path.exists(self.entity_usd_path):
             self.entity_usd_stage = UsdUtils.get_stage(self.entity_usd_path)
             
-        if not os.path.exists(self.entity_usd_path):
-            self.entity_usd_stage = UsdUtils.create_usd_file(self.entity_usd_path)
+            self.entity_root_prim = UsdUtils.get_prim(self.entity_usd_stage, "/Root")
 
-        root_path = "/Root"    
-        
-        self.entity_root_prim = self.entity_usd_stage.GetPrimAtPath(root_path)
-        if not self.entity_root_prim:
-            self.entity_root_prim = UsdUtils.create_scope(self.entity_usd_stage,root_path)
+        else:
+            self.entity_usd_stage = UsdUtils.create_usd_file(self.entity_usd_path)
+            
+            self.entity_root_prim = UsdUtils.create_scope(self.entity_usd_stage, "/Root")
         
         # step_usd = os.path.join(self.entity_path, self.step, f"{self.entity_name}_{self.step}.usda")
         # UsdUtils.create_usd_file(step_usd)
@@ -115,8 +113,8 @@ class EntityUsdConnector:
             print(f"Processing Model step with geo: {geo_paths}")
             for geo_path in geo_paths:
                 if geo_path:
-                    entity_root_prim_path = str(self.parent.entity_root_prim.GetPath())
-                    geo_xform_path = os.path.join(entity_root_prim_path,"geo")
+                    entity_root_prim_path = "/Root"
+                    geo_xform_path = os.path.join(entity_root_prim_path,"MDL")
                     geo_xform = UsdUtils.get_prim(self.parent.entity_usd_stage, geo_xform_path)
                     if not geo_xform:
                         geo_xform =UsdUtils.create_xform(self.parent.entity_usd_stage, geo_xform_path)
@@ -131,8 +129,8 @@ class EntityUsdConnector:
             print(f"Processing Lookdev step with material: {material_paths}")
             for material_path in material_paths:
                 if material_path:
-                    entity_root_prim_path = str(self.parent.entity_root_prim.GetPath())
-                    material_xform_path = os.path.join(entity_root_prim_path,"mat")
+                    entity_root_prim_path = "/Root"
+                    material_xform_path = os.path.join(entity_root_prim_path,"LDV")
                     mat_xform = UsdUtils.get_prim(self.parent.entity_usd_stage, material_xform_path)
                     if not mat_xform:
                         mat_xform =UsdUtils.create_xform(self.parent.entity_usd_stage, material_xform_path)
@@ -147,8 +145,12 @@ class EntityUsdConnector:
             print(f"Processing Matchmove step with camera: {camera_paths}")
             for camera_path in camera_paths:
                 if camera_path:
-                    UsdUtils.add_sublayer(self.parent.entity_usd_stage, camera_path)
-
+                    entity_root_prim_path = "/Root"
+                    material_xform_path = os.path.join(entity_root_prim_path,"MMV")
+                    mat_xform = UsdUtils.get_prim(self.parent.entity_usd_stage, material_xform_path)
+                    if not mat_xform:
+                        mat_xform =UsdUtils.create_xform(self.parent.entity_usd_stage, material_xform_path)
+                    UsdUtils.add_reference(mat_xform, camera_path)
 
     class Layout:
         def __init__(self, parent):
@@ -157,28 +159,34 @@ class EntityUsdConnector:
         def connect(self, provided_args):
             asset_paths = provided_args["asset"]
             camera_paths = provided_args["camera"]
-            print(f"Processing Layout step with assets_path: {asset_paths}, camera: {camera_paths}")
-            for camera_path in camera_paths:
-                if camera_path:
-                    UsdUtils.add_sublayer(self.parent.entity_usd_stage, camera_path)
             for asset_path in asset_paths:
                 if asset_path:
-                    UsdUtils.add_sublayer(self.parent.entity_usd_stage, asset_path)
+                    entity_root_prim_path = "/Root"
+                    geo_xform_path = os.path.join(entity_root_prim_path,"LAY")
+                    geo_xform = UsdUtils.get_prim(self.parent.entity_usd_stage, geo_xform_path)
+                    if not geo_xform:
+                        geo_xform =UsdUtils.create_xform(self.parent.entity_usd_stage, geo_xform_path)
+                    UsdUtils.add_reference(geo_xform, asset_path)
             
     class Animating:
         def __init__(self, parent):
             self.parent = parent
 
         def connect(self, provided_args):
-            anim_cache_paths = provided_args["anim_cache"]
-            camera_paths = provided_args["camera"]
-            print(f"Processing Animating step with anim_cache: {anim_cache_paths}, camera: {camera_paths}")
-            for camera_path in camera_paths:
-                if camera_path:
-                    UsdUtils.add_sublayer(self.parent.entity_usd_stage, camera_path)
+            anim_cache_paths = provided_args["asset"]
+            # camera_paths = provided_args["camera"]
+            # print(f"Processing Animating step with anim_cache: {anim_cache_paths}, camera: {camera_paths}")
+            # for camera_path in camera_paths:
+            #     if camera_path:
+            #         UsdUtils.add_sublayer(self.parent.entity_usd_stage, camera_path)
             for anim_cache_path in anim_cache_paths:
                 if anim_cache_path:
-                    UsdUtils.add_sublayer(self.parent.entity_usd_stage, anim_cache_path)
+                    entity_root_prim_path = "/Root"
+                    geo_xform_path = os.path.join(entity_root_prim_path,"ANI")
+                    geo_xform = UsdUtils.get_prim(self.parent.entity_usd_stage, geo_xform_path)
+                    if not geo_xform:
+                        geo_xform =UsdUtils.create_xform(self.parent.entity_usd_stage, geo_xform_path)
+                    UsdUtils.add_reference(geo_xform, anim_cache_path)
 
     class Light:
         def __init__(self, parent):

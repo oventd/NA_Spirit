@@ -196,23 +196,20 @@ class SgPathUtils:
     def get_category_from_path(path):
         entity_path, after_path = SgPathUtils.trim_entity_path(path)
         return entity_path.split('/')[-2]
-
+    @staticmethod
+    def set_step(publish_file, step):
+        entity_path, after_path= SgPathUtils.trim_entity_path(publish_file)
+        step_changed = after_path.split("/")
+        step_changed[0] = step
+        asset_name_and_version = step_changed[-1]
+        asset_name_spilt = asset_name_and_version.split(".")
+        asset_name_spilt[0] = asset_name_spilt[0][:-3]+step
+        file_name = ".".join(asset_name_spilt)
+        step_changed[-1] = file_name
+        step_changed_path = "/".join(step_changed)
+        result =  os.path.join(entity_path, step_changed_path)
+        return result
+    
 if __name__ == "__main__":
-    session_path = "/nas/spirit/spirit/assets/Prop/apple/MDL/work/maya/scene.v002.ma"
-    session_path = SgPathUtils.get_usd_ext_from_maya_ext(session_path)
-    session_path = SgPathUtils.get_publish_from_work(session_path)
-    session_path = SgPathUtils.get_maya_dcc_from_usd_dcc(session_path)
-
-    publish_path = SgPathUtils.get_publish_from_work(session_path) # work-> "publish"
-    
-    usd_filename = SgPathUtils.get_usd_ext_from_maya_ext(publish_path) # .usd
-    mb_filename = SgPathUtils.get_maya_ext_from_mb(publish_path) # .mb
-
-    
-    maya_export_dir = SgPathUtils.get_maya_dcc_from_usd_dcc(mb_filename) # usd dir
-    usd_export_dir = SgPathUtils.get_usd_dcc_from_usd_dcc(usd_filename) # usd dir
-
-
-    print(publish_path)
-    print(usd_filename)
-    print(f"{usd_export_dir} + {maya_export_dir}")
+    session_path = "/nas/spirit/spirit/assets/Prop/apple/MDL/work/maya/Mat_RIG.v002.ma"
+    print(SgPathUtils.set_step(session_path,"MDL"))

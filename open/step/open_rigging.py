@@ -19,7 +19,8 @@ class RiggingStep(StepOpenMaya):
 
     class Open(StepOpenMaya.Open):
         @staticmethod
-        def setup(group_name="rig"):
+        def setup(task_id=None, file_format=".ma"):
+            group_name = "rig"
             group_name = MayaUtils.create_group(group_name)
             return group_name
 
@@ -61,7 +62,7 @@ class RiggingStep(StepOpenMaya):
             #     print(f"Validation failed: terrain '{group_name}' does not exist.")
 
         @staticmethod
-        def publish(*args):
+        def publish(session_path ,context):
             print("No Work for Publishing rigging step")
             
 

@@ -17,20 +17,10 @@ class AnimatingStep(StepOpenMaya):
     class Open(StepOpenMaya.Open):
 
         @staticmethod
-        def setup(rig_group_name = "rig", asset_group_name="asset", camera_group_name="camera", task_id=None, file_format=".ma"):
+        def setup(task_id, file_format):
+            file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
 
-            asset_group_name = MayaUtils.create_group(asset_group_name)
-            camera_group_name = MayaUtils.create_group(camera_group_name)
-            rig_group_name = MayaUtils.create_group(rig_group_name)
-
-            AnimatingStep.Open.reference(rig_group_name, task_id, file_format)     
-            AnimatingStep.Open.reference(asset_group_name, task_id, file_format)
-            AnimatingStep.Open.reference(camera_group_name, task_id, file_format)   
-
-            # if camera_group_name:  # 카메라 오브젝트가 있을 때만
-            #     MayaUtils.lock_transform([camera_group_name])
-            # else:
-            #     print("No camera objects found to lock.")
+            cmds.file(file_path, reference=True, namespace=":", returnNewNodes=True)
 
         @staticmethod 
         def reference(group_name, task_id=None, file_format=".ma",use_namespace=False):
@@ -91,11 +81,11 @@ class AnimatingStep(StepOpenMaya):
         #         exportSelected=True
         #         )
         #     print(f"{export_path}에서 USD export 완료")
-
+        
         @staticmethod
-        def publish(session_path: str ):
+        def publish(session_path: str,context ):
             """ 특정 그룹을 USD와 MB 파일로 export """
-            super().publish(session_path)
+            StepOpenMaya.Publish.publish(session_path,context)
             
 
                 

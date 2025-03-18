@@ -19,7 +19,7 @@
     "LAY": {
       "camera": {
         "all": true,
-        "isReferenced": true,
+        "isReferenced": false,
         "maya":true
       },
       "asset": {
@@ -29,6 +29,11 @@
       }
     },
     "ANM": {
+      "camera": {
+        "all": true,
+        "isReferenced": false,
+        "maya":true
+      },
       "asset": {
         "all": false,
         "isReferenced": true,
