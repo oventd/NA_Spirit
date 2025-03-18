@@ -98,22 +98,17 @@ ANM = 'ANM' # Animation
 LGT = 'LGT' # Light
 CMP = 'CMP' # Compositing
 
-shot_step_dict = {
-    MODELING: MDL,
-    RIGGING: RIG,
-    LOOKDEV: LDV,
-    MATCHMOVE: MMV,
-    LAYOUT: LAY,
-    ANIMATING: ANM,
-    LIGHTING: LGT,
-    COMPOSITING: CMP
-}
 
 #Shotgrid Project 상수
 SERVER_PATH = 'https://5thacademy.shotgrid.autodesk.com'
 SCRIPT_NAME = 'nayeon_key'
 API_KEY = 'h0mvmfnhuochunhzpgR~zlpur'
 
+
+#Shotgrid Project 상수
+SERVER_PATH = 'https://5thacademy.shotgrid.autodesk.com'
+SCRIPT_NAME = 'nayeon_key'
+API_KEY = 'h0mvmfnhuochunhzpgR~zlpur'
 
 STEP_SHORT_DICT = {
     MODELING: MDL,
