@@ -29,7 +29,7 @@ def save_usd_preview_surface_to_json(json_path):
     with open(json_path, 'w', encoding='utf-8') as json_file:
         json.dump(usd_preview_data, json_file, indent=4, ensure_ascii=False)
 
-    print(f" USD Preview Surface 데이터가 {json_path}에 저장되었습니다.")
+    print(f"[✔] USD Preview Surface 데이터가 {json_path}에 저장되었습니다.")
 
 # 실행 예제
 if __name__ == "__main__":
