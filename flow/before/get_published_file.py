@@ -45,10 +45,6 @@ def find_published_file(current_id, current_format):
 
 
 
-file_path = find_published_file(5911, ".abc")
-
-print(f"Found File: {file_path}")
-
       
 
       

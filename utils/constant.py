@@ -108,3 +108,8 @@ shot_step_dict = {
     LIGHTING: LGT,
     COMPOSITING: CMP
 }
+
+#Shotgrid Project 상수
+SERVER_PATH = 'https://5thacademy.shotgrid.autodesk.com'
+SCRIPT_NAME = 'nayeon_key'
+API_KEY = 'h0mvmfnhuochunhzpgR~zlpur'
