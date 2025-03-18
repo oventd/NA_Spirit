@@ -14,10 +14,3 @@ MongoDB와 연동하여 데이터를 관리하고, UI를 통해 사용자와 상
 ├── /gui/                       # UI 관련 폴더
 │    ├── assetmanager.py        # UI와 DB를 분리하는 서비스 계층
 
-1. Main.py : 프로그램이 실행되는 파일 -> ui_window에서 ui를 불러와 실행
-2. ui_window.py : UI 레이아웃과 상호작용을 담당(필터 UI와 테이블 뷰를 관리)
-3. assetmanager.py : UI와 DB 간의 중간 계층 역할 -> UI가 직접 DB 로직을 호출하지 않게
-4. db_client.py : MongoDB와의 연결 관리
-5. db_crud.py : MongoDB에 대한 CRUD(Create, Read, Update, Delete) 연산을 처리
-6. db_model.py : MongoDB 데이터를 테이블로 표시하는 모델 -> UI에서 데이터를 모델로 변환하여 **QTableView**에 표시하는 역할
-
