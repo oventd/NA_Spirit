@@ -1,9 +1,17 @@
 import sys, os
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget,QListWidgetItem
-from PySide6.QtUiTools import QUiLoader  # .ui 파일을 동적으로 로드하는 데 사용
-from PySide6.QtCore import QFile, Signal
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
+try:
+    from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QListWidgetItem
+    from PySide6.QtUiTools import QUiLoader  # .ui 파일을 동적으로 로드하는 데 사용
+    from PySide6.QtCore import QFile, Signal
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QPixmap
+except:
+    from PySide2.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QListWidgetItem
+    from PySide2.QtUiTools import QUiLoader  # .ui 파일을 동적으로 로드하는 데 사용
+    from PySide2.QtCore import QFile, Signal
+    from PySide2.QtCore import Qt
+    from PySide2.QtGui import QPixmap
+
 from ui_loader import UILoader  
 
 # 현재 파일(ui.py)의 절대 경로

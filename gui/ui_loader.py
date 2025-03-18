@@ -1,7 +1,14 @@
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile
-from PySide6.QtWidgets import QWidget, QApplication
-from PySide6.QtGui import QScreen
+try:
+    from PySide6.QtUiTools import QUiLoader
+    from PySide6.QtCore import QFile
+    from PySide6.QtWidgets import QWidget, QApplication
+    from PySide6.QtGui import QScreen
+except:
+    from PySide2.QtUiTools import QUiLoader
+    from PySide2.QtCore import QFile
+    from PySide2.QtWidgets import QWidget, QApplication
+    from PySide2.QtGui import QScreen
+
 
 class UILoader:
     _instance = None

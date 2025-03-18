@@ -1,13 +1,22 @@
 # 로거 파일 추가해서 유저가 중요한 
 ##### json 파일은 나스피릿에 넣고 이그노어 에 포함
+try:
+    from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGraphicsOpacityEffect
+    from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
+    from PySide6.QtGui import QPixmap, QIcon
+    from PySide6.QtUiTools import QUiLoader
+    from PySide6.QtWidgets import QSizePolicy, QVBoxLayout
+    from PySide6.QtMultimedia import QMediaPlayer
+    from PySide6.QtMultimediaWidgets import QVideoWidget
+except:
+    from PySide2.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGraphicsOpacityEffect
+    from PySide2.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
+    from PySide2.QtGui import QPixmap, QIcon
+    from PySide2.QtUiTools import QUiLoader
+    from PySide2.QtWidgets import QSizePolicy, QVBoxLayout
+    from PySide2.QtMultimedia import QMediaPlayer
+    from PySide2.QtMultimediaWidgets import QVideoWidget
 
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
-from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
-from PySide6.QtGui import QPixmap, QPixmap, QIcon
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
-from PySide6.QtMultimedia import QMediaPlayer
-from PySide6.QtMultimediaWidgets import QVideoWidget
 from functools import partial
 import sys
 import os
@@ -25,8 +34,6 @@ for root, dirs, files in os.walk(na_spirit_dir):
 
 from assetmanager import AssetService  # AssetService 임포트
 from assetmanager import ClickableLabel
-
-from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
 # from add_video_player import *
 

@@ -1,4 +1,7 @@
-from PySide6.QtGui import QPixmap, QIcon
+try:
+    from PySide6.QtGui import QPixmap, QIcon
+except:
+    from PySide2.QtGui import QPixmap, QIcon
 
 from bson import ObjectId
 

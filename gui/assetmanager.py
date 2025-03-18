@@ -1,11 +1,14 @@
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
-from db_crud import AssetDb  # 수정된 db_crud에서 Asset 클래스를 import
-from constant import *
-from bson import ObjectId
+try:
+    from PySide6.QtGui import QPixmap
+    from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
+    from PySide6.QtCore import Signal, Qt
+except:
+    from PySide2.QtGui import QPixmap
+    from PySide2.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
+    from PySide2.QtCore import Signal, Qt
 
-from PySide6.QtWidgets import QLabel
-from PySide6.QtCore import Signal, Qt
+from constant import *
+from db_crud import AssetDb  # 수정된 db_crud에서 Asset 클래스를 import
 from ui_loader import UILoader
 
 

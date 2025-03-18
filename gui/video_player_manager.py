@@ -1,9 +1,15 @@
 import numpy as np
 import sys
 import cv2
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QImage, QPixmap
-from PySide6.QtWidgets import QApplication, QLabel
+try:
+    from PySide6.QtCore import Qt, QTimer
+    from PySide6.QtGui import QImage, QPixmap
+    from PySide6.QtWidgets import QApplication, QLabel
+except:
+    from PySide2.QtCore import Qt, QTimer
+    from PySide2.QtGui import QImage, QPixmap
+    from PySide2.QtWidgets import QApplication, QLabel
+
 
 class VideoPlayer(QLabel):
     def __init__(self, img_path):
