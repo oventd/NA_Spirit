@@ -32,7 +32,7 @@ def export_usd(file_path):
         "worldspace=0",
         "exportStagesAsRefs=0",
         "defaultUSDFormat=usda",
-        "excludeExportTypes=[Meshes,Cameras,Lights]"  # ✅ Mesh, Camera, Light 제외
+        "excludeExportTypes=[Meshes,Cameras,Lights]"  #  Mesh, Camera, Light 제외
     ])
 
     # 파일이 저장될 폴더가 존재하는지 확인하고 생성
@@ -40,9 +40,9 @@ def export_usd(file_path):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
-    # ✅ USD 파일 내보내기 실행
+    #  USD 파일 내보내기 실행
     cmds.file(file_path, force=True, options=usd_options, type="USD Export", preserveReferences=True, exportAll=True)
-    print(f"✅ USD exported to: {file_path}")
+    print(f" USD exported to: {file_path}")
 
 # 실행 예제
 usd_output_path = "/home/rapa/test_maya/Char_Ref/scenes/texture_export.usd"
