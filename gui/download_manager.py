@@ -52,67 +52,43 @@ class DownloadManager:
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
-        
             self.ui.download_format_touch_area.clicked.connect(self.set_download_format_all)
-            
             self.ui.exit_btn_2.clicked.connect(self.exit_sub_bar_all)
-           
             self.ui.download_touch_area.clicked.connect(self.download_all)
-
             self.ui.download_listwidget.clear()
-        
             self.ref_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/reference_toggle.png")
             self.import_download_toggle_pixmap = QPixmap("/nas/spirit/asset_project/source/popup_source/import_toggle.png")
             self.ui.download_format_label.setPixmap(self.ref_download_toggle_pixmap)
-
             self.setDownloadFormat = False  #False가 레퍼런스
-            
-    
-    
             self.logger = create_logger(UX_DOWNLOAD_LOGGER_NAME, UX_DOWNLOAD_LOGGER_DIR)
     
     def download_likged_assets_all(self):
 
         print("전체 다운로드 버튼이 눌렸어요")
         self.ui.download_listwidget.clear()
-        
-      
         self.exemples = self.like_state.like_asset_list
         self.download_list_asset=AssetService.get_assets_by_ids(self.exemples)
         self.add_list_widget(self.download_list_asset)
-
         self.ui.stackedWidget.show()
         self.ui.depth_label.show()
         self.ui.stackedWidget.setCurrentIndex(1)
 
-      
 
-       
     def download_likged_assets(self):
   
         self.ui.download_listwidget.clear()
         print("하나 다운로드 버튼이 눌렸어요")
-
         self.ui.stackedWidget.show()
         self.ui.depth_label.show()
         self.ui.stackedWidget.setCurrentIndex(1)
-        
-       
-        
         self.download_list_asset = {self.asset.current["name"]: str(self.asset.current["_id"])}
         self.add_list_widget(self.download_list_asset)
 
-  
-    
-        
 
     def exit_sub_bar_all(self):
         self.ui.stackedWidget.hide()
         self.ui.depth_label.hide()
         self.ui.stackedWidget.setCurrentIndex(0)
-
-        print("저 전으로 돌아갈 건데요")
-
     
     def set_download_format_all(self):
         if self.setDownloadFormat == False:
@@ -164,7 +140,6 @@ class DownloadManager:
         """
         체크된 아이템을 기준으로 다운로드 또는 임포트 수행
         """
-
         # 체크된 아이템 리스트 추출
         download_fix_list = []
         for i in range(self.ui.download_listwidget.count()):
@@ -186,11 +161,13 @@ class DownloadManager:
 
         # 다운로드 방식에 따라 다르게 처리
         if not self.setDownloadFormat:
-            print(f"{selected_ids_list}이(가) 레퍼런스로 다운로드되었습니다")
-        else:
-            print(f"{selected_ids_list} 에셋이 임포트로 다운로드되었습니다")
+            format = 'Reference'
+            print(f"{selected_ids_list}이(가) {format}로 다운로드되었습니다")
             self.sender.redata_for_flow(selected_ids_list)
-        
+        else:
+            format = 'Import'
+            print(f"{selected_ids_list}이(가) {format}로 다운로드되었습니다")
+            self.sender.redata_for_flow(selected_ids_list)
 
     def on_button_click(self):
         # 버튼 클릭 시 입력된 값을 MainWindow로 전달하는 시그널 발생
