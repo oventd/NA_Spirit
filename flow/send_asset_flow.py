@@ -1,9 +1,3 @@
-#프린트 형식
-# ['67bd6ea2e63d06c897d0de1d', '67bd6ec57dbd058b9f0d9997', '67bd6ec57dbd058b9f0d999b']이 레퍼런스로 다운로드되었습니다
-# ['67bd6ea2e63d06c897d0de1d']에셋이 임포트로 다운되었습니다
-
-
-
 import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/utils/')
@@ -15,7 +9,7 @@ from constant import SERVER_PATH, SCRIPT_NAME, API_KEY
 
 VALID_ASSET_TYPES = {
 
-    "Architecture": "Model",  # ✅ 건축 자산을 Model로 변환
+    "Architecture": "Model",  
 }
 
 class SendAssetFlow:
@@ -35,8 +29,7 @@ class SendAssetFlow:
             "code": code,
             "description": discription,
             "sg_asset_type":  sg_asset_type,
-            "sg_status_list": "fin",
-            # "created_by": {"type": "HumanUser", "id": 123}, #사원 등록 필요함
+            "sg_status_list": "fin"
         }
         self.sg.create("Asset", new_asset_data)  #  인스턴스 변수 사용
 

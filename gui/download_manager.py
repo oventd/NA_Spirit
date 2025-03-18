@@ -88,21 +88,21 @@ class DownloadManager:
       
 
        
-    # def download_likged_assets(self):
+    def download_likged_assets(self):
   
-    #     self.ui.download_listwidget.clear()
-    #     print("하나 다운로드 버튼이 눌렸어요")
+        self.ui.download_listwidget.clear()
+        print("하나 다운로드 버튼이 눌렸어요")
 
-    #     self.ui.stackedWidget.show()
-    #     self.ui.depth_label.show()
-    #     self.ui.stackedWidget.setCurrentIndex(1)
+        self.ui.stackedWidget.show()
+        self.ui.depth_label.show()
+        self.ui.stackedWidget.setCurrentIndex(1)
         
        
-    #     id_list = [str(self.asset.current['_id'])]
-    #     download_name_id = {self.asset.current["name"]: str(self.asset.current["_id"])}
-    #     self.add_list_widget(download_name_id)
+        
+        self.download_list_asset = {self.asset.current["name"]: str(self.asset.current["_id"])}
+        self.add_list_widget(self.download_list_asset)
 
-    #     self.selected_ids_list =id_list
+  
     
         
 
@@ -160,26 +160,25 @@ class DownloadManager:
 
 
             
-    def download_all(self,id_list=False):
+    def download_all(self):
+        
+     
+        for i in range(self.ui.download_listwidget.count()):
+            item = self.ui.download_listwidget.item(i)
+            print(f"아이템: {item.text()}, 체크 상태: {item.checkState()}")
+        download_fix_list=[self.ui.download_listwidget.item(i).text() for i in range(self.ui.download_listwidget.count()) if self.ui.download_listwidget.item(i).checkState() == Qt.Checked]
+        selected_ids_list = [self.download_list_asset[name] for name in download_fix_list if name in self.download_list_asset]
 
-        if id_list is not False:
-            selected_ids_list = id_list
-        else:
-            for i in range(self.ui.download_listwidget.count()):
-                item = self.ui.download_listwidget.item(i)
-                print(f"아이템: {item.text()}, 체크 상태: {item.checkState()}")
-            download_fix_list=[self.ui.download_listwidget.item(i).text() for i in range(self.ui.download_listwidget.count()) if self.ui.download_listwidget.item(i).checkState() == Qt.Checked]
-            selected_ids_list = [self.download_list_asset[name] for name in download_fix_list if name in self.download_list_asset]
-
-            #다운로드 에셋에 다운로드 fix 리스트가 있다면 반환 및 리스트 벨류만 추가 
-
+        #다운로드 에셋에 다운로드 fix 리스트가 있다면 반환 및 리스트 벨류만 추가 
+        print(f"다운로드 픽스 리스트{download_fix_list}")
+        print(f"셀렉트 아이디 리스트{selected_ids_list}")
 
         if self.setDownloadFormat == False:
             print(f"{selected_ids_list}이 레퍼런스로 다운로드되었습니다")
            
         else:  
             print(f"{selected_ids_list}에셋이 임포트로 다운되었습니다")
-            # self.sender.redata_for_flow(selected_ids_list) 
+            self.sender.redata_for_flow(selected_ids_list) 
 
 
     
