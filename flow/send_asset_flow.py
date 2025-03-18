@@ -18,7 +18,7 @@ VALID_ASSET_TYPES = {
     "Architecture": "Model",  # ✅ 건축 자산을 Model로 변환
 }
 
-class FlowUtils:
+class SendAssetFlow:
     
 
     def __init__(self):
