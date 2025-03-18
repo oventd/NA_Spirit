@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append('/home/rapa/NA_Spirit/utils')
 from constant import SERVER_PATH, SCRIPT_NAME, API_KEY
-
+import urllib.request
 class FlowUtils:
 
     sg = Shotgun(SERVER_PATH, SCRIPT_NAME, API_KEY)
@@ -307,6 +307,40 @@ class FlowUtils:
         return updated_published_file
 
 
+    @classmethod
+    def get_thumnail(cls,shot_id , save_path):
+        asset = cls.sg.find_one("Asset", [["id", "is", shot_id]], ["image"])
+
+        if asset and asset.get("image"):
+            thumbnail_url=asset["image"]
+        else:
+            print("Thumbnail not found.")
+
+        # 이미지 다운로드 및 저장
+        urllib.request.urlretrieve(thumbnail_url, save_path)
+
+        print(f"이미지가 {save_path}로 저장되었습니다!")
+
+    @classmethod
+    def get_asset_id(cls, project_id: int, asset_name: str) -> int:
+        """
+        프로젝트 ID와 에셋 이름을 사용하여 해당 에셋의 ID를 반환.
+
+        :param project_id: 프로젝트 ID
+        :param asset_name: 에셋 이름
+        :return: 에셋 ID (없으면 -1 반환)
+        """
+        filters = [
+            ["project", "is", {"type": "Project", "id": project_id}],
+            ["code", "is", asset_name]
+        ]
+        fields = ["id"]
+        
+        result = cls.sg.find_one("Asset", filters, fields)
+
+        if result:
+            return result["id"]
+        return -1  # 에셋을 찾지 못한 경우 -1 반환
 
 if __name__ == "__main__":
     #아래 코드는 예시에용 업스트림 같은 파일 형식의 파일의 path를 가져오는 예시

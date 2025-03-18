@@ -79,14 +79,6 @@ class SgPathUtils:
         trimmed_path = os.sep.join(dirs[:symbolic_index_added])
         trimmed_after = os.sep.join(dirs[symbolic_index_added:])
         return trimmed_path ,trimmed_after
-<<<<<<< HEAD
-    
-    @staticmethod
-    def get_publish_dir(entity_path, step):
-        trimed_path = SgPathUtils.trim_entity_path(entity_path)
-        return os.path.join(trimed_path, "publish", step)
-        
-=======
     @staticmethod
     def get_publish_dir(entity_path, step):
         """
@@ -109,34 +101,10 @@ class SgPathUtils:
         """
         SgPathUtils.trim_entity_path(publish_file)
         return os.path.basename(os.path.dirname(publish_file))
->>>>>>> maya_pub
     @staticmethod
     def get_version(publish_file):
         return os.path.splitext(publish_file)[0].split(".")[1]
     
-<<<<<<< HEAD
-    @staticmethod
-    def get_usd_publish_from_maya_publish(publish_file):
-        return publish_file.replace("maya", "usd")
-    
-    @staticmethod
-    def get_maya_publish_from_usd_publish(publish_file):
-        return publish_file.replace("usd", "maya")
-    
-    @staticmethod
-    def get_publish_from_work(work_file):
-        return work_file.replace("work", "publish")
-    @staticmethod
-    def get_work_from_publish(publish_file):
-        return publish_file.replace("publish", "work")
-    @staticmethod
-    def get_maya_ext_from_usd_ext(usd_file):
-        return usd_file.replace(".usd", ".mb")
-    @staticmethod
-    def get_usd_ext_from_maya_ext(maya_file):
-        return maya_file.replace(".mb", ".usd")
-        
-=======
 
     @staticmethod
     def get_usd_publish_dir(entity_path, step):
@@ -229,34 +197,20 @@ class SgPathUtils:
     def get_category_from_path(path):
         entity_path, after_path = SgPathUtils.trim_entity_path(path)
         return entity_path.split('/')[-2]
->>>>>>> maya_pub
     @staticmethod
     def set_step(publish_file, step):
         entity_path, after_path= SgPathUtils.trim_entity_path(publish_file)
         step_changed = after_path.split("/")
         step_changed[0] = step
-<<<<<<< HEAD
-=======
         asset_name_and_version = step_changed[-1]
         asset_name_spilt = asset_name_and_version.split(".")
         asset_name_spilt[0] = asset_name_spilt[0][:-3]+step
         file_name = ".".join(asset_name_spilt)
         step_changed[-1] = file_name
->>>>>>> maya_pub
         step_changed_path = "/".join(step_changed)
         result =  os.path.join(entity_path, step_changed_path)
         return result
     
-<<<<<<< HEAD
-
-    
-
-if __name__ == "__main__":
-    path = "/nas/spirit/spirit/assets/Prop/apple/MDL/publish/usd/scene.v005.usd"
-    entity, _ = SgPathUtils.trim_entity_path(path)
-    print(entity.split("/")[-1])
-=======
 if __name__ == "__main__":
     session_path = "/nas/spirit/spirit/assets/Prop/apple/MDL/work/maya/Mat_RIG.v002.ma"
     print(SgPathUtils.set_step(session_path,"MDL"))
->>>>>>> maya_pub

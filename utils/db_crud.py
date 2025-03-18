@@ -292,8 +292,3 @@ class AssetDb(DbCrud):
         
         filter_conditions = {"project_name": project_name, "name": asset_name}
         return self.upsert_data(filter_conditions, update_fields)
-    
-
-if __name__ == "__main__":
-    db = DbCrud()
-    
