@@ -14,13 +14,13 @@ class MatchMoveStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(group_name="terrain", camera_group_name="camera", camera_name="main_cam", task_id=None, file_format=None):
+        def setup(group_name="asset", camera_group_name="camera", camera_name="main_cam", task_id=None, file_format=None):
             MayaUtils.create_group(group_name)
             camera_name = MayaUtils.create_camera(group_name=camera_group_name, camera_name=camera_name)
    
     class Publish:
         @staticmethod
-        def validate(group_name="terrain", camera_group_name="camera", camera_name="main_cam"):
+        def validate(group_name="asset", camera_group_name="camera", camera_name="main_cam"):
             """그룹 및 카메라 검증"""
             if not camera_name:
                 camera_name = "main_cam"
@@ -32,7 +32,7 @@ class MatchMoveStep(StepOpenMaya):
 
             # 환경 그룹 검증
             if not MayaUtils.validate_hierarchy(group_name):
-                print(f"Validation failed: terrain '{group_name}' does not exist.") 
+                print(f"Validation failed: asset '{group_name}' does not exist.") 
                 return False
 
             # # 카메라 그룹 검증

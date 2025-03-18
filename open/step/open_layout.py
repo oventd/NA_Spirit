@@ -17,14 +17,11 @@ class LayoutStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(terrain_group_name="terrain", camera_group_name="camera", rig_group_name="rig", 
+        def setup(asset_group_name="asset", camera_group_name="camera", rig_group_name="rig", 
                 matchmove_camera="matchmove_camera", matchmove_env="matchmove_env", task_id=None, file_format=None):
             
-            terrain_group_name = MayaUtils.create_group(terrain_group_name)  # "terrain"
+            asset_group_name = MayaUtils.create_group(asset_group_name)  # "asset"
             camera_group_name = MayaUtils.create_group(camera_group_name)  # "camera"
-            rig_group_name = MayaUtils.create_group(rig_group_name)  # "rig"
-            matchmove_camera = MayaUtils.create_group(matchmove_camera)  # "matchmove_camera"
-            matchmove_env = MayaUtils.create_group(matchmove_env)  # "matchmove_env"
 
             def reference(group_name, task_id, file_format):
                 """
@@ -45,7 +42,7 @@ class LayoutStep(StepOpenMaya):
                 return group_name
             
             # reference에 전달
-            reference(terrain_group_name, task_id, file_format)
+            reference(asset_group_name, task_id, file_format)
             reference(camera_group_name, task_id, file_format)
             reference(rig_group_name, task_id, file_format)
 
@@ -54,7 +51,7 @@ class LayoutStep(StepOpenMaya):
 
     class Publish:
         @staticmethod
-        def validate(rig_group_name = "rig", terrain_group_name="terrain", camera_group_name="camera"):
+        def validate(rig_group_name = "rig", asset_group_name="asset", camera_group_name="camera"):
             
             exception_group = {"rig"} # 검증 예외처리 할 객체
 
@@ -63,9 +60,9 @@ class LayoutStep(StepOpenMaya):
                 print(f"Validation failed: Rig group '{rig_group_name}' does not exist.")  
                 return False
 
-            # terrain 그룹이 존재하는지 체크
-            if not MayaUtils.validate_hierarchy(terrain_group_name):
-                print(f"Validation failed: terrain '{terrain_group_name}' does not exist.")  
+            # asset 그룹이 존재하는지 체크
+            if not MayaUtils.validate_hierarchy(asset_group_name):
+                print(f"Validation failed: asset '{asset_group_name}' does not exist.")  
                 return False
 
             # camera 그룹이 존재하는지 체크

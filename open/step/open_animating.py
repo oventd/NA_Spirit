@@ -17,10 +17,10 @@ class AnimatingStep(StepOpenMaya):
 
     class Open:
         @staticmethod
-        def setup(rig_group_name = "rig", terrain_group_name="terrain", camera_group_name="camera", task_id=None, file_format=None):
+        def setup(rig_group_name = "rig", asset_group_name="asset", camera_group_name="camera", task_id=None, file_format=None):
             
-            rig_group_name = MayaUtils.create_group(rig_group_name)
-            terrain_group_name = MayaUtils.create_group(terrain_group_name)
+
+            asset_group_name = MayaUtils.create_group(asset_group_name)
             camera_group_name = MayaUtils.create_group(camera_group_name)
             if camera_group_name:  # 카메라 오브젝트가 있을 때만
                 MayaUtils.lock_transform([camera_group_name])
@@ -47,7 +47,7 @@ class AnimatingStep(StepOpenMaya):
 
             #reference에 전달
             reference(rig_group_name, task_id, file_format)     
-            reference(terrain_group_name, task_id, file_format)
+            reference(asset_group_name, task_id, file_format)
             reference(camera_group_name, task_id, file_format)       
             
     class Publish:       
@@ -103,6 +103,6 @@ if __name__ == "__main__":
     animation = AnimatingStep()
     AnimatingStep.Open.setup()
     AnimatingStep.Open.reference_rig()
-    AnimatingStep.Open.reference_terrain()
+    AnimatingStep.Open.reference_asset()
     AnimatingStep.Open.reference_camera()
     AnimatingStep.Publish.validate()
