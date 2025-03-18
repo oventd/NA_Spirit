@@ -81,17 +81,11 @@ class DownloadManager:
 
         self.ui.stackedWidget.show()
         self.ui.depth_label.show()
-        self.ui.stackedWidget.setCurrentIndex(2)
+        self.ui.stackedWidget.setCurrentIndex(1)
 
       
 
-        for i in range(self.ui.download_listwidget.count()):
-            item = self.ui.download_listwidget.item(i)
-            print(f"아이템: {item.text()}, 체크 상태: {item.checkState()}")
-            download_fix_list=[self.ui.download_listwidget.item(i).text() for i in range(self.ui.download_listwidget.count()) if self.ui.download_listwidget.item(i).checkState() == Qt.Checked]
-            self.selected_ids_list = [self.download_list_asset[name] for name in download_fix_list if name in self.download_list_asset]
-
-   
+       
     def download_likged_assets(self):
   
         self.ui.download_listwidget.clear()
@@ -99,7 +93,7 @@ class DownloadManager:
 
         self.ui.stackedWidget.show()
         self.ui.depth_label.show()
-        self.ui.stackedWidget.setCurrentIndex(2)
+        self.ui.stackedWidget.setCurrentIndex(1)
         
        
         id_list = [str(self.asset.current['_id'])]
@@ -164,14 +158,24 @@ class DownloadManager:
 
 
             
-    def download_all(self):
+    def download_all(self,id_list=False):
+
+        if id_list is not False:
+            selected_ids_list = id_list
+        else:
+            for i in range(self.ui.download_listwidget.count()):
+                item = self.ui.download_listwidget.item(i)
+                print(f"아이템: {item.text()}, 체크 상태: {item.checkState()}")
+            download_fix_list=[self.ui.download_listwidget.item(i).text() for i in range(self.ui.download_listwidget.count()) if self.ui.download_listwidget.item(i).checkState() == Qt.Checked]
+            selected_ids_list = [self.download_list_asset[name] for name in download_fix_list if name in self.download_list_asset]
+
+            #다운로드 에셋에 다운로드 fix 리스트가 있다면 반환 및 리스트 벨류만 추가 
+
 
         if self.setDownloadFormat == False:
-            print(f"{self.selected_ids_list}이 레퍼런스로 다운로드되었습니다")
-            self.logger.info(f"유저가 {self.selected_ids_list}를 레퍼런스로 다운로드되었습니다")
+            print(f"{selected_ids_list}이 레퍼런스로 다운로드되었습니다")
         else:  
-            print(f"{self.selected_ids_list}에셋이 임포트로 다운되었습니다")
-            self.logger.info(f"유저가 {self.selected_ids_list}를 임포트로 다운로드되었습니다")
+            print(f"{selected_ids_list}에셋이 임포트로 다운되었습니다")
 
 
     
