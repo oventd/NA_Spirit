@@ -11,7 +11,6 @@ from PySide6.QtMultimediaWidgets import QVideoWidget
 from functools import partial
 import sys
 import os
-import vlc
 import cv2
 from PySide6.QtGui import QImage
 from PySide6.QtCore import QTimer
@@ -27,8 +26,8 @@ for root, dirs, files in os.walk(na_spirit_dir):
         sys.path.append(root)
 
 
-from asset_service import AssetService  # AssetService 임포트
-from asset_service import ClickableLabel
+from assetmanager import AssetService  # AssetService 임포트
+from assetmanager import ClickableLabel
 
 from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *

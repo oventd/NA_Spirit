@@ -26,13 +26,13 @@ for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
 
-from asset_service import AssetService  # AssetService 임포트
-from asset_service import ClickableLabel
+from assetmanager import AssetService  # AssetService 임포트
+from assetmanager import ClickableLabel
 
 from constant import *
 
 
-from trashcan.asset_manager import AssetManager
+from assetmanager import AssetManager
 # from data_manager import DataManager
 from default_ui_manager import DefaultUiManager
 
@@ -71,8 +71,10 @@ class MainUi(QMainWindow):
             self.default_ui_manager = DefaultUiManager()
             self.tree_ui_manager = TreeUiManager()
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
+        else:
+            self.ui.show()
             
-
-app = QApplication(sys.argv)
-window = MainUi()
-app.exec()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainUi()
+    app.exec()

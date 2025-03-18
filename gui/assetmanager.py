@@ -1,4 +1,3 @@
-from asset_service import AssetService
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
 from db_crud import AssetDb  # 수정된 db_crud에서 Asset 클래스를 import
