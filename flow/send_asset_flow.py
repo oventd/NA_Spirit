@@ -24,14 +24,29 @@ class SendAssetFlow:
         return asset_all_info
     
     def add_asset_project(self, project_id, code, discription, sg_asset_type):
+    # ShotGrid에서 동일한 code(이름)을 가진 Asset이 있는지 확인
+        existing_asset = self.sg.find_one(
+            "Asset",
+            [["project", "is", {"type": "Project", "id": project_id}], ["code", "is", code]],
+            ["id"]
+        )
+
+        #  만약 같은 이름이 있으면 추가하지 않음
+        if existing_asset:
+            print(f" 이미 존재하는 Asset입니다: {code} (ID: {existing_asset['id']})")
+            return  # 중복되면 함수 종료
+
+        #  중복이 없으면 새로 추가
         new_asset_data = {
             "project": {"type": "Project", "id": project_id},
             "code": code,
             "description": discription,
-            "sg_asset_type":  sg_asset_type,
+            "sg_asset_type": sg_asset_type,
             "sg_status_list": "fin"
         }
-        self.sg.create("Asset", new_asset_data)  #  인스턴스 변수 사용
+
+        new_asset = self.sg.create("Asset", new_asset_data)
+        print(f" 새로운 Asset 생성 완료! ID: {new_asset['id']}")
 
     def redata_for_flow(self,asset_list):
         
