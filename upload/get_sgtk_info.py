@@ -2,7 +2,8 @@ import os
 import sgtk
 import sys
 import shutil
-
+import re
+import moviepy
 sys.path.append('/home/rapa/NA_Spirit/utils')
 sys.path.append('/home/rapa/NA_Spirit/DB/lib')
 
@@ -10,6 +11,7 @@ sys.path.append('/home/rapa/NA_Spirit/DB/lib')
 from sg_path_utils import SgPathUtils
 from flow_utils import FlowUtils
 from db_crud import AssetDb
+
 
 
 class ShotGridAssetManager:
@@ -49,8 +51,9 @@ class ShotGridAssetManager:
         category = split[-2] if len(split) > 1 else ""
 
         self.destination_path = f"/nas/spirit/DB/source/{asset_name}"
+        self.playblast_path = f"/nas/spirit/DB/turnaround/{asset_name}.mov"
 
-        asset_info = {
+        self.asset_info = {
             "name": asset_name,
             "description": "",
             "asset_type": "3D Model",
@@ -72,7 +75,7 @@ class ShotGridAssetManager:
             "project_name": self.context.project["name"]
         }
 
-        return asset_info
+        return self.asset_info
 
     def find_asset_path(self, asset_name: str) -> str:
         """
@@ -118,6 +121,24 @@ class ShotGridAssetManager:
             print(f"폴더 복사가 완료되었습니다: {source_folder} -> {destination_folder}")
         except Exception as e:
             print(f"폴더 복사 중 오류 발생: {e}")
+    def copy_file(self, source_path: str, destination_path: str):
+        """
+        특정 폴더를 대상 경로로 복사하는 메서드.
+
+        :param source_folder: 원본 폴더 경로
+        :param destination_folder: 복사할 대상 폴더 경로
+        """
+        if not os.path.exists(destination_path):
+            raise FileNotFoundError(f"원본 폴더가 존재하지 않습니다: {source_path}")
+
+        if os.path.exists(destination_path):
+            shutil.rmtree(destination_path)  # 기존 폴더 삭제
+
+        try:
+            shutil.copyfile(source_path, destination_path)
+            print(f"폴더 복사가 완료되었습니다: {source_path} -> {destination_path}")
+        except Exception as e:
+            print(f"폴더 복사 중 오류 발생: {e}")
 
     def get_thumbnail_url(self, asset_name: str , thumbnail_url):
         """
@@ -150,12 +171,53 @@ class ShotGridAssetManager:
 
         self.copy_folder(asset_dir, self.destination_path)
 
+        playblast_dir = os.path.join(asset_dir,"publish","playblast")
+        playblast_path = self.get_latest_version_file(playblast_dir)
+        if playblast_path:
+            self.copy_file(playblast_path, self.playblast_path)
+            mp4_path = self.convert_mov_to_mp4(self.playblast_path)
+            self.asset_info["video_url"] = mp4_path
+
         try:
-            AssetDb().upsert_asset(asset_info)
+            AssetDb().upsert_asset(self.asset_info)
             print(f"에셋 정보:\n{asset_info}")
         except Exception as e:
             print(f"데이터베이스 업로드 실패: {e}")
+            
+    def convert_mov_to_mp4(self, video_path):
+        clip = moviepy.VideoFileClip(video_path)
+        video_path, ext = os.path.splitext(video_path)
+        mp4_video_name = f"{video_path}.mp4"
+        print(mp4_video_name)
+        clip.write_videofile(mp4_video_name)
+        return mp4_video_name
+        
+    def get_latest_version_file(self,folder_path):
+        """
+        주어진 폴더에서 '파일명.v###.ma' 형식의 파일 중 최신 버전의 파일을 반환
 
+        :param folder_path: 검색할 폴더 경로
+        :return: 최신 버전의 파일 전체 경로 또는 None
+        """
+        pattern = re.compile(r"^(.*)\.v(\d{3})\.ma$")  # 정규식 패턴 (모든 베이스 이름 지원)
+
+        latest_version = -1
+        latest_file = None
+
+        for file in os.listdir(folder_path):
+            match = pattern.match(file)
+            if match:
+                base_name, version = match.groups()  # 파일명과 버전 추출
+                version = int(version)  # 버전 번호를 정수 변환
+
+                if version > latest_version:
+                    latest_version = version
+                    latest_file = file
+
+        if latest_file:
+            return os.path.join(folder_path, latest_file)
+        else:
+            return None
 
 # 사용 예시
 if __name__ == "__main__":

@@ -8,20 +8,20 @@ class PlayblastGenerator:
 
     def __init__(self):
         self._playblast_options = {
-            'startTime':0,
-            'endTime':0,
-            "format": "qt",
+            'startTime': 0,
+            'endTime': 0,
+            "format": "image",
             "filename": "",
             "sequenceTime": False,
             "clearCache": True,
-            "viewer": True,
-            "showOrnaments": True,
+            "viewer": False,  # 자동 재생 방지
+            "showOrnaments": False,  # UI 요소 제거
             "framePadding": 4,
-            "percent": 50,
+            "percent": 100,  # 100% 해상도 유지
             "compression": "png",
-            "quality": 70,
-            "exposure": 0,
-            "gamma": 1
+            "quality": 100,
+            "widthHeight": (1920, 1080),  # 해상도 설정
+            "offScreen": True  # 뷰포트 크기 영향 방지
         }        
         
     

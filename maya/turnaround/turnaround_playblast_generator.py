@@ -10,7 +10,7 @@ class TurnAroundPlayblastGenerator(playblast_generator.PlayblastGenerator):
     """
     def __init__(self):
         super().__init__()
-        self.__turnaround_cam = "publish_turnaround_cam#" # 턴어라운드 카메라 이름
+        self.__turnaround_cam = "main_cam#" # 턴어라운드 카메라 이름
         self.__turnaround_cam_group = "publish_turnaround_cam_group"   # 턴어라운드 카메라 그룹 이름
         self.user_cammera_name = "" # 유저가 사용하고 있는 기존 persp 뷰의 카메라 이름
         self.__offset_pos = {

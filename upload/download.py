@@ -1,11 +1,35 @@
 import os
 import maya.cmds as cmds
+import shutil
+import sys
+import re
+import sgtk
+sys.path.append('/home/rapa/NA_Spirit/utils')
+from sg_path_utils import SgPathUtils
 # file_path = 'D:/NA_Spirit_assets/apple_box\\MDL\\publish\\maya\\apple_box_MDL.v006.ma'
 
 class DownloadReferencePathMatcher:
-    def __init__(self):
-        
-    def open_maya_file_force(file_path):
+    def __init__(self,context):
+        self.context = context
+        self.project_dir = self.get_project_directory()
+        self.asset_dir = os.path.join(self.project_dir, "assets")
+
+
+
+    def get_project_directory(self) -> str:
+        """
+        현재 ShotGrid Toolkit 프로젝트의 루트 디렉토리를 반환.
+
+        :return: 프로젝트 디렉토리 경로 (str)
+        """
+        if not self.context or not self.context.project:
+            raise ValueError("현재 ShotGrid 프로젝트 컨텍스트를 찾을 수 없습니다.")
+
+        # 프로젝트의 루트 디렉토리 가져오기
+        tk = self.engine.sgtk
+        return tk.project_path
+
+    def open_maya_file_force(self,file_path):
         cmds.file(file_path, 
           force=True,  # 기존 씬 변경 내용 무시하고 강제 오픈
           open=True, 
@@ -14,7 +38,7 @@ class DownloadReferencePathMatcher:
           loadReferenceDepth="none",  # 처음에는 reference를 불러오지 않음
           options="v=0")  # 추가적인 창이 뜨지 않도록 설정
 
-    def find_files_by_extension(root_dir, extensions):
+    def find_files_by_extension(self,root_dir, extensions):
         """
         주어진 디렉터리에서 특정 확장자를 가진 파일을 재귀적으로 찾음.
         
@@ -31,8 +55,7 @@ class DownloadReferencePathMatcher:
         return found_files
 
 
-    def open_ref_file(file_path):
-        file_path = r'D:\NA_Spirit_assets\apple_box\RIG\work\maya\apple_box_RIG.v003.ma'
+    def open_ref_file(self,file_path):
         cmds.file(file_path, 
                 force=True,  # 변경 사항 무시하고 강제 오픈
                 open=True, 
@@ -41,7 +64,7 @@ class DownloadReferencePathMatcher:
                 loadReferenceDepth="all")  # Reference 모두 로드
 
 
-    def replace_reference_paths(input1, input2):
+    def replace_reference_paths(self,input1, input2):
         """
         Maya 씬의 모든 reference 노드를 찾아 기존 경로를 input1에서 input2로 변경하여 기존 노드에 반영.
 
@@ -85,7 +108,24 @@ class DownloadReferencePathMatcher:
             print("⚠️ 변경된 reference가 없습니다.")
 
 
+    def copy_folder(self, source_folder: str, destination_folder: str):
+        """
+        특정 폴더를 대상 경로로 복사하는 메서드.
 
+        :param source_folder: 원본 폴더 경로
+        :param destination_folder: 복사할 대상 폴더 경로
+        """
+        if not os.path.exists(source_folder):
+            raise FileNotFoundError(f"원본 폴더가 존재하지 않습니다: {source_folder}")
+
+        if os.path.exists(destination_folder):
+            shutil.rmtree(destination_folder)  # 기존 폴더 삭제
+
+        try:
+            shutil.copytree(source_folder, destination_folder)
+            print(f"폴더 복사가 완료되었습니다: {source_folder} -> {destination_folder}")
+        except Exception as e:
+            print(f"폴더 복사 중 오류 발생: {e}")
 
     def replace_text_in_ascii_file(input_file, target_string, replacement_string):
         """
@@ -93,7 +133,6 @@ class DownloadReferencePathMatcher:
         and writes the modified content to a new file.
 
         :param input_file: Path to the input ASCII file.
-        :param output_file: Path to save the modified file.
         :param target_string: The string to be replaced.
         :param replacement_string: The string to replace with.
         """
@@ -115,28 +154,85 @@ class DownloadReferencePathMatcher:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    def process(self):        
+    def process(self,category, db_asset_dir):
+        current_session = self.get_current_maya_scene_path()
+
+        asset_name = os.path.dirname(db_asset_dir)
+        project_asset_dir = os.path.join(self.project_dir, "assets", category, asset_name)
+
         # 검색할 디렉터리 경로 설정
-        root_directory = "/nas/spirit/project/spirit/assets/Prop/apple_box"  # 원하는 경로로 변경
+        self.copy_folder(db_asset_dir, project_asset_dir)
 
         # ma, mb 파일 찾기
-        maya_files = self.find_files_by_extension(root_directory, (".ma", ".mb"))
+        self.replace_paths(project_asset_dir)
 
+        rig_ma_publish_dir = os.path.join(project_asset_dir, "RIG", "publish", "maya")
+        last_rig_ma = self.get_latest_version_file(rig_ma_publish_dir)
+
+        self.open_maya_file_force(current_session)
+        cmds.file(last_rig_ma, reference=True)
+
+
+    def replace_paths(self, project_asset_dir):
+        references = cmds.file(q=True, reference=True) or []
+        if references:
+            original_path = cmds.referenceQuery(references[0], filename=True, withoutCopyNumber=True)
+        original_dir = SgPathUtils.trim_entity_path(original_path)[0]
+        maya_files = self.find_files_by_extension(project_asset_dir, (".ma", ".mb"))
         # usd 파일 찾기
-        usd_files = self.find_files_by_extension(root_directory, ".usd")
-        print(usd_files)
+        usd_files = self.find_files_by_extension(project_asset_dir, ".usd")
         # 결과 출력
         print("Maya Files (.ma, .mb):", maya_files)
         print("USD Files (.usd):", usd_files)
-            # 사용 예시
-        input1 = "/nas/spirit/project/spirit/assets/Prop/"  # 기존 경로 패턴
-        input2 = "D:/NA_Spirit_assets/"  # 변경할 새로운 경로
+
+        self.open_maya_file_force(maya_files[0])
+
         for maya_file in maya_files:
             self.open_maya_file_force(maya_file)
-            self.replace_reference_paths(input1, input2)
+            self.replace_reference_paths(original_dir, project_asset_dir)
 
         for usd_file in usd_files:
-            self.replace_text_in_ascii_file(usd_file, input1, input2)
+            self.replace_text_in_ascii_file(usd_file, original_dir, project_asset_dir)
 
-    # Example usage
-    replace_text_in_ascii_file("/home/rapa/NA_Spirit/SH0010.usd", "/home/rapa/NA_Spirit", "/home/rapa/NA_BATZ")
+    
+        
+    def get_latest_version_file(self,folder_path):
+        """
+        주어진 폴더에서 '파일명.v###.ma' 형식의 파일 중 최신 버전의 파일을 반환
+
+        :param folder_path: 검색할 폴더 경로
+        :return: 최신 버전의 파일 전체 경로 또는 None
+        """
+        pattern = re.compile(r"^(.*)\.v(\d{3})\.ma$")  # 정규식 패턴 (모든 베이스 이름 지원)
+
+        latest_version = -1
+        latest_file = None
+
+        for file in os.listdir(folder_path):
+            match = pattern.match(file)
+            if match:
+                base_name, version = match.groups()  # 파일명과 버전 추출
+                version = int(version)  # 버전 번호를 정수 변환
+
+                if version > latest_version:
+                    latest_version = version
+                    latest_file = file
+
+        if latest_file:
+            return os.path.join(folder_path, latest_file)
+        else:
+            return None
+
+    def get_current_maya_scene_path(self):
+        """
+        현재 열린 Maya 씬의 전체 파일 경로를 반환합니다.
+        씬이 저장되지 않았다면 'untitled'를 반환합니다.
+        """
+        scene_path = cmds.file(q=True, sceneName=True)
+
+        if not scene_path:
+            print("⚠️ 현재 씬은 저장되지 않았습니다. (untitled)")
+            return None
+        
+        print(f"📌 현재 씬 경로: {scene_path}")
+        return scene_path
