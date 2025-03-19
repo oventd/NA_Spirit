@@ -1,7 +1,7 @@
 # 로거 파일 추가해서 유저가 중요한 
 ##### json 파일은 나스피릿에 넣고 이그노어 에 포함
 
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
+from PySide6.QtWidgets import  QLabel, QWidget
 from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
 from PySide6.QtGui import QPixmap, QPixmap, QIcon
 from PySide6.QtUiTools import QUiLoader
@@ -29,15 +29,9 @@ for root, dirs, files in os.walk(na_spirit_dir):
 
 from assetmanager import AssetService  # AssetService 임포트
 from assetmanager import ClickableLabel
-
-from PySide6.QtCore import QObject, QEvent, Qt
+from PySide6.QtCore import Qt
 from constant import *
-         
-# from add_video_player import *
-
-from emitter_class import EmitterParent
 from like_state import LikeState
-
 from asset import Asset
 from check import Check
 from subwin import SubWin
@@ -45,7 +39,6 @@ from dynamic_circle_label import DynamicCircleLabel
 from logger import *
 from download_manager import DownloadManager
 from json_manager import DictManager
-from bson import ObjectId
 from ui_loader import UILoader   
 
 
@@ -80,17 +73,16 @@ class TableUiManager:
             self.ui.like_download_btn_area.clicked.connect(download_manager.download_likged_assets_all)
             self.ui.download_btn.clicked.connect(download_manager.download_likged_assets)
             self.logger = create_logger(UX_Like_ASSET_LOGGER_NAME, UX_Like_ASSET_LOGGER_DIR)
-            self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.asset_dict = {}
-            self.like_state = LikeState()
-
+        
     def search_input(self, search_word):
+        """검색할 단어 검색 후 업데이트 테이블 실행 메서드"""
         self.search_word = search_word
         self.update_table()
 
-#라벨 초기화 함수 실행
-    def remove_lable(self):
 
+    def remove_lable(self):
+        
         while self.ui.image_widget_s.count() > 0:
             item = self.ui.image_widget_s.takeAt(0)
             if item.widget():
@@ -105,15 +97,15 @@ class TableUiManager:
             if item.widget():
                 item.widget().deleteLater()
 
-        # ✅ 기존 stackedWidget_2 내부의 QLabel 삭제
+        #  기존 stackedWidget_2 내부의 QLabel 삭제
         for label in self.ui.stackedWidget_2.findChildren(QLabel):
             label.deleteLater()
 
-        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
         for video_widget in self.ui.stackedWidget_2.findChildren(QVideoWidget):
             video_widget.deleteLater()
 
-        # ✅ 비디오 플레이어 리스트도 정리
+        #  비디오 플레이어 리스트도 정리
         self.video_widgets = []
         self.video_players = []
 
@@ -132,20 +124,20 @@ class TableUiManager:
         ui = self.ui  # UI 객체 참조
         print(f"여기 리스트 랜의 갯수를 알려줍니당 {list_len}")
 
-        # ✅ 기존 image_widget_s 내부의 위젯 삭제
+        #  기존 image_widget_s 내부의 위젯 삭제
         while ui.image_widget_s.count() > 0:
             item = ui.image_widget_s.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
 
-        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
         for widget in ui.stackedWidget_2.findChildren(QVideoWidget):
             widget.deleteLater()
 
         self.make_video_labels = []  # 리스트 초기화
         self.video_players = []  # QMediaPlayer 객체 리스트
 
-        # ✅ 새로운 QVideoWidget 추가
+        # 새로운 QVideoWidget 추가
         for _ in range(list_len):  
             video_widget = QVideoWidget(ui.stackedWidget_2)  # 부모 설정
             video_widget.setGeometry(0, 0, 380, 291)  #  위치 (0, 53) 크기 (380x291) 설정
@@ -154,13 +146,13 @@ class TableUiManager:
             player = QMediaPlayer()
             player.setVideoOutput(video_widget)
 
-            # ✅ UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
+            #  UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
 
-            # ✅ 리스트에 저장
+            #  리스트에 저장
             self.make_video_labels.append(video_widget)
             self.video_players.append(player)
 
-        print("✅ 비디오 위젯 생성 완료")
+        print(" 비디오 위젯 생성 완료")
 
 
 
@@ -195,11 +187,10 @@ class TableUiManager:
             for key, value in Check().dict.items():
                 filter_conditions[key] = value      ##### 쿼리를 만드는 부분
 
-        # if filter_conditions == list:
-        #     AssetService.get_asset_by_id_all(filter_conditions, sort_by, limit, skip, search_word)
+        
             
         assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip,search_word)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
-        # print(f"여기에 테이블위젯 구정하는 assets 들어있어요 <<>>>>>>{assets}")
+    
         
         self.ui.tableWidget.clear()
         self.make_table(assets)
@@ -238,7 +229,6 @@ class TableUiManager:
         layout.setContentsMargins(0, 0, 0, 10)  # 여백 제거
         layout.setAlignment(Qt.AlignTop)
 
-        #asset[]#여기에 찾을 항목 적어서 값 도출  
 
         Thum = ClickableLabel("썸네일", parent=widget)
         name = ClickableLabel("이름", parent=widget)

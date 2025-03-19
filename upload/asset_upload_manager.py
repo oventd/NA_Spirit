@@ -20,8 +20,8 @@ class AssetUploadManager:
         """
         ShotGrid 프로젝트의 정보를 가져오고, 에셋 관련 작업을 수행하는 클래스.
         """
-        self.engine = sgtk.platform.current_engine()  # ShotGrid Toolkit 엔진 가져오기
-        self.context = self.engine.context  # 컨텍스트 가져오기
+        # self.engine = sgtk.platform.current_engine()  # ShotGrid Toolkit 엔진 가져오기
+        # self.context = self.engine.context  # 컨텍스트 가져오기
 
         self.project_dir = self.get_project_directory()
         self.db_thub_path = "/nas/spirit/DB/thum/3d_assets"

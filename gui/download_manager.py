@@ -21,13 +21,15 @@ for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
    
-
+sys.path.append("/home/rapa/NA_Spirit/upload")
 from constant import *
 from logger import *
 from like_state import LikeState
 from asset import Asset
 from assetmanager import AssetService
 from send_asset_flow import SendAssetFlow
+from asset_download_manager import AssetDownloadManager
+import sgtk
 
 class DownloadManager:
     
@@ -60,7 +62,8 @@ class DownloadManager:
             self.ui.download_format_label.setPixmap(self.ref_download_toggle_pixmap)
             self.setDownloadFormat = False  #False가 레퍼런스
             self.logger = create_logger(UX_DOWNLOAD_LOGGER_NAME, UX_DOWNLOAD_LOGGER_DIR)
-    
+            self.engine = sgtk.platform.current_engine()  # ShotGrid Toolkit 엔진 가져오기
+            self.context = self.engine.context  # 컨텍스트 가져오기
     def download_likged_assets_all(self):
         """
         다운로드 리스트를 하트 누른 리스트에서 가져온 뒤 
@@ -163,6 +166,13 @@ class DownloadManager:
             format = 'Reference'
             print(f"{selected_ids_list}이(가) {format}로 다운로드되었습니다")
             self.sender.redata_for_flow(selected_ids_list)
+
+            assets=AssetService().get_assets_by_ids_all_return(selected_ids_list)
+            for asset in assets:
+                category = asset["category"]
+                source_path = asset["source_url"]
+                print(category, source_path)
+                AssetDownloadManager(self.context).process(category,source_path)
         else:
             format = 'Import'
             print(f"{selected_ids_list}이(가) {format}로 다운로드되었습니다")
@@ -171,3 +181,6 @@ class DownloadManager:
     def on_button_click(self):
         # 버튼 클릭 시 입력된 값을 MainWindow로 전달하는 시그널 발생
         value = self.ui.lineEdit.text()  # 입력된 텍스트 가져오기
+
+download = DownloadManager()
+download.download_all()

@@ -11,6 +11,8 @@ class DictManager:
         
         :param data_dict: 저장할 dict 데이터
         """
+        if not isinstance(data_dict, list):
+            print("잘못된 형식이에요 오브젝트 id가 들어있는 list형식만 가능합니다")  # 리스트가 아니면 None 반환 
         try:
             with open(cls.file_path, 'w') as json_file:
                 json.dump(data_dict, json_file, indent=4)  # 데이터를 JSON 형식으로 저장
