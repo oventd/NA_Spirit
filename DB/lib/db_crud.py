@@ -34,32 +34,47 @@ class DbCrud:
     # Create (데이터 생성 또는 업데이트)
     def upsert_data(self, filter_conditions, update_fields=None):
         """
-        데이터가 없으면 새로 생성하고, 있으면 업데이트하는 메서드.
-        :param filter_conditions: 찾을 조건
-        :param update_fields: 삽입 또는 업데이트할 필드
-        :return: 업데이트 또는 삽입된 문서
+        에셋이 없으면 생성하고, 있으면 업데이트하는 메서드.
+        :param filter_conditions: 찾을 조건 (dict)
+        :param update_fields: 삽입 또는 업데이트할 필드 (dict)
+        :return: 업데이트 또는 삽입된 문서의 ID
         """
         if not update_fields:
-            raise ValueError("data_fields는 기본으로 제공되어야 합니다.")
+            raise ValueError("업데이트할 필드가 제공되지 않았습니다.")
+        
+        existing_document = self.collection.find_one(filter_conditions)
+        
+        if existing_document:
+            # 기존 데이터가 있으면 업데이트만 수행
+            update_data = {"$set": {"updated_at": datetime.utcnow()}}  # 변경 시간 갱신
 
-        update_data = {
-            "$set": {UPDATED_AT: datetime.utcnow()},
-            "$setOnInsert": {CREATED_AT: datetime.utcnow()}
-        }
+            if update_fields:
+                update_fields_copy = update_fields.copy()
 
-        update_data["$set"].update(update_fields)
-        update_data["$setOnInsert"].update(update_fields)
-        update_data["$setOnInsert"].update(filter_conditions)
+                for key, value in update_fields_copy.items():
+                    if existing_document.get(key) == value:
+                        print(f"'{key}' 필드 값이 동일하므로 업데이트하지 않습니다.")
+                        update_fields.pop(key)  # 동일한 값은 업데이트 리스트에서 제거
+                # 업데이트 필드 적용
+                update_data["$set"].update(update_fields)
 
-        # 데이터가 없으면 삽입, 있으면 업데이트
-        result = self.collection.update_one(filter_conditions, update_data, upsert=True)
+            # 데이터가 존재하면 업데이트
+            result = self.collection.update_one(filter_conditions, update_data, upsert=False)
+            print(f"기존 자산 업데이트 완료")
 
-        if result.upserted_id:
-            print(f"새로운 데이터 생성되었습니다.: {result.upserted_id}")
+        # 데이터가 없으면 새로 생성
         else:
-            print(f"기존 데이터 업데이트 완료: {result.modified_count}개 문서 수정되었습니다.")
+            new_data = {
+                **filter_conditions,  # filter_conditions에 있는 데이터 추가
+                "created_at": datetime.utcnow(),  # 최초 생성 시간 추가
+                "updated_at": datetime.utcnow()   # 변경 시간 추가
+            }
+            new_data.update(update_fields)
 
-        self.logger.info(f"Upsert operation result: {result.raw_result}")
+            # 새로 삽입
+            result = self.collection.update_one(filter_conditions, {"$set": new_data}, upsert=True)
+            print(f"새로운 자산 생성: {result.upserted_id}")
+
         return result
     
     # Read(조회 쿼리 파이프라인 생성)
@@ -83,11 +98,11 @@ class DbCrud:
         query_filter = {} # 필터 조건 저장 딕셔너리
 
         default_sort_orders = {
-            CREATED_AT: (UPDATED_AT, pymongo.DESCENDING),
+            CREATED_AT: (CREATED_AT, pymongo.DESCENDING),
             UPDATED_AT: (UPDATED_AT, pymongo.ASCENDING),
             DOWNLOADS: (DOWNLOADS, pymongo.DESCENDING),
-        }                   
-
+        }
+        
         pipeline = [] # 쿼리 파이프라인
         if limit:
             pipeline.append({"$limit": limit})
@@ -129,6 +144,20 @@ class DbCrud:
             sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, pymongo.ASCENDING))
             pipeline.append({"$sort": {sort_by: sort_order}})
             print(f"기본 정렬 기준 적용: {sort_by}, {sort_order}")
+
+        # sort_by가 제공되지 않았을 때 기본값을 설정
+        if not sort_by:
+            sort_by = CREATED_AT
+            sort_order = pymongo.DESCENDING
+            print(f"기본 정렬 기준 적용: {sort_by}, {sort_order}")
+
+        # default_sort_orders에서 추가 정렬 조건 설정
+        if sort_by in default_sort_orders:
+            sort_by, sort_order = default_sort_orders.get(sort_by, (sort_by, pymongo.ASCENDING))
+
+        print(f"최종 정렬 기준 적용: {sort_by}, {sort_order}")
+
+
 
         self.logger.debug(f"Generated Query Pipeline: {pipeline}")
         return pipeline
@@ -175,7 +204,6 @@ class DbCrud:
         :param fields: 반환할 필드를 지정하는 리스트
         :return: 자산의 상세 정보
         """
-
         projection = None 
         # 필드가 주어지면 해당 필드 반환
         if fields:
@@ -265,19 +293,28 @@ class AssetDb(DbCrud):
             # self.logger.info("Indexes set up for AssetDb")
 
     # Create (에셋 생성 및 업데이트)
-    def upsert_asset(self, project_name, asset_name, update_fields):
+    def upsert_asset(self, asset_data):
         """
-        에셋이 없은 경우 새로 생성하고, 있은 경우 업데이트.
-        :param project_name: 프로젝트 이름
-        :param name: 에셋 이름
-        :param update_fields: 업데이트할 필드 (선택 사항)
+        자산 데이터를 업데이트하거나 새로 추가합니다.
+        :param asset_data: 자산 데이터 (딕셔너리 형태)
         """
+        # upsert_data(asset_data)
+        project_name = asset_data.get("project_name")
+        asset_name = asset_data.get("name")
+
         if not project_name or not asset_name:
             raise ValueError("필수 필드 'project_name'과 'name'이 제공되지 않았습니다~~!")
         
         filter_conditions = {"project_name": project_name, "name": asset_name}
-        return self.upsert_data(filter_conditions, update_fields)
-    
+
+        # 업데이트할 필드 설정
+        update_fields = {}
+        for key, value in asset_data.items():
+            if key not in ["project_name", "name"]:
+                update_fields[key] = value
+
+        result = super().upsert_data(filter_conditions=filter_conditions, update_fields=update_fields)
+        return result
 
 if __name__ == "__main__":
     db = DbCrud()
