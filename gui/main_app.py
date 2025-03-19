@@ -13,7 +13,7 @@ for root, dirs, files in os.walk(na_spirit_dir):
         sys.path.append(root)
 
 from constant import *
-from assetmanager import AssetManager
+
 from default_ui_manager import DefaultUiManager
 from table_ui_manager import TableUiManager
 from tree_ui_manager import TreeUiManager
