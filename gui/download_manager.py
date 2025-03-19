@@ -1,14 +1,10 @@
 import sys, os
 try:
-    from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QListWidgetItem
-    from PySide6.QtUiTools import QUiLoader  # .ui 파일을 동적으로 로드하는 데 사용
-    from PySide6.QtCore import QFile, Signal
+    from PySide6.QtWidgets import QListWidgetItem
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QPixmap
 except:
-    from PySide2.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QWidget, QListWidgetItem
-    from PySide2.QtUiTools import QUiLoader  # .ui 파일을 동적으로 로드하는 데 사용
-    from PySide2.QtCore import QFile, Signal
+    from PySide2.QtWidgets import QListWidgetItem
     from PySide2.QtCore import Qt
     from PySide2.QtGui import QPixmap
 
@@ -24,15 +20,13 @@ na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
 for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
+   
 
 from constant import *
 from logger import *
 from like_state import LikeState
 from asset import Asset
 from assetmanager import AssetService
-from functools import partial
-
-
 from send_asset_flow import SendAssetFlow
 
 class DownloadManager:
@@ -54,8 +48,6 @@ class DownloadManager:
             self.download_list_asset ={}
             self.like_state = LikeState()
             self.sender=SendAssetFlow()
-           
-        
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()

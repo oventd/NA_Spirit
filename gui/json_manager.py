@@ -1,6 +1,5 @@
 import json
 import os
-from assetmanager import AssetService
 
 class DictManager:
     file_path = '/nas/spirit/gui/json/like_asset_data.json'  # 클래스 변수로 파일 경로 설정

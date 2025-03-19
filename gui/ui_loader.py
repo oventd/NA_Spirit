@@ -2,12 +2,12 @@ try:
     from PySide6.QtUiTools import QUiLoader
     from PySide6.QtCore import QFile
     from PySide6.QtWidgets import QWidget, QApplication
-    from PySide6.QtGui import QScreen
+
 except:
     from PySide2.QtUiTools import QUiLoader
     from PySide2.QtCore import QFile
     from PySide2.QtWidgets import QWidget, QApplication
-    from PySide2.QtGui import QScreen
+
 
 
 class UILoader:
@@ -39,9 +39,9 @@ class UILoader:
         return self.ui
 
     def center(self):
-        screen = QApplication.primaryScreen()  # ✅ QApplication을 사용하여 기본 화면 가져오기
-        screen_geometry = screen.availableGeometry()  # ✅ 사용 가능한 화면 크기 가져오기
+        screen = QApplication.primaryScreen()  #  QApplication을 사용하여 기본 화면 가져오기
+        screen_geometry = screen.availableGeometry()  #  사용 가능한 화면 크기 가져오기
         x = (screen_geometry.width() - self.ui.width()) // 2
         y = (screen_geometry.height() - self.ui.height()) // 2
-        self.ui.move(x, y)  # ✅ 화면 중앙으로 이동
+        self.ui.move(x, y)  #  화면 중앙으로 이동
 

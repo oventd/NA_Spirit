@@ -1,7 +1,7 @@
 try:
-    from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
+    from PySide6.QtWidgets import QMainWindow, QApplication
 except:
-    from PySide2.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGraphicsOpacityEffect
+    from PySide2.QtWidgets import QMainWindow, QApplication
 
 import sys
 import os
