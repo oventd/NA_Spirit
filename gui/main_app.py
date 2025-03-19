@@ -32,7 +32,7 @@ class MainUi(QMainWindow):
         if not hasattr(self, "_initialized"):  
             super().__init__()
             self._initialized = True  
-            ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
+            ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
             TableUiManager()

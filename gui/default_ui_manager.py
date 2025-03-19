@@ -12,7 +12,7 @@ for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root: 
         sys.path.append(root)
 
-sys.path.append("/home/llly/NA_Spirit/upload/") 
+sys.path.append("/home/rapa/NA_Spirit/upload/") 
 from get_sgtk_info import ShotGridAssetManager
 from constant import *
 from tree_ui_manager import TreeUiManager
