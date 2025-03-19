@@ -648,6 +648,12 @@ QTreeWidget::item:selected {
 
 </string>
     </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+    </property>
     <property name="editTriggers">
      <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
     </property>
