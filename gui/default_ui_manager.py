@@ -36,7 +36,6 @@ class DefaultUiManager:
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
-
             self.main_ui_setting()
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
 
@@ -83,7 +82,7 @@ class DefaultUiManager:
                 border: 1px solid #303030;;
             }
         """)
-        # self.user_num()
+        self.user_num()
         
         TreeUiManager.tree_widget()
         TableUiManager().update_table(None,UPDATED_AT, 50, 0,None)

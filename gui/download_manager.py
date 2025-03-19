@@ -62,6 +62,10 @@ class DownloadManager:
             self.logger = create_logger(UX_DOWNLOAD_LOGGER_NAME, UX_DOWNLOAD_LOGGER_DIR)
     
     def download_likged_assets_all(self):
+        """
+        다운로드 리스트를 하트 누른 리스트에서 가져온 뒤 
+        에셋정보 추출하고 다음 메서드로 넘져주는 메서드
+        """
 
         self.ui.download_listwidget.clear()
         self.exemples = self.like_state.like_asset_list
@@ -73,6 +77,7 @@ class DownloadManager:
 
 
     def download_likged_assets(self):
+      
   
         self.ui.download_listwidget.clear()
         self.ui.stackedWidget.show()
@@ -129,9 +134,6 @@ class DownloadManager:
             }
         """)
             
-
-
-
             
     def download_all(self):
         """
