@@ -1,0 +1,10 @@
+[
+    {
+        "geo_prim": "/Root/geo/MeetMat/Low/Mesh_01_Head_Low",
+        "mat_path": "/Root/mat/Body_TX1SG"
+    },
+    {
+        "geo_prim": "/Root/geo/MeetMat/Low/Mesh_02_Body_Low",
+        "mat_path": "/Root/mat/Head_TX1SG"
+    }
+]

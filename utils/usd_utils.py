@@ -1,4 +1,5 @@
 from pxr import Usd, UsdGeom, Sdf, Gf, UsdShade
+import json
 
 class UsdUtils:
     @staticmethod
@@ -69,6 +70,8 @@ class UsdUtils:
         variant_set = xform.GetVariantSets().AddVariantSet(variant_set_name)
         stage.GetRootLayer().Save()
         return variant_set
+
+
     @staticmethod
     def add_reference_to_variant_set(prim, variant_set_name, variants : dict, set_default = True):
         variant_set = prim.GetVariantSets().GetVariantSet(variant_set_name)
@@ -164,28 +167,26 @@ class UsdUtils:
         material = UsdShade.Material.Get(stage, material_path)
         UsdShade.MaterialBindingAPI(prim).Bind(material)
         stage.GetRootLayer().Save()
+    
+        # 추가 코드 작성
+    @staticmethod
+    def process_usd_and_bind():
+        root_stage = UsdUtils.get_stage("/home/rapa/NA_Spirit/root.usd")
+        root_prim = UsdUtils.get_prim(root_stage, "/Root")
+        root_dict = UsdUtils.usd_to_dict(root_prim)
+
+        geo_paths = UsdUtils.find_prim_paths_by_type(root_dict, "Mesh")
+        mat_paths = UsdUtils.find_prim_paths_by_type(root_dict, "Material")
+
+        # 매테리얼과 지오메트리 바인딩
+        for geo_path, mat_path in zip(geo_paths, mat_paths):
+            geo_prim = UsdUtils.get_prim(root_stage, geo_path)
+            UsdUtils.bind_material(geo_prim, mat_path)
+
 
 if __name__ == "__main__":
 
-    # root_stage = UsdUtils.create_usd_file("/home/rapa/NA_Spirit/root.usd", ascii=True)
-    root_stage = UsdUtils.get_stage("/home/rapa/NA_Spirit/root.usd")
-    root_prim = UsdUtils.get_prim(root_stage, "/Root")
-    # root_prim = UsdUtils.create_scope(root_stage, "/Root")
-    # geo_prim = UsdUtils.create_scope(root_stage, "/Root/geo")
-    # mat_prim = UsdUtils.create_scope(root_stage, "/Root/mat")
-
-    # UsdUtils.add_reference(geo_prim, "/home/rapa/NA_Spirit/Mat_MDL.v005.usd")
-    # UsdUtils.add_reference(mat_prim, "/home/rapa/NA_Spirit/material_test.usd")
-    import pprint
-    root_dict = UsdUtils.usd_to_dict(root_prim)
-    pprint.pprint(root_dict)
-    geo_paths = UsdUtils.find_prim_paths_by_type(root_dict, "Mesh")
-    print(geo_paths)
-    mat_paths = UsdUtils.find_prim_paths_by_type(root_dict, "Material")
-    print(mat_paths)
-
-    geo_prim = UsdUtils.get_prim(root_stage, geo_paths[0])
-    UsdUtils.bind_material(geo_prim, mat_paths[0])
+    UsdUtils.process_usd_and_bind()
 
 
 
