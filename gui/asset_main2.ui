@@ -405,7 +405,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::FocusPolicy::NoFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">background: #080808;
@@ -413,13 +413,13 @@
 </string>
     </property>
     <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
     <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::AdjustIgnored</enum>
+     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
     </property>
     <property name="autoScroll">
      <bool>false</bool>
@@ -427,11 +427,17 @@
     <property name="autoScrollMargin">
      <number>0</number>
     </property>
+    <property name="tabKeyNavigation">
+     <bool>true</bool>
+    </property>
+    <property name="showDropIndicator" stdset="0">
+     <bool>true</bool>
+    </property>
     <property name="textElideMode">
-     <enum>Qt::ElideLeft</enum>
+     <enum>Qt::TextElideMode::ElideLeft</enum>
     </property>
     <property name="showGrid">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="columnCount">
      <number>5</number>
@@ -625,10 +631,10 @@ color:#ffffff;
 </string>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
+     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
     </property>
     <property name="selectionMode">
-     <enum>QAbstractItemView::NoSelection</enum>
+     <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
     </property>
     <property name="indentation">
      <number>10</number>
@@ -897,7 +903,7 @@ color:#ffffff;
      </font>
     </property>
     <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
+     <enum>Qt::LayoutDirection::LeftToRight</enum>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -913,7 +919,7 @@ color:#ffffff;
      </rect>
     </property>
     <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
+     <enum>QFrame::Shape::NoFrame</enum>
     </property>
     <property name="currentIndex">
      <number>0</number>
@@ -932,7 +938,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -982,7 +987,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1014,7 +1018,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1100,7 +1103,7 @@ color:#ffffff;
         <number>0</number>
        </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
+        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
        </property>
        <property name="topMargin">
         <number>0</number>
@@ -1120,7 +1123,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1158,7 +1160,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1210,7 +1211,7 @@ color:#ffffff;
        <string/>
       </property>
       <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -1253,7 +1254,7 @@ color:#ffffff;
         <number>12</number>
        </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
+        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
        </property>
        <item>
         <widget class="QLabel" name="license_type">
@@ -1270,7 +1271,7 @@ color:#ffffff;
           <string/>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -1289,7 +1290,7 @@ color:#ffffff;
           <string/>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -1308,7 +1309,7 @@ color:#ffffff;
           <string/>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -1632,7 +1633,7 @@ color:#ffffff;</string>
        <string>체크 후 다운로드 버튼을 누르면 다운이 시작됩니다</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -1661,7 +1662,7 @@ color:#ffffff;</string>
 유형을 골라주세요</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -1709,7 +1710,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1797,7 +1797,7 @@ color:#ffffff;
        <pixmap>../../../../nas/spirit/asset_project/source/download_btn_one.png</pixmap>
       </property>
       <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
      <zorder>label_6</zorder>

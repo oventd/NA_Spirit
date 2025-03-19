@@ -1,27 +1,20 @@
 # 로거 파일 추가해서 유저가 중요한 
 ##### json 파일은 나스피릿에 넣고 이그노어 에 포함
 
-try:
-    from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGraphicsOpacityEffect
-    from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
-    from PySide6.QtGui import QPixmap, QIcon
-    from PySide6.QtUiTools import QUiLoader
-    from PySide6.QtWidgets import QSizePolicy, QVBoxLayout
-    from PySide6.QtMultimedia import QMediaPlayer
-    from PySide6.QtMultimediaWidgets import QVideoWidget
-except:
-    from PySide2.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGraphicsOpacityEffect
-    from PySide2.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
-    from PySide2.QtGui import QPixmap, QIcon
-    from PySide2.QtUiTools import QUiLoader
-    from PySide2.QtWidgets import QSizePolicy, QVBoxLayout
-    from PySide2.QtMultimedia import QMediaPlayer
-    from PySide2.QtMultimediaWidgets import QVideoWidget
-
-from ui_loader import UILoader   
+from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
+from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
+from PySide6.QtGui import QPixmap, QPixmap, QIcon
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
+from PySide6.QtMultimedia import QMediaPlayer
+from PySide6.QtMultimediaWidgets import QVideoWidget
 from functools import partial
 import sys
 import os
+from PySide6.QtMultimedia import QMediaPlayer
+from PySide6.QtMultimediaWidgets import QVideoWidget
+from PySide6.QtCore import QUrl
+from ui_loader import UILoader   
 
 # 현재 파일(ui.py)의 절대 경로
 current_file_path = os.path.abspath(__file__)
@@ -37,6 +30,7 @@ for root, dirs, files in os.walk(na_spirit_dir):
 from assetmanager import AssetService  # AssetService 임포트
 from assetmanager import ClickableLabel
 
+from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
          
 # from add_video_player import *
@@ -70,17 +64,12 @@ class TableUiManager:
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
-
             self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.search_word =None
             self.ui.exit_btn.clicked.connect(self.exit_sub_win)
             self.ui.image_l_btn.clicked.connect(partial (SubWin.prev_slide, self.ui.stackedWidget_2))
             self.ui.image_r_btn.clicked.connect(partial (SubWin.next_slide, self.ui.stackedWidget_2))
-
-            
-            
-
             self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
             self.ui.search.textEdited.connect(self.search_input)
@@ -88,16 +77,9 @@ class TableUiManager:
             self.asset_manager = Asset()
             self.like_state = LikeState()
             self.like_state.like_asset_list = DictManager.load_dict_from_json()
-
-            
-
-# 버튼 이벤트 연결 (추가 인자 없이 호출)
             self.ui.like_download_btn_area.clicked.connect(download_manager.download_likged_assets_all)
-            
             self.ui.download_btn.clicked.connect(download_manager.download_likged_assets)
-
             self.logger = create_logger(UX_Like_ASSET_LOGGER_NAME, UX_Like_ASSET_LOGGER_DIR)
-
             self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.asset_dict = {}
             self.like_state = LikeState()
@@ -199,9 +181,9 @@ class TableUiManager:
         
     
     def update_table(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
-        ui = self.ui
+        ui = self.ui ## 체크 (변경하기)
 
-        ui.like_empty_notice.hide()
+        ui.like_empty_notice.hide()  ########주의
         search_word = self.search_word
         if self.search_word is not None:
             if len(self.search_word) < 3:
@@ -211,7 +193,7 @@ class TableUiManager:
             filter_conditions[OBJECT_ID] = LikeState().like_filter_condition[OBJECT_ID]
         if Check().dict:
             for key, value in Check().dict.items():
-                filter_conditions[key] = value
+                filter_conditions[key] = value      ##### 쿼리를 만드는 부분
 
         # if filter_conditions == list:
         #     AssetService.get_asset_by_id_all(filter_conditions, sort_by, limit, skip, search_word)
@@ -236,11 +218,14 @@ class TableUiManager:
 
         ui.tableWidget.setRowCount(rows)  # 행 개수 설정
         ui.tableWidget.setColumnCount(max_columns)  # 열 개수 설정
+        
+
 
         for index, asset in enumerate(assets):
             row_index = index // max_columns  # index 항목이 몇 번째 행(row)에 있는 정의
             col_index = index % max_columns   # 나머지를 통해 몇번째 열에 있는지 정의
             self.add_thumbnail(row_index, col_index, asset)
+        
 
     def add_thumbnail(self, row, col, asset):
         ui = self.ui
@@ -268,6 +253,7 @@ class TableUiManager:
         layout.addWidget(type)
 
         widget.setLayout(layout)  # 위젯에 레이아웃 설정
+        
 
         pixmap = QPixmap(thumbnail_path)
         if pixmap.isNull():
@@ -308,6 +294,8 @@ class TableUiManager:
 
         ui.tableWidget.setCellWidget(row, col, widget)  # 행과 열에 이미지 추가
         ui.tableWidget.resizeRowsToContents() 
+      
+
 
     def exit_sub_win(self):
         self.ui.stackedWidget.hide()
