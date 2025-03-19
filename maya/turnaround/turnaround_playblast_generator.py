@@ -111,6 +111,8 @@ class TurnAroundPlayblastGenerator(playblast_generator.PlayblastGenerator):
         # 턴어라운드 카메라를 persp 뷰에 설정
         self.set_persp_camera(self.__turnaround_cam)
 
+        self.run()
+
     def run(self):
 
         # 프레임레인지 설정
