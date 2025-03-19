@@ -693,7 +693,7 @@ QTreeWidget::item:selected {
      <property name="font">
       <font>
        <family>Pretendard Light</family>
-       <pointsize>12</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="flags">
@@ -751,7 +751,7 @@ QTreeWidget::item:selected {
      <property name="font">
       <font>
        <family>Pretendard Light</family>
-       <pointsize>12</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="flags">
@@ -842,7 +842,7 @@ QTreeWidget::item:selected {
      <property name="font">
       <font>
        <family>Pretendard Light</family>
-       <pointsize>12</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="flags">

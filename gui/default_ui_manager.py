@@ -109,7 +109,7 @@ class DefaultUiManager:
                 border: 1px solid #303030;;
             }
         """)
-        self.user_num()
+        # self.user_num()
         
         TreeUiManager.tree_widget()
         TableUiManager().update_table(None,UPDATED_AT, 50, 0,None)
