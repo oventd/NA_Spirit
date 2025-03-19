@@ -6,9 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>611</height>
+    <width>390</width>
+    <height>600</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>390</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>390</width>
+    <height>578</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -17,10 +35,10 @@
    <widget class="QListWidget" name="assetname_listwidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>119</y>
-      <width>321</width>
-      <height>300</height>
+      <width>331</width>
+      <height>341</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -32,9 +50,9 @@ color:#ffffff;
    <widget class="QPushButton" name="remove_button">
     <property name="geometry">
      <rect>
-      <x>9</x>
-      <y>470</y>
-      <width>371</width>
+      <x>30</x>
+      <y>460</y>
+      <width>331</width>
       <height>81</height>
      </rect>
     </property>
@@ -67,9 +85,9 @@ color:#ffffff;
    <widget class="QLabel" name="download_btn_one">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>500</y>
-      <width>320</width>
+      <x>30</x>
+      <y>490</y>
+      <width>341</width>
       <height>52</height>
      </rect>
     </property>
@@ -90,8 +108,8 @@ color:#ffffff;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>395</width>
-     <height>27</height>
+     <width>390</width>
+     <height>24</height>
     </rect>
    </property>
   </widget>

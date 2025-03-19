@@ -31,27 +31,40 @@ class ShotGridAssetUI(QWidget):
 
         self.ui.assetname_listwidget.setStyleSheet("""
             QListWidget {
-                background-color: #222222;  /* 리스트의 배경을 투명하게 설정 /
-                color: white;  /* 텍스트 색상 흰색으로 설정 */
+                background-color: #222222;  /* 리스트의 배경을 어두운 색으로 설정 */
+                color: white;  /* 기본 텍스트 색상 흰색으로 설정 */
+            }
+
+            QListWidget::item {
+                background-color: #222222;  /* 항목 배경색 어두운 색 */
+                color: white;  /* 기본 항목 텍스트 색상 흰색 */
             }
 
             QListWidget::item:selected {
-                color: black;  /* 선택된 항목은 검정색으로 텍스트 색상 변경 */
+                color: white;  /* 선택된 항목 텍스트 색상 흰색 */
+                background-color: #444444;  /* 선택된 항목 배경을 밝은 회색으로 설정 */
             }
-                                                   
-            QListWidget::item:checked::indicator {
 
-                border-radius: 50%;  / 체크박스를 원형으로 설정 /
-                width: 16px;  / 체크박스 크기 설정 /
-                height: 24px;
+            QListWidget::item:checked {
+                color: black;  /* 체크된 항목의 텍스트 색상 검정색으로 설정 */
+                background-color: #444444;  /* 체크된 항목 배경을 밝은 회색으로 설정 */
+            }
+
+            QListWidget::item:unchecked {
+                color: white;  /* 체크되지 않은 항목 텍스트 색상 흰색으로 설정 */
+                background-color: #222222;  /* 체크되지 않은 항목 배경을 어두운 색으로 설정 */
+            }
+
+            QListWidget::item:checked::indicator {
+                border-radius: 50%;  /* 체크박스를 원형으로 설정 */
+                width: 16px;  /* 체크박스 크기 설정 */
+                height: 16px;  /* 체크박스 크기 설정 */
             }
 
             QListWidget::item:unchecked::indicator {
-
-                border: 0.4px solid #202020;  / 체크박스의 테두리 색상 /
-                border-radius: 50%;  / 체크박스를 원형으로 설정 /
-                width: 16px;  / 체크박스 크기 설정 */
-                height: 24px;
+                border-radius: 50%;  /* 체크박스를 원형으로 설정 */
+                width: 16px;  /* 체크박스 크기 설정 */
+                height: 16px;  /* 체크박스 크기 설정 */                                
             }
         """)
 
