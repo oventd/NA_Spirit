@@ -1,10 +1,6 @@
-# 로거 파일 추가해서 유저가 중요한 
-##### json 파일은 나스피릿에 넣고 이그노어 에 포함
-
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
-from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
-from PySide6.QtGui import QPixmap, QPixmap, QIcon
-from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QLabel, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap, QPixmap
 from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
 from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
@@ -13,31 +9,18 @@ import sys
 import os
 from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
-from PySide6.QtCore import QUrl
 from ui_loader import UILoader   
 
-# 현재 파일(ui.py)의 절대 경로
 current_file_path = os.path.abspath(__file__)
-
-# 'NA_Spirit' 폴더의 최상위 경로 찾기
 na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
-
-# 모든 하위 폴더를 sys.path에 추가
 for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
 
 from assetmanager import AssetService  # AssetService 임포트
 from assetmanager import ClickableLabel
-
-from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
-         
-# from add_video_player import *
-
-from emitter_class import EmitterParent
 from like_state import LikeState
-
 from asset import Asset
 from check import Check
 from subwin import SubWin
@@ -45,7 +28,6 @@ from dynamic_circle_label import DynamicCircleLabel
 from logger import *
 from download_manager import DownloadManager
 from json_manager import DictManager
-from bson import ObjectId
 from ui_loader import UILoader   
 
 
@@ -61,34 +43,35 @@ class TableUiManager:
     def __init__(self):
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
             super().__init__()
+
+            self._initialized = True  # 인스턴스가 초기화되었음을 표시
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
-            self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
-            self._initialized = True  # 인스턴스가 초기화되었음을 표시
             self.search_word =None
+            self.asset_dict = {}
+            self.like_state = LikeState()
+            self.like_state.like_asset_list = DictManager.load_dict_from_json()
+
+            self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
             self.ui.exit_btn.clicked.connect(self.exit_sub_win)
-            self.ui.image_l_btn.clicked.connect(partial (SubWin.prev_slide, self.ui.stackedWidget_2))
-            self.ui.image_r_btn.clicked.connect(partial (SubWin.next_slide, self.ui.stackedWidget_2))
+            self.ui.image_l_btn.clicked.connect(partial(SubWin.prev_slide, self.ui.stackedWidget_2))
+            self.ui.image_r_btn.clicked.connect(partial(SubWin.next_slide, self.ui.stackedWidget_2))
             self.ui.toggle_btn_touch_area.clicked.connect(self.toggle_change) # 토글 버튼 토글 이벤트
             self.ui.like_btn.clicked.connect(self.toggle_like_icon)
             self.ui.search.textEdited.connect(self.search_input)
-            download_manager=DownloadManager()
-            self.asset_manager = Asset()
-            self.like_state = LikeState()
-            self.like_state.like_asset_list = DictManager.load_dict_from_json()
-            self.ui.like_download_btn_area.clicked.connect(download_manager.download_likged_assets_all)
-            self.ui.download_btn.clicked.connect(download_manager.download_likged_assets)
+            self.ui.like_download_btn_area.clicked.connect(DownloadManager().download_likged_assets_all)
+            self.ui.download_btn.clicked.connect(DownloadManager().download_likged_assets)
+            
             self.logger = create_logger(UX_Like_ASSET_LOGGER_NAME, UX_Like_ASSET_LOGGER_DIR)
-            self._initialized = True  # 인스턴스가 초기화되었음을 표시
-            self.asset_dict = {}
-            self.like_state = LikeState()
+            
+            
 
     def search_input(self, search_word):
+        """검색어를 받아서 search_word라는 객체 속성을 만드는 메서드"""
         self.search_word = search_word
         self.update_table()
 
-#라벨 초기화 함수 실행
     def remove_lable(self):
 
         while self.ui.image_widget_s.count() > 0:
@@ -105,17 +88,15 @@ class TableUiManager:
             if item.widget():
                 item.widget().deleteLater()
 
-        # ✅ 기존 stackedWidget_2 내부의 QLabel 삭제
+        #  기존 stackedWidget_2 내부의 QLabel 삭제
         for label in self.ui.stackedWidget_2.findChildren(QLabel):
             label.deleteLater()
 
-        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
         for video_widget in self.ui.stackedWidget_2.findChildren(QVideoWidget):
             video_widget.deleteLater()
 
-        # ✅ 비디오 플레이어 리스트도 정리
-        self.video_widgets = []
-        self.video_players = []
+     
 
     def make_label_list(self, list_len): 
         self.remove_lable()

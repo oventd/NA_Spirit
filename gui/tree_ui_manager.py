@@ -1,37 +1,18 @@
-# 로거 파일 추가해서 유저가 중요한 
-##### json 파일은 나스피릿에 넣고 이그노어 에 포함
-
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget,QGraphicsOpacityEffect
-from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
-from PySide6.QtGui import QPixmap, QPixmap, QIcon
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
-from PySide6.QtMultimedia import QMediaPlayer
-from PySide6.QtMultimediaWidgets import QVideoWidget
-from functools import partial
+from PySide6.QtCore import Qt
 import sys
 import os
 
-# 현재 파일(ui.py)의 절대 경로
 current_file_path = os.path.abspath(__file__)
-
-# 'NA_Spirit' 폴더의 최상위 경로 찾기
 na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
-
-# 모든 하위 폴더를 sys.path에 추가
 for root, dirs, files in os.walk(na_spirit_dir):
     if '__pycache__' not in root:  # __pycache__ 폴더는 제외
         sys.path.append(root)
 
-from assetmanager import AssetService  # AssetService 임포트
-from assetmanager import ClickableLabel
-
-from PySide6.QtCore import QObject, QEvent, Qt
 from constant import *
-
 from check import Check
 from table_ui_manager import TableUiManager
 from ui_loader import UILoader
+
 
 class TreeUiManager:
     _instance = None  # 싱글톤 인스턴스 저장
@@ -47,29 +28,24 @@ class TreeUiManager:
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
-            
             self.ui.treeWidget.itemClicked.connect(self.toggle_checkbox)
             self.ui.treeWidget.itemClicked.connect(self.get_checked_items)
 
 
-
-    #체크 / 재귀적 .. 마음에 안듬    
     def get_checked_items(self):
-        """QTreeWidget에서 체크된 항목들의 텍스트를 가져오는 함수"""
+        """QTreeWidget에서 체크된 항목들의 텍스트를 가져오는 함수 (비재귀적 방법)"""
         checked_items = []  # 체크된 항목을 저장할 리스트
         root = self.ui.treeWidget.invisibleRootItem()  # 트리의 루트 아이템 가져오기
+        stack = [root]  # 트리 탐색을 위한 스택
 
-        def traverse_tree(item):
-            """재귀적으로 트리의 모든 항목을 탐색"""
+        while stack:
+            item = stack.pop()  # 스택에서 항목을 꺼내기
             for i in range(item.childCount()):
                 child = item.child(i)
-                if child.checkState(0) == Qt.Checked:  #  체크된 항목 확인
-                    checked_items.append(child.text(0))  #  항목의 텍스트 저장
-                traverse_tree(child)  #  자식 항목이 있을 경우 재귀적으로 탐색
+                if child.checkState(0) == Qt.Checked:  # 체크된 항목 확인
+                    checked_items.append(child.text(0))  # 항목의 텍스트 저장
+                stack.append(child)  # 자식 항목을 스택에 추가
 
-        traverse_tree(root)  # 트리 탐색 시작
-
-        Check.checked_items = checked_items
         return checked_items
         
 
