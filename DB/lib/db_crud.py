@@ -28,52 +28,53 @@ class DbCrud:
             log_path = default_log_dir
         self.logger = create_logger(logger_name, log_path)
 
-    def upsert_data(self, filter_conditions, update_fields):
+
+    def upsert_data(self, filter_conditions, update_fields=None):
         """
-        데이터가 없으면 새로 생성하고, 있으면 업데이트하는 메서드.
+        에셋이 없으면 생성하고, 있으면 업데이트하는 메서드.
         :param filter_conditions: 찾을 조건 (dict)
         :param update_fields: 삽입 또는 업데이트할 필드 (dict)
         :return: 업데이트 또는 삽입된 문서의 ID
         """
         if not update_fields:
             raise ValueError("업데이트할 필드가 제공되지 않았습니다.")
-
-        # 기존 데이터 가져오기
+        
         existing_document = self.collection.find_one(filter_conditions)
-
+        
         if existing_document:
-            # 기존 데이터와 딕셔너리의 필드 값 비교
-            for key, value in update_fields.items():
-                if existing_document.get(key) == value:
-                    print(f"'{key}' 필드 값이 동일하므로 업데이트하지 않습니다.")
-                    update_fields.pop(key)  # 동일한 값은 업데이트 리스트에서 제거
+            # 기존 데이터가 있으면 업데이트만 수행
+            update_data = {"$set": {"updated_at": datetime.utcnow()}}  # 변경 시간 갱신
 
-        # 업데이트할 데이터 설정
-        update_data = {
-            "$set": {"updated_at": datetime.utcnow()},  # 모든 업데이트에 적용
-            "$setOnInsert": {"created_at": datetime.utcnow()}  # 새로 삽입될 경우 적용
-        }
+            if update_fields:
+                # 동일한 값은 업데이트에서 제거
+                # update_fields를 복사하여 변경하지 않고 순회할 수 있도록 함
+                update_fields_copy = update_fields.copy()
 
-        # 필드 업데이트
-        if update_fields:
-            update_data["$set"].update(update_fields)
-            update_data["$setOnInsert"].update(update_fields)
+                for key, value in update_fields_copy.items():
+                    if existing_document.get(key) == value:
+                        print(f"'{key}' 필드 값이 동일하므로 업데이트하지 않습니다.")
+                        update_fields.pop(key)  # 동일한 값은 업데이트 리스트에서 제거
+                # 업데이트 필드 적용
+                update_data["$set"].update(update_fields)
 
-        try:
-            # 데이터가 없으면 삽입, 있으면 업데이트
-            result = self.collection.update_one(filter_conditions, update_data, upsert=True)
+            # 데이터가 존재하면 업데이트
+            result = self.collection.update_one(filter_conditions, update_data, upsert=False)
+            print(f"기존 자산 업데이트 완료")
 
-            if result.upserted_id:
-                print(f"새로운 데이터 생성되었습니다.: {result.upserted_id}")
-            else:
-                print(f"기존 데이터 업데이트 완료: {result.modified_count} 개 문서 수정되었습니다.")
+        else:
+            # 데이터가 없으면 새로 생성
+            new_data = {
+                **filter_conditions,  # filter_conditions에 있는 데이터 추가
+                "created_at": datetime.utcnow(),  # 최초 생성 시간 추가
+                "updated_at": datetime.utcnow()   # 변경 시간 추가
+            }
+            new_data.update(update_fields)
 
-            return result
-        except Exception as e:
-            print(f"데이터 업데이트 또는 삽입 중 오류가 발생했습니다: {e}")
-            return None
+            # 새로 삽입
+            result = self.collection.update_one(filter_conditions, {"$set": new_data}, upsert=True)
+            print(f"새로운 자산 생성: {result.upserted_id}")
 
-
+        return result
         
     # Read(조회 쿼리 파이프라인 생성)
     def construct_query_pipeline(self, filter_conditions=None, sort_by=None, sort_order=None,
@@ -297,66 +298,51 @@ class AssetDb(DbCrud):
             #     unique=True)
             # self.logger.info("Indexes set up for AssetDb")
 
-    def upsert_asset(self, namespace_name, update_fields=None):
+    def upsert_asset(self, asset_data):
         """
-        에셋이 없으면 생성하고, 있으면 업데이트.
-        :param namespace_name: 프로젝트 이름
-        :param update_fields: 업데이트할 필드 (선택 사항)
+        자산 데이터를 업데이트하거나 새로 추가합니다.
+        :param asset_data: 자산 데이터 (딕셔너리 형태)
         """
-        existing_asset = self.find_asset(namespace_name)  # 먼저 조회
+        super().upsert_data(asset_data)
+        project_name = asset_data.get("project_name")
+        asset_name = asset_data.get("name")
 
-        filter_query = {"namespace": namespace_name}
-        update_data = {}
+        if not project_name or not asset_name:
+            raise ValueError("필수 필드 'project_name'과 'name'이 제공되지 않았습니다~~!")
+        
+        filter_conditions = {"project_name": project_name, "name": asset_name}
 
-        if existing_asset:
-            # 기존 데이터가 있으면 업데이트만 수행
-            update_data["$set"] = {"updated_at": datetime.utcnow()}  # 변경 시간 갱신
+        # 업데이트할 필드 설정
+        update_fields = {}
+        for key, value in asset_data.items():
+            if key not in ["project_name", "name"]:
+                update_fields[key] = value
 
-            if update_fields:
-                # 동일한 값은 업데이트에서 제거
-                for key, value in update_fields.items():
-                    if existing_asset.get(key) == value:
-                        print(f"'{key}' 필드 값이 동일하므로 업데이트하지 않습니다.")
-                        update_fields.pop(key)  # 동일한 값은 업데이트 리스트에서 제거
-                # 업데이트 필드 적용
-                update_data["$set"].update(update_fields)
-
-            result = self.collection.update_one(filter_query, update_data, upsert=False)
-            print(f"✅ 기존 에셋 업데이트 완료")
-
-        else:
-            # 데이터가 없으면 새로 생성
-            new_data = {
-                "namespace": namespace_name,
-                "created_at": datetime.utcnow(),  # 최초 생성 시간 추가
-                "updated_at": datetime.utcnow()
-            }
-            if update_fields:
-                new_data.update(update_fields)
-
-            result = self.collection.update_one(filter_query, {"$set": new_data}, upsert=True)
-            print(f"✅ 새로운 에셋 생성: {result.upserted_id}")
-
-    def find_asset(self, namespace_name, fields=None):
-        """
-        특정 프로젝트의 에셋 데이터를 조회한다.
-        :param namespace_name: 프로젝트 이름
-        :param fields: 선택적으로 반환할 필드 목록
-        :return: 조회된 데이터 또는 None
-        """
-        filter_query = {"namespace": namespace_name}
-
-        projection = {field: 1 for field in fields} if fields else None  # 필요한 필드만 조회
-
-        asset = self.collection.find_one(filter_query, projection)
-
-        if asset:
-            print(f"🔍 조회된 데이터: {asset}")
-        else:
-            print("❌ 해당 에셋 데이터 없음")
-
-        return asset
+        result = self.upsert_data(filter_conditions, update_fields)
+        return result
 
 if __name__ == "__main__":
     db = DbCrud()
-    
+
+"""집 이사 가야되는데 어딨지"""    
+        asset_info = {
+            "name": asset_name,
+            "description": "",
+            "asset_type": "3D Model",
+            "category": category,
+            "style": "realistic",
+            "resolution": "",
+            "file_format": "",
+            "size": "",
+            "license_type": "",
+            "creator_id": self.context.user["id"],
+            "creator_name": self.context.user["name"],
+            "downloads": "",
+            "created_at": "",
+            "updated_at": "",
+            "preview_url": self.thumbnail_url if self.thumbnail_url else "",  # 썸네일 URL 추가
+            "image_url": "",
+            "source_url": self.destination_path,
+            "video_url": "",
+            "project_name": self.context.project["name"]
+        }
