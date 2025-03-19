@@ -154,7 +154,7 @@ class UsdUtils:
     def find_prim_paths_by_type(usd_dict, prim_type):
         lists = UsdUtils.find_prim_paths_by_type_recursion(usd_dict, prim_type)
         for n, i in enumerate(lists):
-            lists[n] = i[2:]
+            lists[n] = i
         return lists
             
 
@@ -166,54 +166,29 @@ class UsdUtils:
         stage.GetRootLayer().Save()
 
 if __name__ == "__main__":
-    stage = UsdUtils.get_stage("geo.usd")
-    stage_com = UsdUtils.get_stage("combined.usd")
 
-    # Get the root layers for comparison
-    UsdUtils.add_sublayer(stage,"combined.usd")
+    # root_stage = UsdUtils.create_usd_file("/home/rapa/NA_Spirit/root.usd", ascii=True)
+    root_stage = UsdUtils.get_stage("/home/rapa/NA_Spirit/root.usd")
+    root_prim = UsdUtils.get_prim(root_stage, "/Root")
+    # root_prim = UsdUtils.create_scope(root_stage, "/Root")
+    # geo_prim = UsdUtils.create_scope(root_stage, "/Root/geo")
+    # mat_prim = UsdUtils.create_scope(root_stage, "/Root/mat")
 
-    
+    # UsdUtils.add_reference(geo_prim, "/home/rapa/NA_Spirit/Mat_MDL.v005.usd")
+    # UsdUtils.add_reference(mat_prim, "/home/rapa/NA_Spirit/material_test.usd")
+    import pprint
+    root_dict = UsdUtils.usd_to_dict(root_prim)
+    pprint.pprint(root_dict)
+    geo_paths = UsdUtils.find_prim_paths_by_type(root_dict, "Mesh")
+    print(geo_paths)
+    mat_paths = UsdUtils.find_prim_paths_by_type(root_dict, "Material")
+    print(mat_paths)
 
-    # Check if the root layer of `stage_com` is in the layer stack of `stage`
-    
-    # scope_a = UsdUtils.create_scope(stage, "/Root/Geometry")
-    # scope_b = UsdUtils.create_scope(stage, "/Root/Shader")
-    
-    # UsdUtils.add_reference(scope_a, "geo.usd")
-    # UsdUtils.add_reference(scope_b, "tex.usd")
-
-    # usd_hierarchy = UsdUtils.usd_to_dict(stage.GetPseudoRoot())
-    # mats = UsdUtils.find_prim_paths_by_type(usd_hierarchy, "Material")
-    # meshs = UsdUtils.find_prim_paths_by_type(usd_hierarchy, "Mesh")
-    # print(mats)
-    # print(meshs)
-    # path = "/geo"
-    # stage_geo = UsdUtils.get_stage("geo.usd")
-    # usd_hierarchy1 = UsdUtils.usd_to_dict(stage_geo.GetPseudoRoot())
-    # mesh1 = UsdUtils.find_prim_paths_by_type(usd_hierarchy1, "Xform")
-    # print(mesh1)
-
-    # mesh1 = stage.GetPrimAtPath(meshs[0])
-    # mesh2 = stage.GetPrimAtPath(meshs[1])
-    # if not mesh1 or not mesh1.IsValid():
-    #     raise RuntimeError(f"Invalid Mesh Prim: {path}")
-    
+    geo_prim = UsdUtils.get_prim(root_stage, geo_paths[0])
+    UsdUtils.bind_material(geo_prim, mat_paths[0])
 
 
-    # material = UsdShade.Material.Get(stage, mats[0])
-    # material1 = UsdShade.Material.Get(stage, mats[1])
 
-    # if not material.GetPrim().IsValid():
-    #     raise RuntimeError(f"Invalid Material Prim: {mats[0]}")
-
-    # if mesh1.GetStage() != material.GetPrim().GetStage():
-    #     raise RuntimeError("Mesh and Material belong to different USD Stages.")
-
-    # # 올바르게 로드되었으면 Material을 Mesh에 바인딩
-    # UsdShade.MaterialBindingAPI(mesh1).Bind(material)
-    # UsdShade.MaterialBindingAPI(mesh2).Bind(material1)
-    # stage.GetRootLayer().Save()
-    # print(f"Successfully bound material {mats[0]} to {meshs[0]}")
 
 
     
