@@ -1,58 +1,57 @@
 import os
 import json
 
-# JSON과 USD 파일이 저장된 폴더
+# 기본 경로 설정
 BASE_DIR = "D:\\real\\char_ref"
+USD_SHADER_JSON = os.path.join(BASE_DIR, "usd_preview_surface_assignments.json")
 FINAL_JSON_PATH = os.path.join(BASE_DIR, "final_shader_data.json")
 
-class USDShaderFinalizer:
-    """모든 에셋 데이터를 저장하는 프로그램"""
+class USDShaderIntegrator:
+    """쉐이더 JSON에서 에셋을 기준으로 통합 JSON을 생성하는 클래스"""
 
-    def __init__(self, asset_name, json_path, usd_paths):
-        self.asset_name = asset_name  # 에셋 이름 (예: "character_01")
-        self.json_path = json_path  # JSON 파일 경로
-        self.usd_paths = usd_paths  # USD 파일 리스트
-        self.final_data = self.load_final_json()  # 기존 데이터 불러오기
+    def __init__(self):
+        self.asset_data = {}
 
-    def load_final_json(self, path):
-        """통합 JSON(`final_shader_data.json`)을 불러온다"""
-        if os.path.exists(path):
-            with open(path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        return {}  # 기존 파일이 없으면 새로 만든다
+    def load_shader_json(self):
+        """USD Preview Surface JSON 파일을 읽고, 에셋별 쉐이더 정보를 매핑"""
+        if not os.path.exists(USD_SHADER_JSON):
+            print(f"파일을 찾을 수 없습니다: {USD_SHADER_JSON}")
+            return
 
-    def update_final_json(self):
-        """새로운 에셋 데이터를 통합 JSON에 추가"""
-        self.final_data[self.asset_name] = {
-            "json": self.json_path,
-            "usd": self.usd_paths
-        }
+        with open(USD_SHADER_JSON, 'r', encoding='utf-8') as f:
+            shader_data = json.load(f)
 
-        # 통합 JSON 저장
+        # 쉐이더별로 연결된 에셋을 가져와서 asset_data에 저장
+        for shader, assets in shader_data.items():
+            for asset in assets:
+                if asset not in self.asset_data:
+                    self.asset_data[asset] = {
+                        "shader": shader,
+                        "shader_json": USD_SHADER_JSON
+                    }
+
+    def link_usd_files(self):
+        """에셋에 해당하는 USD 파일 연결"""
+        usd_files = [f for f in os.listdir(BASE_DIR) if f.endswith('.usda') or f.endswith('.usd')]
+
+        for usd_file in usd_files:
+            asset_name = os.path.splitext(usd_file)[0]
+            usd_path = os.path.join(BASE_DIR, usd_file)
+
+            if asset_name in self.asset_data:
+                self.asset_data[asset_name]["usd_file"] = usd_path
+
+    def save_final_json(self):
+        """에셋을 기준으로 한 최종 JSON 저장"""
+        self.load_shader_json()  # 쉐이더 JSON 불러오기
+        self.link_usd_files()  # USD 파일 연결
+
         with open(FINAL_JSON_PATH, 'w', encoding='utf-8') as f:
-            json.dump(self.final_data, f, indent=4, ensure_ascii=False)
+            json.dump(self.asset_data, f, indent=4, ensure_ascii=False)
 
-        print(f" {self.asset_name} 데이터가 통합 JSON에 저장됨: {FINAL_JSON_PATH}")
-    
+        print(f"통합 JSON이 저장되었습니다: {FINAL_JSON_PATH}")
 
 # 실행 예제
 if __name__ == "__main__":
-    # 모델러가 퍼블리시한 에셋 데이터
-    asset_name = input(" 캐릭터 이름을 입력하세요: ")  # 예: "robot"
-
-    # JSON 파일 경로 입력
-    json_path = input(" 쉐이더 JSON 파일 경로를 입력하세요: ")  # 예: "D:\\real\\char_ref\\robot_shader.json"
-
-    # USD 파일들 입력 (쉼표로 구분해서 여러 개 입력 가능)
-    usd_paths_input = input(" USD 파일 경로들을 쉼표(,)로 구분하여 입력하세요: ")  # 예: "D:\\real\\char_ref\\robot_material_1.usd, D:\\real\\char_ref\\robot_material_2.usd"
-
-    # 입력된 값을 리스트로 변환
-    usd_paths = [path.strip() for path in usd_paths_input.split(",")]
-
-    # 데이터 저장하기
-    finalizer = USDShaderFinalizer(asset_name, json_path, usd_paths)
-    finalizer.update_final_json()
-
-    finalizer.load_final_json(FINAL_JSON_PATH)  # 최종 데이터 확인
-
-
+    integrator = USDShaderIntegrator()
+    integrator.save_final_json()
