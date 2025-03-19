@@ -1,7 +1,7 @@
 import json
 from pxr import Usd, UsdShade
 import sys
-sys.path.append("D:\\NA_Spirit\\utils")
+sys.path.append("/home/rapa/NA_Spirit/utils")
 print(sys.path) 
 from usd_utils import UsdUtils
 
@@ -21,7 +21,7 @@ def bind_material(prim, material_path):
  # 추가 코드 작성
 
 def process_usd_and_bind():
-    root_stage = UsdUtils.get_stage("D:\\NA_Spirit\\root.usd")
+    root_stage = UsdUtils.get_stage("/home/rapa/NA_Spirit/root.usd")
     root_prim = UsdUtils.get_prim(root_stage, "/Root")
     root_dict = UsdUtils.usd_to_dict(root_prim)
 
@@ -38,4 +38,4 @@ def process_usd_and_bind():
 # 실행 예시
 if __name__ == "__main__":
     process_usd_and_bind()
-    process_assets("D:\\real\\char_ref\\final_shader_data.json")  # JSON 파일 경로
+    process_assets("/nas/spirit/Char_ref/final_shader_data.json")  # JSON 파일 경로

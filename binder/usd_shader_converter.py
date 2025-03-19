@@ -2,7 +2,7 @@ import os
 import json
 
 # 기본 경로 설정
-BASE_DIR = "D:\\real\\char_ref"
+BASE_DIR = "/nas/spirit/Char_ref"
 USD_SHADER_JSON = os.path.join(BASE_DIR, "usd_preview_surface_assignments.json")
 FINAL_JSON_PATH = os.path.join(BASE_DIR, "final_shader_data.json")
 

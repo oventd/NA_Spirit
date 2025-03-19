@@ -38,5 +38,5 @@ def save_usd_preview_surface_to_json(json_path):
 
 # 실행 예제
 if __name__ == "__main__":
-    json_output_path = os.path.join("D:\\real\\char_ref", "usd_preview_surface_assignments.json")
+    json_output_path = os.path.join("/nas/spirit/Char_ref", "usd_preview_surface_assignments.json")
     save_usd_preview_surface_to_json(json_output_path)
