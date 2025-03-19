@@ -13,7 +13,7 @@ for root, dirs, files in os.walk(na_spirit_dir):
         sys.path.append(root)
 
 sys.path.append("/home/rapa/NA_Spirit/upload/") 
-from get_sgtk_info import ShotGridAssetManager
+from asset_upload_manager import AssetUploadManager
 from constant import *
 from tree_ui_manager import TreeUiManager
 from table_ui_manager import TableUiManager
@@ -105,7 +105,7 @@ class DefaultUiManager:
         self.ui.stackedWidget_2.removeWidget(self.ui.page_2)
         
     def user_num(self):
-        sg_user_name = ShotGridAssetManager()
+        sg_user_name = AssetUploadManager()
         name = sg_user_name.get_user_name()
         self.ui.user_num.setText(name)
 

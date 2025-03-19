@@ -2,6 +2,7 @@ import maya.mel as mel
 import maya.cmds as cmds
 import os
 import sys
+import sgtk
 sys.path.append('/home/rapa/NA_Spirit/open/step')
 from step_open_maya import StepOpenMaya
 sys.path.append('/home/rapa/NA_Spirit/utils')
@@ -9,16 +10,22 @@ from maya_utils import MayaUtils
 
 
 class LightingStep(StepOpenMaya):
-    def __init__(self, env_usd):
+    def __init__(self):
         super().__init__()
         print("Opening lighting step")
-        self.env_usd = env_usd
+
+
 
     class Open(StepOpenMaya.Open):
         @staticmethod
-        def setup(group_name="light", task_id=None, file_format=None):
+        def setup( task_id=None, file_format=None):
             # 라이트 그룹 생성
-            group_name = MayaUtils.create_group(group_name)
+            context = sgtk.current_engine().context
+            project_path = context.project.path
+            category = context.entity["type"]
+            entity = context.entity["name"]
+            usd_path = os.path.join(project_path,"squences" ,category, entity, f"{entity}.usd")
+            MayaUtils.create_usd_proxy(usd_path)
 
             # # USD 로드
             # MayaUtils.create_usd_proxy("lighting") 

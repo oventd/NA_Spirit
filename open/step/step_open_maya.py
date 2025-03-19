@@ -70,12 +70,13 @@ class StepOpenMaya(ABC):
             usd_export_path = StepOpenMaya.Publish.get_usd_export_path(session_path)
             usd_export_options = render_settings.get("export_usd_static_mesh", {})
 
-            if StepOpenMaya.Publish.get_animated_transform_nodes():
+            if step == "MDL" or step == "RIG" or step == "MMV":
+                animated = False
+
+            else:
                 animated = True
                 frame_range = FlowUtils.get_cut_in_out(context.entity["id"])
                 print("frame_range : ", frame_range)
-            else:
-                animated = False
             
             published_usds = {}
             for item, options in publish_settings[step].items():

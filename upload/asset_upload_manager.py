@@ -4,6 +4,7 @@ import sys
 import shutil
 import re
 import moviepy
+import cv2
 sys.path.append('/home/rapa/NA_Spirit/utils')
 sys.path.append('/home/rapa/NA_Spirit/DB/lib')
 
@@ -14,7 +15,7 @@ from db_crud import AssetDb
 
 
 
-class ShotGridAssetManager:
+class AssetUploadManager:
     def __init__(self):
         """
         ShotGrid 프로젝트의 정보를 가져오고, 에셋 관련 작업을 수행하는 클래스.
@@ -132,11 +133,6 @@ class ShotGridAssetManager:
         :param source_folder: 원본 폴더 경로
         :param destination_folder: 복사할 대상 폴더 경로
         """
-        if not os.path.exists(destination_path):
-            raise FileNotFoundError(f"원본 폴더가 존재하지 않습니다: {source_path}")
-
-        if os.path.exists(destination_path):
-            shutil.rmtree(destination_path)  # 기존 폴더 삭제
 
         try:
             shutil.copyfile(source_path, destination_path)
@@ -169,20 +165,40 @@ class ShotGridAssetManager:
             print(f"에셋 '{asset_name}'을 찾을 수 없습니다.")
             return
         self.thumbnail_url = os.path.join(self.db_thub_path, f"{asset_name}.png")
-        temp_path = "/home/rapa/temp.png"
-        self.get_thumbnail_url(asset_name, temp_path)
+        self.get_thumbnail_url(asset_name, self.thumbnail_url )
+        self.resize_image_40_percent(self.thumbnail_url, self.thumbnail_url)
         asset_info = self.get_asset_info(asset_dir)
 
         self.copy_folder(asset_dir, self.destination_path)
-
-        playblast_dir = os.path.join(asset_dir,"publish","playblast")
-        playblast_path = self.get_latest_version_file(playblast_dir)
-        if playblast_path:
-            self.copy_file(playblast_path, self.playblast_path)
-            mp4_path = self.convert_mov_to_mp4(self.playblast_path)
-            self.asset_info["video_url"] = mp4_path
-
+        print(asset_dir)
+        
+        pb_list = []
+        
+        playblast_dir = os.path.join(asset_dir,"LDV","publish","playblast")
+        if os.path.exists(playblast_dir):
+            tmp_list = os.listdir(playblast_dir)
+            pb_list.extend(tmp_list)
+        playblast_dir = os.path.join(asset_dir,"MDL","publish","playblast")
+        if os.path.exists(playblast_dir):
+            tmp_list = os.listdir(playblast_dir)
+            pb_list.extend(tmp_list)
+        playblast_dir = os.path.join(asset_dir,"RIG","publish","playblast")
+        if os.path.exists(playblast_dir):
+            tmp_list = os.listdir(playblast_dir)
+            pb_list.extend(tmp_list)
+        print(pb_list)
+        for pb in pb_list:
+            if pb.endswith(".mov"):
+                playblast_path = os.path.join(playblast_dir,pb)
+                break
+        print(playblast_path)
+        self.copy_file(playblast_path, self.playblast_path)
+        mp4_path = self.convert_mov_to_mp4(self.playblast_path)
+        self.asset_info["video_url"] = [mp4_path]
+        # except:
+        #     print("playblast 파일을 찾을 수 없습니다.")
         try:
+            print(self.asset_info)
             AssetDb().upsert_asset(self.asset_info)
             print(f"에셋 정보:\n{asset_info}")
         except Exception as e:
@@ -195,15 +211,46 @@ class ShotGridAssetManager:
         print(mp4_video_name)
         clip.write_videofile(mp4_video_name)
         return mp4_video_name
-        
-    def get_latest_version_file(self,folder_path):
+
+
+    def resize_image_40_percent(self,image_path, output_path):
+        """
+        이미지를 40% 크기로 줄이는 함수
+
+        :param image_path: 원본 이미지 파일 경로
+        :param output_path: 리사이즈된 이미지 저장 경로
+        """
+        # 이미지 로드
+        image = cv2.imread(image_path)
+
+        if image is None:
+            raise FileNotFoundError(f"이미지를 찾을 수 없습니다: {image_path}")
+
+        # 원본 크기 가져오기
+        height, width = image.shape[:2]
+
+        # 새로운 크기 계산 (40% 크기로 줄임)
+        new_width = int(width * 0.4)
+        new_height = int(height * 0.4)
+
+        # 이미지 리사이즈
+        resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+
+        # 리사이즈된 이미지 저장
+        cv2.imwrite(output_path, resized_image)
+
+        return output_path
+    def get_latest_version_file(self,folder_path,ext):
         """
         주어진 폴더에서 '파일명.v###.ma' 형식의 파일 중 최신 버전의 파일을 반환
 
         :param folder_path: 검색할 폴더 경로
         :return: 최신 버전의 파일 전체 경로 또는 None
         """
-        pattern = re.compile(r"^(.*)\.v(\d{3})\.ma$")  # 정규식 패턴 (모든 베이스 이름 지원)
+        if ext == "ma":
+            pattern = re.compile(r"^(.*)\.v(\d{3})\.ma$")  # 정규식 패턴 (모든 베이스 이름 지원)
+        elif ext == "mov":
+            pattern = re.compile(r"^(.*)\.v(\d{3})\.mov$")
 
         latest_version = -1
         latest_file = None
@@ -225,7 +272,7 @@ class ShotGridAssetManager:
 
 # 사용 예시
 if __name__ == "__main__":
-    manager = ShotGridAssetManager()
+    manager = AssetUploadManager()
     asset_name = "wood"  # 찾고자 하는 에셋 이름
     manager.process_asset(asset_name)
     asset_path = manager.find_asset_path(asset_name)
