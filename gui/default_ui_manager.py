@@ -42,7 +42,9 @@ from table_ui_manager import TableUiManager
 
 
 from like_state import LikeState
-from ui_loader import UILoader   
+from ui_loader import UILoader  
+sys.path.append("/home/llly/NA_Spirit/upload/") 
+from get_sgtk_info import ShotGridAssetManager
 
 
 class DefaultUiManager:
@@ -139,4 +141,7 @@ class DefaultUiManager:
         #정렬 콤보박스를 바꾸면 set_sorting_option 메서드로 연결
         
     def user_num(self):
-        self.ui.user_num.setText("b976211")
+        sg_user_name = ShotGridAssetManager()
+        name = sg_user_name.get_user_name()
+        self.ui.user_num.setText(name)
+
