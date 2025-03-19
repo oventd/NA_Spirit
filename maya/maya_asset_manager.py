@@ -59,7 +59,7 @@ class AssetManager(QMainWindow):
         """최신 버전 찾기"""
         asset_dir = AssetManager.get_asset_directory(asset_name)
         if not asset_dir or not os.path.exists(asset_dir):
-            print(f"⚠️ '{asset_name}'의 디렉토리를 찾을 수 없음.")
+            print(f"'{asset_name}'의 디렉토리를 찾을 수 없음.")
             return "v001"  # 기본값 v001 반환
 
         versions = []
@@ -75,7 +75,6 @@ class AssetManager(QMainWindow):
             return f"v{latest_version:03d}"
         else:
             return "v001"  # 최신 버전이 없으면 v001 반환
-        
 
 
     @staticmethod
@@ -116,7 +115,7 @@ class AssetManager(QMainWindow):
         """특정 에셋의 모든 버전 가져오기"""
         asset_dir = AssetManager.get_asset_directory(asset_name)
         if not asset_dir or not os.path.exists(asset_dir):
-            print(f"⚠️ '{asset_name}'의 디렉토리를 찾을 수 없음.")
+            print(f"'{asset_name}'의 디렉토리를 찾을 수 없음.")
             return "v001"  # 기본값 v001 반환
 
         versions = []

@@ -94,7 +94,7 @@ class MainUiManager(QMainWindow):
         try:
             referenced_assets = MayaReferenceManager.get_referenced_assets()
             if not referenced_assets:
-                print("⚠️ 참조된 에셋이 없습니다.")
+                print("참조된 에셋이 없습니다.")
                 return
 
             # 기존 테이블 항목 초기화 (행 삭제)
@@ -102,8 +102,10 @@ class MainUiManager(QMainWindow):
 
             # 에셋 정보를 테이블에 추가
             self.set_table_items(referenced_assets)
+            
         except Exception as e:
-            print(f"⚠️ 에셋 정보를 불러오는 중 오류 발생: {e}")
+            print(f"에셋 정보를 불러오는 중 오류 발생: {e}")
+
     def set_table_items(self, version_data):
         """테이블 항목 설정"""
 
@@ -262,18 +264,14 @@ class MainUiManager(QMainWindow):
                 self.update_table()
 
             except Exception as e:
-                print(f"⚠️ 참조 업데이트 실패: {e}")
+                print(f" 참조 업데이트 실패: {e}")
+
 
 
     def find_reference_row(self, ref):
-        """
-        테이블에서 참조 파일에 해당하는 행을 찾아 반환합니다.
-        참조 파일의 이름 또는 경로를 기준으로 테이블에서 해당 행을 찾는 로직입니다.
-        """
         for row in range(self.table.rowCount()):
-            # 테이블의 'Asset' 열에서 참조 파일을 찾기
-            asset_name = self.table.item(row, 0).text()  # 'Asset' 열 (예: 첫 번째 열)
-            if asset_name == ref:  # 참조 파일 이름과 일치하는지 비교
+            asset_name = self.table.item(row, 1).text()  # 'Asset' 열
+            if asset_name == ref:
                 return row
         return None
 
@@ -361,7 +359,7 @@ class MainUiManager(QMainWindow):
         print(f"안녕 난느 {ref_path}")
         
         if not ref_path or not os.path.exists(ref_path):
-            print(f"⚠️ 참조 경로를 찾을 수 없습니다: {ref_path}")
+            print(f"참조 경로를 찾을 수 없습니다: {ref_path}")
             return
 
         # 참조된 파일이 존재하는 디렉토리 가져오기
