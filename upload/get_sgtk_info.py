@@ -23,6 +23,10 @@ class ShotGridAssetManager:
         self.db_thub_path = "/nas/spirit/DB/thum/3d_assets"
         self.thumbnail_url = None  # 썸네일 URL을 저장할 변수 초기화
 
+    def get_user_name(self):
+        creater_id=self.context.user["name"]
+        return creater_id
+
     def get_project_directory(self) -> str:
         """
         현재 ShotGrid Toolkit 프로젝트의 루트 디렉토리를 반환.
