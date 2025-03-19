@@ -7,7 +7,7 @@ if custom_script_path not in sys.path:
     sys.path.append(custom_script_path)
 
 # 🔹 DictManager 불러오기
-from json_manager import DictManager
+from maya.trash_can.json_manager import DictManager
 # 🔹 JSON 저장 & 불러오기 테스트
 data = {
     "character": {
