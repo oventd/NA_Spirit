@@ -33,6 +33,7 @@ class USDShaderFinalizer:
             json.dump(self.final_data, f, indent=4, ensure_ascii=False)
 
         print(f" {self.asset_name} 데이터가 통합 JSON에 저장됨: {FINAL_JSON_PATH}")
+    
 
 # 실행 예제
 if __name__ == "__main__":
