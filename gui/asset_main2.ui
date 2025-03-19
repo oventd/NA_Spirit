@@ -610,6 +610,9 @@ QComboBox QAbstractItemView {
       <family>Pretendard</family>
      </font>
     </property>
+    <property name="contextMenuPolicy">
+     <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
+    </property>
     <property name="toolTip">
      <string notr="true"/>
     </property>
@@ -628,6 +631,21 @@ QComboBox QAbstractItemView {
     <property name="styleSheet">
      <string notr="true">background: transparent;
 color:#ffffff;
+QTreeWidget::item {
+    border: none;  /* 항목의 테두리 제거 */
+}
+
+QTreeWidget::item {
+    border: none;  /* 항목의 테두리 제거 */
+}
+
+QTreeWidget::item:selected {
+    border: none;  /* 선택된 항목의 테두리 제거 */
+    background-color: transparent;  /* 선택된 항목의 배경을 투명하게 설정 */
+}
+
+
+
 </string>
     </property>
     <property name="editTriggers">
@@ -635,6 +653,9 @@ color:#ffffff;
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectionBehavior::SelectItems</enum>
     </property>
     <property name="indentation">
      <number>10</number>
@@ -666,6 +687,7 @@ color:#ffffff;
      <property name="font">
       <font>
        <family>Pretendard Light</family>
+       <pointsize>12</pointsize>
       </font>
      </property>
      <property name="flags">
@@ -723,6 +745,7 @@ color:#ffffff;
      <property name="font">
       <font>
        <family>Pretendard Light</family>
+       <pointsize>12</pointsize>
       </font>
      </property>
      <property name="flags">
@@ -813,6 +836,7 @@ color:#ffffff;
      <property name="font">
       <font>
        <family>Pretendard Light</family>
+       <pointsize>12</pointsize>
       </font>
      </property>
      <property name="flags">
