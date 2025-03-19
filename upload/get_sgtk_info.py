@@ -52,14 +52,23 @@ class ShotGridAssetManager:
 
         asset_info = {
             "name": asset_name,
+            "description": "",
             "asset_type": "3D Model",
             "category": category,
             "style": "realistic",
+            "resolution": "",
+            "file_format": "",
+            "size": "",
+            "license_type": "",
             "creator_id": self.context.user["id"],
             "creator_name": self.context.user["name"],
+            "downloads": "",
+            "created_at": "",
+            "updated_at": "",
             "preview_url": self.thumbnail_url if self.thumbnail_url else "",  # 썸네일 URL 추가
+            "image_url": "",
             "source_url": self.destination_path,
-            "video_url": "to be added",
+            "video_url": "",
             "project_name": self.context.project["name"]
         }
 

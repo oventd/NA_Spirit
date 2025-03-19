@@ -29,7 +29,7 @@ class DbCrud:
         self.logger = create_logger(logger_name, log_path)
 
 
-    def upsert_data(self, filter_conditions, update_fields=None):
+    def upsert_data(self, filter_conditions, update_fields):
         """
         에셋이 없으면 생성하고, 있으면 업데이트하는 메서드.
         :param filter_conditions: 찾을 조건 (dict)
@@ -303,7 +303,7 @@ class AssetDb(DbCrud):
         자산 데이터를 업데이트하거나 새로 추가합니다.
         :param asset_data: 자산 데이터 (딕셔너리 형태)
         """
-        super().upsert_data(asset_data)
+        # upsert_data(asset_data)
         project_name = asset_data.get("project_name")
         asset_name = asset_data.get("name")
 
@@ -318,31 +318,8 @@ class AssetDb(DbCrud):
             if key not in ["project_name", "name"]:
                 update_fields[key] = value
 
-        result = self.upsert_data(filter_conditions, update_fields)
+        result = super().upsert_data(filter_conditions=filter_conditions, update_fields=update_fields)
         return result
 
 if __name__ == "__main__":
     db = DbCrud()
-
-"""집 이사 가야되는데 어딨지"""    
-        asset_info = {
-            "name": asset_name,
-            "description": "",
-            "asset_type": "3D Model",
-            "category": category,
-            "style": "realistic",
-            "resolution": "",
-            "file_format": "",
-            "size": "",
-            "license_type": "",
-            "creator_id": self.context.user["id"],
-            "creator_name": self.context.user["name"],
-            "downloads": "",
-            "created_at": "",
-            "updated_at": "",
-            "preview_url": self.thumbnail_url if self.thumbnail_url else "",  # 썸네일 URL 추가
-            "image_url": "",
-            "source_url": self.destination_path,
-            "video_url": "",
-            "project_name": self.context.project["name"]
-        }
