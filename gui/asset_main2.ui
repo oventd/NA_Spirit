@@ -371,6 +371,11 @@
     </disabled>
    </palette>
   </property>
+  <property name="font">
+   <font>
+    <family>Pretendard Variable</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Asset_Lib</string>
   </property>
@@ -932,7 +937,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -982,7 +986,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1014,7 +1017,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1120,7 +1122,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1158,7 +1159,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>
@@ -1709,7 +1709,6 @@ color:#ffffff;
        <font>
         <family>PT Sans</family>
         <pointsize>24</pointsize>
-        <weight>50</weight>
         <bold>false</bold>
        </font>
       </property>

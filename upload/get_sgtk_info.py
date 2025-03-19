@@ -162,3 +162,8 @@ if __name__ == "__main__":
     manager = ShotGridAssetManager()
     asset_name = "wood"  # 찾고자 하는 에셋 이름
     manager.process_asset(asset_name)
+    asset_path = manager.find_asset_path(asset_name)
+    if asset_path:
+        print(f"찾은 자산 경로: {asset_path}")
+    else:
+        print(f"자산 '{asset_name}'을(를) 찾을 수 없습니다.")
