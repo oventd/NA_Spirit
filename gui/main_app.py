@@ -31,13 +31,13 @@ class MainUi(QMainWindow):
         """초기 화면에 필요한 클래스를 호출하고 객체에 저장 """
         if not hasattr(self, "_initialized"):  
             super().__init__()
+            self._initialized = True  
             ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
             TableUiManager()
             DefaultUiManager()
             TreeUiManager()
-            self._initialized = True  
         else:
             self.ui.show()
             

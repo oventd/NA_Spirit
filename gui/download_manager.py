@@ -50,7 +50,6 @@ class DownloadManager:
         if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
             super().__init__()
             self.asset = Asset()
-            self.exm_list = []
             self.exemples = []
             self.download_list_asset ={}
             self.like_state = LikeState()
@@ -72,7 +71,6 @@ class DownloadManager:
     
     def download_likged_assets_all(self):
 
-        print("전체 다운로드 버튼이 눌렸어요")
         self.ui.download_listwidget.clear()
         self.exemples = self.like_state.like_asset_list
         self.download_list_asset=AssetService.get_assets_by_ids(self.exemples)
@@ -85,7 +83,6 @@ class DownloadManager:
     def download_likged_assets(self):
   
         self.ui.download_listwidget.clear()
-        print("하나 다운로드 버튼이 눌렸어요")
         self.ui.stackedWidget.show()
         self.ui.depth_label.show()
         self.ui.stackedWidget.setCurrentIndex(1)
