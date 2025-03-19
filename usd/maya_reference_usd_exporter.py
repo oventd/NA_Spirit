@@ -198,12 +198,6 @@ class MayaReferenceUsdExporter:
             asset_nodes = cmds.listRelatives(category, children=True) or []
 
         for asset in asset_nodes:
-            if asset in anim_assets:
-                if self.export_animated == False:
-                    continue
-            if asset not in anim_assets:
-                if self.export_static == False:
-                    continue
             
             print(f"Processing animated asset: {asset}")
             

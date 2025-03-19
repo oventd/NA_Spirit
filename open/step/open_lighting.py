@@ -20,12 +20,15 @@ class LightingStep(StepOpenMaya):
         @staticmethod
         def setup( task_id=None, file_format=None):
             # 라이트 그룹 생성
-            context = sgtk.current_engine().context
-            project_path = context.project.path
-            category = context.entity["type"]
+            engine = sgtk.platform.current_engine()  # ShotGrid Toolkit 엔진 가져오기
+            context = engine.context  # 컨텍스트 가져오기
+            tk = engine.sgtk
+            project_path = tk.project_path
+
             entity = context.entity["name"]
-            usd_path = os.path.join(project_path,"squences" ,category, entity, f"{entity}.usd")
-            MayaUtils.create_usd_proxy(usd_path)
+            usd_path = os.path.join(project_path,"squences" ,"SQ0010", entity, f"{entity}.usd")
+            MayaUtils.create_usd_proxy("/nas/spirit/project/spirit/sequences/SQ001/SH0020/SH0020.usd")
+
 
             # # USD 로드
             # MayaUtils.create_usd_proxy("lighting") 
@@ -44,8 +47,8 @@ class LightingStep(StepOpenMaya):
             # print("Opened USD Layer Editor")
 
         @staticmethod    
-        def reference(self):
-            pass
+        def reference(group_name="rig", task_id=None, file_format=".ma", use_namespace=True):
+            print("reference")
 
     class Publish(StepOpenMaya.Publish):
         @staticmethod

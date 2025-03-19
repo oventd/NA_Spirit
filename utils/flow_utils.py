@@ -344,11 +344,11 @@ class FlowUtils:
 
 if __name__ == "__main__":
     #아래 코드는 예시에용 업스트림 같은 파일 형식의 파일의 path를 가져오는 예시
-    # upstream_file_path=FlowUtils.get_upstream_file_for_currnet_file(6183,".ma")
-    # print(upstream_file_path)
+    upstream_file_path=FlowUtils.get_upstream_file_for_currnet_file(6465,".ma")
+    print(upstream_file_path)
 
     
-    a = FlowUtils.get_cut_in_out(1273)
-    print(a[0], a[1])
+    # a = FlowUtils.get_cut_in_out(1273)
+    # print(a[0], a[1])
 
 

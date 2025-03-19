@@ -39,6 +39,7 @@ class OpenManager:
         file_format = ".ma"
         print(f"Debug: open_setup() is passing task_id={task_id}, {file_format}")
         self.open_class.Open.setup(task_id=task_id, file_format=file_format)
+        self.open_class.Open.reference(task_id=task_id, file_format=file_format)
     
     def validate(self):
         self.open_class.Publish.validate()

@@ -74,16 +74,16 @@ class MayaUtils:
         ref_nodes = cmds.file(file_path, reference=True, namespace=namespace_arg, returnNewNodes=True)
 
         transform_nodes = []
-        for node in ref_nodes:
-            if cmds.objectType(node) == "transform":
-                transform_nodes.append(node)
+        # for node in ref_nodes:
+        #     if cmds.objectType(node) == "transform":
+        #         transform_nodes.append(node)
                 
-        if transform_nodes:
-            top_node = transform_nodes[0]
-            cmds.parent(top_node, group_name)
+        # if transform_nodes:
+        #     top_node = transform_nodes[0]
+        #     cmds.parent(top_node, group_name)
 
-        if not use_namespace:
-            MayaUtils.remove_all_namespaces()
+        # if not use_namespace:
+        #     MayaUtils.remove_all_namespaces()
 
         return transform_nodes
     

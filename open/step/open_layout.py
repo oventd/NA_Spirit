@@ -17,9 +17,10 @@ class LayoutStep(StepOpenMaya):
     class Open(StepOpenMaya.Open):
         @staticmethod
         def setup(task_id, file_format):
-            file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
+            print()
+            # file_path = FlowUtils.get_upstream_file_for_currnet_file(task_id, file_format)
 
-            cmds.file(file_path, reference=True, namespace=":", returnNewNodes=True)
+            # cmds.file(file_path, reference=True, namespace=":", returnNewNodes=True)
             
         @staticmethod 
         def reference(group_name = "asset", task_id=None, file_format=".ma", use_namespace=False):

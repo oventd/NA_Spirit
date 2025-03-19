@@ -20,8 +20,8 @@ class ModelingStep(StepOpenMaya):
             """ 모델링 작업을 위한 기본 그룹 생성 """
             MayaUtils.create_group(geo_group_name)
         
-        def reference(self):
-            pass
+        def reference(group_name="rig", task_id=None, file_format=".ma", use_namespace=True):
+            print("reference")
 
     class Publish(StepOpenMaya.Publish):
         @staticmethod

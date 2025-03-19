@@ -19,8 +19,9 @@ class MatchMoveStep(StepOpenMaya):
             camera_name = MayaUtils.create_camera(group_name=camera_group_name, camera_name=camera_name)
         
         @staticmethod 
-        def reference(self):
-            pass
+        def reference(group_name="rig", task_id=None, file_format=".ma", use_namespace=True):
+            print("reference")
+            
         
     class Publish(StepOpenMaya.Publish):
         @staticmethod
