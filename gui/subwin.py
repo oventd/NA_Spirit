@@ -59,22 +59,22 @@ class SubWin:
         pass
  
     @staticmethod 
-    def next_slide(stackedWidget_2):
+    def next_slide(detail_veiwer):
         """다음 슬라이드 이동"""
-        current_index = stackedWidget_2.currentIndex()
-        next_index = (current_index + 1) % stackedWidget_2.count()
-        stackedWidget_2.setCurrentIndex(next_index)
+        current_index = detail_veiwer.currentIndex()
+        next_index = (current_index + 1) % detail_veiwer.count()
+        detail_veiwer.setCurrentIndex(next_index)
         print(f"{next_index}다음 이미지로 변경됨")
     @staticmethod
-    def prev_slide( stackedWidget_2):
+    def prev_slide( detail_veiwer):
         """이전 슬라이드 이동"""
-        current_index = stackedWidget_2.currentIndex()
-        prev_index = (current_index - 1) % stackedWidget_2.count()
-        stackedWidget_2.setCurrentIndex(prev_index)
+        current_index = detail_veiwer.currentIndex()
+        prev_index = (current_index - 1) % detail_veiwer.count()
+        detail_veiwer.setCurrentIndex(prev_index)
         print("이전 이미지로 변경됨")
       # 리뷰 순서를 정리를 
 
-    def show_asset_detail_image(stackedWidget_2, detail_thum_urls, image_labels):
+    def show_asset_detail_image(detail_veiwer, detail_thum_urls, image_labels):
         detail_pixmap_urls = []  # 비디오에서 추출한 이미지를 저장할 리스트
 
         for img_path in detail_thum_urls:
@@ -84,7 +84,7 @@ class SubWin:
                 label = VideoPlayer(img_path)
                 label.setAlignment(Qt.AlignCenter)
                 label.setFixedSize(380, 291)  # 500x300 해상도로 고정
-                stackedWidget_2.addWidget(label)
+                detail_veiwer.addWidget(label)
 
                 # 비디오에서 프레임 추출
                 image = VideoToImageExtractor(img_path)
@@ -113,7 +113,7 @@ class SubWin:
                 pixmap = QPixmap(img_path)
                 label.setPixmap(pixmap)
                 label.setAlignment(Qt.AlignCenter)
-                stackedWidget_2.addWidget(label)
+                detail_veiwer.addWidget(label)
 
                 # 썸네일을 이미지 레이블에 설정
                 for idx, label in enumerate(image_labels):
@@ -123,6 +123,6 @@ class SubWin:
                     else:
                         label.clear()
 
-        stackedWidget_2.setCurrentIndex(0)  # 0번째의 label을 보여준다.
+        detail_veiwer.setCurrentIndex(0)  # 0번째의 label을 보여준다.
 
  

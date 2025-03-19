@@ -77,26 +77,26 @@ class DownloadManager:
         self.exemples = self.like_state.like_asset_list
         self.download_list_asset=AssetService.get_assets_by_ids(self.exemples)
         self.add_list_widget(self.download_list_asset)
-        self.ui.stackedWidget.show()
+        self.ui.sub_bar_widget.show()
         self.ui.depth_label.show()
-        self.ui.stackedWidget.setCurrentIndex(1)
+        self.ui.sub_bar_widget.setCurrentIndex(1)
 
 
     def download_likged_assets(self):
   
         self.ui.download_listwidget.clear()
         print("하나 다운로드 버튼이 눌렸어요")
-        self.ui.stackedWidget.show()
+        self.ui.sub_bar_widget.show()
         self.ui.depth_label.show()
-        self.ui.stackedWidget.setCurrentIndex(1)
+        self.ui.sub_bar_widget.setCurrentIndex(1)
         self.download_list_asset = {self.asset.current["name"]: str(self.asset.current["_id"])}
         self.add_list_widget(self.download_list_asset)
 
 
     def exit_sub_bar_all(self):
-        self.ui.stackedWidget.hide()
+        self.ui.sub_bar_widget.hide()
         self.ui.depth_label.hide()
-        self.ui.stackedWidget.setCurrentIndex(0)
+        self.ui.sub_bar_widget.setCurrentIndex(0)
     
     def set_download_format_all(self):
         if self.setDownloadFormat == False:

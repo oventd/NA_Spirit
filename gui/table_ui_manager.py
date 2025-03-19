@@ -96,7 +96,9 @@ class TableUiManager:
         for video_widget in self.ui.stackedWidget_2.findChildren(QVideoWidget):
             video_widget.deleteLater()
 
-     
+        # #  비디오 플레이어 리스트도 정리
+        # self.video_widgets = []
+        # self.video_players = []
 
     def make_label_list(self, list_len): 
         self.remove_lable()
