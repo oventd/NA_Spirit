@@ -371,6 +371,11 @@
     </disabled>
    </palette>
   </property>
+  <property name="font">
+   <font>
+    <family>Pretendard Variable</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Asset_Lib</string>
   </property>
