@@ -20,8 +20,8 @@ class AssetUploadManager:
         """
         ShotGrid 프로젝트의 정보를 가져오고, 에셋 관련 작업을 수행하는 클래스.
         """
-        # self.engine = sgtk.platform.current_engine()  # ShotGrid Toolkit 엔진 가져오기
-        # self.context = self.engine.context  # 컨텍스트 가져오기
+        self.engine = sgtk.platform.current_engine()  # ShotGrid Toolkit 엔진 가져오기
+        self.context = self.engine.context  # 컨텍스트 가져오기
 
         self.project_dir = self.get_project_directory()
         self.db_thub_path = "/nas/spirit/DB/thum/3d_assets"
@@ -178,14 +178,16 @@ class AssetUploadManager:
         if os.path.exists(playblast_dir):
             tmp_list = os.listdir(playblast_dir)
             pb_list.extend(tmp_list)
-        playblast_dir = os.path.join(asset_dir,"MDL","publish","playblast")
-        if os.path.exists(playblast_dir):
-            tmp_list = os.listdir(playblast_dir)
-            pb_list.extend(tmp_list)
-        playblast_dir = os.path.join(asset_dir,"RIG","publish","playblast")
-        if os.path.exists(playblast_dir):
-            tmp_list = os.listdir(playblast_dir)
-            pb_list.extend(tmp_list)
+        else:
+            playblast_dir = os.path.join(asset_dir,"MDL","publish","playblast")
+            if os.path.exists(playblast_dir):
+                tmp_list = os.listdir(playblast_dir)
+                pb_list.extend(tmp_list)
+            else:
+                playblast_dir = os.path.join(asset_dir,"RIG","publish","playblast")
+                if os.path.exists(playblast_dir):
+                    tmp_list = os.listdir(playblast_dir)
+                    pb_list.extend(tmp_list)
         print(pb_list)
         for pb in pb_list:
             if pb.endswith(".mov"):
