@@ -52,6 +52,7 @@ class TableUiManager:
             self.asset_dict = {}
             self.like_state = LikeState()
             self.like_state.like_asset_list = DictManager.load_dict_from_json()
+            self.update_table()
 
             self.ui.comboBox.currentTextChanged.connect(self.set_sorting_option)
             self.ui.exit_btn.clicked.connect(self.exit_sub_win)
@@ -72,101 +73,11 @@ class TableUiManager:
         self.search_word = search_word
         self.update_table()
 
-    def remove_lable(self):
 
-        while self.ui.image_widget_s.count() > 0:
-            item = self.ui.image_widget_s.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()  # QLabel 메모리 해제
-
-      
-        for label in self.ui.stackedWidget_2.findChildren(QLabel):
-            label.deleteLater()
-
-        while self.ui.image_widget_s.count() > 0:
-            item = self.ui.image_widget_s.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
-
-        #  기존 stackedWidget_2 내부의 QLabel 삭제
-        for label in self.ui.stackedWidget_2.findChildren(QLabel):
-            label.deleteLater()
-
-        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
-        for video_widget in self.ui.stackedWidget_2.findChildren(QVideoWidget):
-            video_widget.deleteLater()
-
-        # #  비디오 플레이어 리스트도 정리
-        # self.video_widgets = []
-        # self.video_players = []
-
-    def make_label_list(self, list_len): 
-        self.remove_lable()
-        self.make_labels = []  # 리스트 초기화
-
-        for _ in range(list_len):  
-            label = QLabel()
-            label.setFixedSize(60, 60)
-            label.setAlignment(Qt.AlignCenter)
-            self.ui.image_widget_s.addWidget(label)  # 레이아웃에 QLabel 추가
-            self.make_labels.append(label)
-
-    def make_video_label_list(self, list_len):
-        ui = self.ui  # UI 객체 참조
-        print(f"여기 리스트 랜의 갯수를 알려줍니당 {list_len}")
-
-        # ✅ 기존 image_widget_s 내부의 위젯 삭제
-        while ui.image_widget_s.count() > 0:
-            item = ui.image_widget_s.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
-
-        # ✅ 기존 stackedWidget_2 내부의 QVideoWidget 삭제
-        for widget in ui.stackedWidget_2.findChildren(QVideoWidget):
-            widget.deleteLater()
-
-        self.make_video_labels = []  # 리스트 초기화
-        self.video_players = []  # QMediaPlayer 객체 리스트
-
-        # ✅ 새로운 QVideoWidget 추가
-        for _ in range(list_len):  
-            video_widget = QVideoWidget(ui.stackedWidget_2)  # 부모 설정
-            video_widget.setGeometry(0, 0, 380, 291)  #  위치 (0, 53) 크기 (380x291) 설정
-            video_widget.show()  # 반드시 show() 호출해야 표시됨
-
-            player = QMediaPlayer()
-            player.setVideoOutput(video_widget)
-
-            # ✅ UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
-
-            # ✅ 리스트에 저장
-            self.make_video_labels.append(video_widget)
-            self.video_players.append(player)
-
-        print("✅ 비디오 위젯 생성 완료")
-
-
-
-    def set_sorting_option(self, option):
-        #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
-        if option == "오래된 순":
-            print(f"오래된 순의 필터임 :{Check().dict}")
-            self.update_table(None, CREATED_AT, 0,None)
-
-        elif option =="다운로드 순":
-            print("다운로드된 순서를 정렬할게요")
-            self.update_table(None, DOWNLOADS, 0,None)
-
-        else:
-            print("최신 순서를 정렬할게요")
-            self.update_table(None, UPDATED_AT, 0, None)
-        
-        
-    
+     
     def update_table(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
-        ui = self.ui ## 체크 (변경하기)
 
-        ui.like_empty_notice.hide()  ########주의
+        self.ui.like_empty_notice.hide()  ########주의
         search_word = self.search_word
         if self.search_word is not None:
             if len(self.search_word) < 3:
@@ -177,13 +88,9 @@ class TableUiManager:
         if Check().dict:
             for key, value in Check().dict.items():
                 filter_conditions[key] = value      ##### 쿼리를 만드는 부분
-
-        # if filter_conditions == list:
-        #     AssetService.get_asset_by_id_all(filter_conditions, sort_by, limit, skip, search_word)
             
         assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip,search_word)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
-        # print(f"여기에 테이블위젯 구정하는 assets 들어있어요 <<>>>>>>{assets}")
-        
+     
         self.ui.tableWidget.clear()
         self.make_table(assets)
 
@@ -279,6 +186,97 @@ class TableUiManager:
         ui.tableWidget.resizeRowsToContents() 
       
 
+
+    def remove_lable(self):
+
+        while self.ui.image_widget_s.count() > 0:
+            item = self.ui.image_widget_s.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()  # QLabel 메모리 해제
+
+      
+        for label in self.ui.stackedWidget_2.findChildren(QLabel):
+            label.deleteLater()
+
+        while self.ui.image_widget_s.count() > 0:
+            item = self.ui.image_widget_s.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        #  기존 stackedWidget_2 내부의 QLabel 삭제
+        for label in self.ui.stackedWidget_2.findChildren(QLabel):
+            label.deleteLater()
+
+        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        for video_widget in self.ui.stackedWidget_2.findChildren(QVideoWidget):
+            video_widget.deleteLater()
+
+        # #  비디오 플레이어 리스트도 정리
+        # self.video_widgets = []
+        # self.video_players = []
+
+    def make_label_list(self, list_len): 
+        self.remove_lable()
+        self.make_labels = []  # 리스트 초기화
+
+        for _ in range(list_len):  
+            label = QLabel()
+            label.setFixedSize(60, 60)
+            label.setAlignment(Qt.AlignCenter)
+            self.ui.image_widget_s.addWidget(label)  # 레이아웃에 QLabel 추가
+            self.make_labels.append(label)
+
+    def make_video_label_list(self, list_len):
+        ui = self.ui  # UI 객체 참조
+        print(f"여기 리스트 랜의 갯수를 알려줍니당 {list_len}")
+
+        # ✅ 기존 image_widget_s 내부의 위젯 삭제
+        while ui.image_widget_s.count() > 0:
+            item = ui.image_widget_s.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
+        for widget in ui.stackedWidget_2.findChildren(QVideoWidget):
+            widget.deleteLater()
+
+        self.make_video_labels = []  # 리스트 초기화
+        self.video_players = []  # QMediaPlayer 객체 리스트
+
+        #  새로운 QVideoWidget 추가
+        for _ in range(list_len):  
+            video_widget = QVideoWidget(ui.stackedWidget_2)  # 부모 설정
+            video_widget.setGeometry(0, 0, 380, 291)  #  위치 (0, 53) 크기 (380x291) 설정
+            video_widget.show()  # 반드시 show() 호출해야 표시됨
+
+            player = QMediaPlayer()
+            player.setVideoOutput(video_widget)
+
+            #  UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
+            #  리스트에 저장
+            self.make_video_labels.append(video_widget)
+            self.video_players.append(player)
+
+        print(" 비디오 위젯 생성 완료")
+
+
+
+    def set_sorting_option(self, option):
+        #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
+        if option == "오래된 순":
+            print(f"오래된 순의 필터임 :{Check().dict}")
+            self.update_table(None, CREATED_AT, 0,None)
+
+        elif option =="다운로드 순":
+            print("다운로드된 순서를 정렬할게요")
+            self.update_table(None, DOWNLOADS, 0,None)
+
+        else:
+            print("최신 순서를 정렬할게요")
+            self.update_table(None, UPDATED_AT, 0, None)
+        
+        
+   
 
     def exit_sub_win(self):
         self.ui.stackedWidget.hide()

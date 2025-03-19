@@ -34,7 +34,6 @@ class MainUi(QMainWindow):
             ui_loader = UILoader("/home/llly/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
-            AssetManager() #에셋 
             TableUiManager()
             DefaultUiManager()
             TreeUiManager()
