@@ -2,12 +2,10 @@ from PySide6.QtWidgets import  QLabel, QWidget
 from PySide6.QtCore import  Qt
 from PySide6.QtGui import QPixmap, QPixmap
 from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
-from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from functools import partial
 import sys
 import os
-from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from ui_loader import UILoader   
 
@@ -38,7 +36,6 @@ class TableUiManager:
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(TableUiManager, cls).__new__(cls)
-
         return cls._instance
 
     def __init__(self):
@@ -111,7 +108,11 @@ class TableUiManager:
             self.make_labels.append(label)
 
     def set_sorting_option(self, option):
-        #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
+        """
+        유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 
+        테이블 위젯의 나열순서를 정하는 메서드
+        """
+
         if option == "오래된 순":
             print(f"오래된 순의 필터임 :{Check().dict}")
             self.update_table(None, CREATED_AT, 0,None)
@@ -127,9 +128,9 @@ class TableUiManager:
         
     
     def update_table(self, filter_conditions=None, sort_by=None, limit=None, skip=0, fields=None):
-        ui = self.ui ## 체크 (변경하기)
-
-        ui.like_empty_notice.hide()  ########주의
+        """테이블을 재 로드할 때 사용하는 메서드"""
+      
+        self.ui.like_empty_notice.hide()  
         search_word = self.search_word
         if self.search_word is not None:
             if len(self.search_word) < 3:
@@ -139,30 +140,27 @@ class TableUiManager:
             filter_conditions[OBJECT_ID] = LikeState().like_filter_condition[OBJECT_ID]
         if Check().dict:
             for key, value in Check().dict.items():
-                filter_conditions[key] = value      ##### 쿼리를 만드는 부분
+                filter_conditions[key] = value     
 
-        
-            
-        assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip,search_word)) # 모두 가져올거기 때문에 filter_conditions 는 빈딕셔너리
-    
-        
+        assets  = list(AssetService.get_all_assets(filter_conditions, sort_by, limit, skip,search_word)) 
         self.ui.tableWidget.clear()
         self.make_table(assets)
 
         filter_conditions = None
     
     def make_table(self, assets):
-        ui = self.ui
+        """테이블을 동적으로 열과 행을 만드는 메서드"""
+     
         len_asset =len(assets)
-        ui.tableWidget.horizontalHeader().setVisible(False)  # 열(가로) 헤더 숨기기
-        ui.tableWidget.verticalHeader().setVisible(False)  # 행(세로) 헤더 숨기기
+        self.ui.tableWidget.horizontalHeader().setVisible(False)  # 열(가로) 헤더 숨기기
+        self.ui.tableWidget.verticalHeader().setVisible(False)  # 행(세로) 헤더 숨기기
 
         max_columns = 5  # 한 줄에 최대 5개 배치
 
         rows = (len_asset / max_columns +1)   # 행 개수 계산
 
-        ui.tableWidget.setRowCount(rows)  # 행 개수 설정
-        ui.tableWidget.setColumnCount(max_columns)  # 열 개수 설정
+        self.ui.tableWidget.setRowCount(rows)  # 행 개수 설정
+        self.ui.tableWidget.setColumnCount(max_columns)  # 열 개수 설정
         
 
 
