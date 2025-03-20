@@ -171,7 +171,7 @@ class TableUiManager:
         
 
     def add_thumbnail(self, row, col, asset):
-        ui = self.ui
+
         thumbnail_path = asset["preview_url"]
         asset_name = asset["name"] 
         aseet_type = asset["asset_type"]
@@ -234,8 +234,8 @@ class TableUiManager:
         type.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         type.setFixedHeight(18)
 
-        ui.tableWidget.setCellWidget(row, col, widget)  # 행과 열에 이미지 추가
-        ui.tableWidget.resizeRowsToContents() 
+        self.ui.tableWidget.setCellWidget(row, col, widget)  # 행과 열에 이미지 추가
+        self.ui.tableWidget.resizeRowsToContents() 
       
 
 
@@ -256,7 +256,7 @@ class TableUiManager:
         except:
             pass
         
-        # for asset_id, asset_info in asset.items(): 
+
         LikeState().set_like_icon(str(asset[OBJECT_ID]),self.ui.like_btn)
         
         Asset().current= asset
@@ -291,28 +291,19 @@ class TableUiManager:
 
             for url in asset["image_url"]:
                 detail_thum_urls.append(url)
-          
-      
+
 
         elif asset[ASSET_TYPE]=="3D Model":
-            
             for url in asset["video_url"]:
                 detail_thum_urls.append(url)
             
-            print(detail_thum_urls)
-      
-
         elif asset[ASSET_TYPE]=="HDRI":
             for url in asset["image_url"]:
                 detail_thum_urls.append(url)
-   
-
         else:
             for url in asset["image_url"]:
                 detail_thum_urls.append(url)
-               
-            
-          
+
         self.make_label_list(len(detail_thum_urls))
         SubWin.show_asset_detail_image(self.ui.stackedWidget_2,detail_thum_urls, self.make_labels)
 
@@ -321,18 +312,11 @@ class TableUiManager:
             
     def toggle_like_icon(self):
        
-            
         """하트 버튼을 누르는 시그널로 실행
         아이콘 변경 & 딕셔너리에 좋아요한 asset 정보 저장 """
-        
 
-       
         asset = Asset().current
         asset_object_id = str(asset[OBJECT_ID])
-  
-
-        
-    
         current_icon = self.ui.like_btn.icon()
      
         if current_icon.cacheKey() == self.like_state.like_icon_empty.cacheKey():  #빈하트 상태일때 
@@ -341,9 +325,7 @@ class TableUiManager:
             
             self.logger.info(f"유저가 {asset[NAME]} 에셋을 관심리스트에 추가했습니다\n해당 에셋 정보 : {asset}")
             DictManager().save_dict_to_json(self.like_state.like_asset_list)
-            
-  
-            
+     
 
             if LikeState().state == True:
                 print("저 서브바가 열려있을때만 닫혀요")
@@ -352,12 +334,7 @@ class TableUiManager:
                 self.ui.like_download_btn.show()
                 self.ui.like_download_btn_area.show()
 
-         
-            
-      
-            
-            
-                
+        
         else:  # 채워진 하트 상태일 때 (좋아요 취소)
             print("하트 지워짐")
             self.ui.like_btn.setIcon(self.like_state.like_icon_empty)  # 빈 하트로 변경
