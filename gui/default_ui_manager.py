@@ -22,7 +22,7 @@ from ui_loader import UILoader
 
 
 class DefaultUiManager:
-    _instance = None  # 싱글톤 인스턴스 저장
+    _instance = None 
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -31,13 +31,13 @@ class DefaultUiManager:
         return cls._instance
     
     def __init__(self):
-        if not hasattr(self, "_initialized"):  # 중복 초기화를 방지
+        if not hasattr(self, "_initialized"): 
             super().__init__()
             ui_loader = UILoader("/home/rapa/NA_Spirit/gui/asset_main2.ui")
             self.ui = ui_loader.load_ui()
             self.ui.show()
             self.main_ui_setting()
-            self._initialized = True  # 인스턴스가 초기화되었음을 표시
+            self._initialized = True  
 
     def set_search_area_design(self):
         """
@@ -95,12 +95,8 @@ class DefaultUiManager:
         self.ui.toggle_btn.setPixmap(LikeState().toggle_open) 
         bg =QPixmap("/nas/spirit/asset_project/source/bg.png")
         self.ui.label.setPixmap(bg)
-
-        #사이드 바 기본 설정 
         self.ui.stackedWidget.hide()
         self.ui.depth_label.hide()
-    
-        # 사이드 바 안에 이미지 롤링 배너 안 stackedwidget에 속한 위젯 지우기
         self.ui.stackedWidget_2.removeWidget(self.ui.page)
         self.ui.stackedWidget_2.removeWidget(self.ui.page_2)
         
