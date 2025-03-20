@@ -110,34 +110,6 @@ class TableUiManager:
             self.ui.image_widget_s.addWidget(label)  
             self.make_labels.append(label)
 
-    def make_video_label_list(self, list_len):
-        ui = self.ui 
-        while ui.image_widget_s.count() > 0:
-            item = ui.image_widget_s.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
-
-        for widget in ui.stackedWidget_2.findChildren(QVideoWidget):
-            widget.deleteLater()
-
-        self.make_video_labels = []  
-        self.video_players = []  
-
-        for _ in range(list_len):  
-            video_widget = QVideoWidget(ui.stackedWidget_2) 
-            video_widget.setGeometry(0, 0, 380, 291) 
-            video_widget.show() 
-
-            player = QMediaPlayer()
-            player.setVideoOutput(video_widget)
-
-            self.make_video_labels.append(video_widget)
-            self.video_players.append(player)
-
-        print(" 비디오 위젯 생성 완료")
-
-
-
     def set_sorting_option(self, option):
         #유저가 설정한 sorting_option에 맞게 table에 적절한 인자를 전달하여 테이블 위젯의 나열순서를 정함
         if option == "오래된 순":
