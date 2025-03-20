@@ -1,6 +1,3 @@
-# 로거 파일 추가해서 유저가 중요한 
-##### json 파일은 나스피릿에 넣고 이그노어 에 포함
-
 from PySide6.QtWidgets import  QLabel, QWidget
 from PySide6.QtCore import  Qt
 from PySide6.QtGui import QPixmap, QPixmap
@@ -13,7 +10,6 @@ import os
 from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from ui_loader import UILoader   
-
 
 current_file_path = os.path.abspath(__file__)
 na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
@@ -76,6 +72,8 @@ class TableUiManager:
 
 
     def remove_lable(self):
+
+        """동적으로 만들어진 라벨을 삭제하는 메서드"""
         
         while self.ui.image_widget_s.count() > 0:
             item = self.ui.image_widget_s.takeAt(0)
@@ -101,6 +99,7 @@ class TableUiManager:
         self.video_players = []
 
     def make_label_list(self, list_len): 
+        """미리보기 이미지를 담는 라벨을 만드는 메서드"""
         self.remove_lable()
         self.make_labels = []  # 리스트 초기화
 
@@ -113,33 +112,25 @@ class TableUiManager:
 
     def make_video_label_list(self, list_len):
         ui = self.ui 
-        print(f"여기 리스트 랜의 갯수를 알려줍니당 {list_len}")
-
-        
         while ui.image_widget_s.count() > 0:
             item = ui.image_widget_s.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
 
-       
         for widget in ui.stackedWidget_2.findChildren(QVideoWidget):
             widget.deleteLater()
 
         self.make_video_labels = []  
         self.video_players = []  
 
-        # 새로운 QVideoWidget 추가
         for _ in range(list_len):  
             video_widget = QVideoWidget(ui.stackedWidget_2) 
             video_widget.setGeometry(0, 0, 380, 291) 
-            video_widget.show()  # 반드시 show() 호출해야 표시됨
+            video_widget.show() 
 
             player = QMediaPlayer()
             player.setVideoOutput(video_widget)
 
-            #  UI 레이아웃에 추가하지 않고 직접 위치 설정했으므로 addWidget() 호출 필요 없음
-
-            #  리스트에 저장
             self.make_video_labels.append(video_widget)
             self.video_players.append(player)
 

@@ -12,20 +12,16 @@ from db_crud import AssetDb  # 수정된 db_crud에서 Asset 클래스를 import
 from ui_loader import UILoader
 
 
-
-
-
 class ClickableLabel(QLabel):
-
     clicked = Signal()  # 클릭 시그널 생성
 
     def __init__(self, text="", parent=None):
         super().__init__(text, parent)
 
     def mousePressEvent(self, event):
+        """라벨에 클릭 시그널을 넣어주는 메서드"""
         if event.button() == Qt.LeftButton:
-            self.clicked.emit()  # 클릭 시그널 발생
-
+            self.clicked.emit()  
 
 
 class AssetService:
@@ -35,9 +31,11 @@ class AssetService:
     """
     @staticmethod
     def get_assets_by_ids(ids_list):
-        #여기서 리스트를 받아 에셋으로 변환하고 해당 내용을 id: name 형식으로 변환하기 
+        """
+        여기서 리스트를 받아 에셋으로 변환하고 해당 내용을 id: name 형식으로 변환하는 메서드 
+        """
 
-        asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
+        asset_manager = AssetDb()  
         dowmload_list_asset= asset_manager.find(filter_conditions = ids_list)  # 자산 삭제
         
         asset_dict = {asset["name"] : str(asset["_id"]) for asset in dowmload_list_asset}
@@ -45,10 +43,12 @@ class AssetService:
     
     @staticmethod
     def get_assets_by_ids_all_return(ids_list):
-        #여기서 리스트를 받아 에셋으로 변환하고 해당 내용을 id: name 형식으로 변환하기 
+        """
+        리스트를 매개변수로 받아서 에셋의 모든 필드를 담아서 리턴하는 메서드
+        """
 
-        asset_manager = AssetDb()  # AssetDb 클래스의 인스턴스를 생성
-        dowmload_list_asset= asset_manager.find(filter_conditions = ids_list)  # 자산 삭제
+        asset_manager = AssetDb() 
+        dowmload_list_asset= asset_manager.find(filter_conditions = ids_list) 
         
        
         return dowmload_list_asset
@@ -56,7 +56,7 @@ class AssetService:
                 
 
     @staticmethod
-    def get_all_assets(filter_conditions, sort_by, limit, skip,user_query): # 리뷰 메서드 이상함 all과 limit가 공존하는 이름 
+    def get_all_assets(filter_conditions, sort_by, limit, skip,user_query): 
         """
         모든 자산 데이터를 MongoDB에서 가져옴. 무한 스크롤을 지원.
         - db_crud.py의 find() 호출
@@ -77,7 +77,7 @@ class AssetService:
         :param fields: 검색 결과에서 가져올 필드 목록
         :return: 검색 결과
         """
-        return AssetDb().search(user_query=search_word, filter_conditions = filter_conditions)  # 자산 데이터 업데이트
+        return AssetDb().search(user_query=search_word, filter_conditions = filter_conditions) 
     
     @staticmethod
     def get_asset_by_id_all(filter_conditions, sort_by=None, limit=None, skip=None, user_quaery = None):
@@ -105,7 +105,7 @@ class AssetService:
     @staticmethod
     def update_count(asset_id):
         """
-        자산 데이터를 업데이트합니다.
+        자산 데이터를 업데이트
         :param asset_id: 수정할 자산 ID
         :param update_data: 수정할 데이터
         :return: 업데이트 성공 여부
@@ -115,7 +115,7 @@ class AssetService:
     @staticmethod
     def delete_asset(asset_id):
         """
-        자산 데이터를 삭제합니다.
+        자산 데이터를 삭제
         :param asset_id: 삭제할 자산 ID
         :return: 삭제 성공 여부
         """
