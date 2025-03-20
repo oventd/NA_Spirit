@@ -2,9 +2,8 @@
 ##### json 파일은 나스피릿에 넣고 이그노어 에 포함
 
 from PySide6.QtWidgets import  QLabel, QWidget
-from PySide6.QtCore import QFile, Qt, Signal, QEvent, QObject, QUrl
-from PySide6.QtGui import QPixmap, QPixmap, QIcon
-from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import  Qt
+from PySide6.QtGui import QPixmap, QPixmap
 from PySide6.QtWidgets import QSizePolicy ,QVBoxLayout
 from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
@@ -13,21 +12,16 @@ import sys
 import os
 from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
-from PySide6.QtCore import QUrl
 from ui_loader import UILoader   
 
-# 현재 파일(ui.py)의 절대 경로
+
 current_file_path = os.path.abspath(__file__)
-
-# 'NA_Spirit' 폴더의 최상위 경로 찾기
 na_spirit_dir = os.path.abspath(os.path.join(current_file_path, "../../"))
-
-# 모든 하위 폴더를 sys.path에 추가
 for root, dirs, files in os.walk(na_spirit_dir):
-    if '__pycache__' not in root:  # __pycache__ 폴더는 제외
+    if '__pycache__' not in root: 
         sys.path.append(root)
 
-from assetmanager import AssetService  # AssetService 임포트
+from assetmanager import AssetService  
 from assetmanager import ClickableLabel
 from PySide6.QtCore import Qt
 from constant import *
@@ -97,15 +91,12 @@ class TableUiManager:
             if item.widget():
                 item.widget().deleteLater()
 
-        #  기존 stackedWidget_2 내부의 QLabel 삭제
         for label in self.ui.stackedWidget_2.findChildren(QLabel):
             label.deleteLater()
 
-        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
         for video_widget in self.ui.stackedWidget_2.findChildren(QVideoWidget):
             video_widget.deleteLater()
 
-        #  비디오 플레이어 리스트도 정리
         self.video_widgets = []
         self.video_players = []
 
@@ -117,30 +108,30 @@ class TableUiManager:
             label = QLabel()
             label.setFixedSize(60, 60)
             label.setAlignment(Qt.AlignCenter)
-            self.ui.image_widget_s.addWidget(label)  # 레이아웃에 QLabel 추가
+            self.ui.image_widget_s.addWidget(label)  
             self.make_labels.append(label)
 
     def make_video_label_list(self, list_len):
-        ui = self.ui  # UI 객체 참조
+        ui = self.ui 
         print(f"여기 리스트 랜의 갯수를 알려줍니당 {list_len}")
 
-        #  기존 image_widget_s 내부의 위젯 삭제
+        
         while ui.image_widget_s.count() > 0:
             item = ui.image_widget_s.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
 
-        #  기존 stackedWidget_2 내부의 QVideoWidget 삭제
+       
         for widget in ui.stackedWidget_2.findChildren(QVideoWidget):
             widget.deleteLater()
 
-        self.make_video_labels = []  # 리스트 초기화
-        self.video_players = []  # QMediaPlayer 객체 리스트
+        self.make_video_labels = []  
+        self.video_players = []  
 
         # 새로운 QVideoWidget 추가
         for _ in range(list_len):  
-            video_widget = QVideoWidget(ui.stackedWidget_2)  # 부모 설정
-            video_widget.setGeometry(0, 0, 380, 291)  #  위치 (0, 53) 크기 (380x291) 설정
+            video_widget = QVideoWidget(ui.stackedWidget_2) 
+            video_widget.setGeometry(0, 0, 380, 291) 
             video_widget.show()  # 반드시 show() 호출해야 표시됨
 
             player = QMediaPlayer()
@@ -481,7 +472,7 @@ class TableUiManager:
                     item = layout.takeAt(0)
                     child_widget = item.widget()
                     if child_widget:
-                        child_widget.deleteLater()  # ✅ 내부 요소 삭제
+                        child_widget.deleteLater()  #  내부 요소 삭제
             widget.setParent(None)  #  부모에서 제거
             widget.deleteLater()  # 위젯 자체도 삭제
 
@@ -491,8 +482,8 @@ class TableUiManager:
             item = layout.takeAt(0)  # 첫 번째 아이템 가져오기
             widget = item.widget()  # 아이템이 위젯인지 확인
             if widget is not None:
-                widget.setParent(None)  # ✅ 부모에서 제거
-                widget.deleteLater()  # ✅ 메모리에서 완전 삭제
+                widget.setParent(None)  #  부모에서 제거
+                widget.deleteLater()  #  메모리에서 완전 삭제
 
 
     
